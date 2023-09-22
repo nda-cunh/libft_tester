@@ -1,9 +1,6 @@
 [CCode (has_target = false)]
 delegate string d_worker();
 Loader loader;
-extern void init_malloc();
-extern void reset_malloc();
-extern void show_leak();
 
 class LibftTester{
 
@@ -59,7 +56,7 @@ class LibftTester{
 		});
 
 		while (finish == false) {
-			Idle.add(worker.callback, Priority.LOW);
+			Timeout.add(200, worker.callback);
 			yield;
 		}
 		return result;
@@ -69,15 +66,9 @@ class LibftTester{
 }
 
 void main() {
-	init_malloc();
-	reset_malloc();
-	malloc(5);
-	free(null);
-	free(null);
-	free(null);
-	free(null);
-	free(null);
-	free(null);
-	show_leak();
+	print("\n\n\nBEGIN\n");
 	new LibftTester();
+	print("\n [[[[[[[[[ END ]]]]]]]]]\n");
+	// print("%d\n", Posix.getpid());
+	// Posix.sleep(50);
 }

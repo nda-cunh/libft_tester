@@ -151,13 +151,13 @@ string run_strlen() {
 	string result = "STRLEN: ";
 	try {
 		var ft_strlen = (d_strlen)loader.symbol("ft_strlen");
-		try { Test.simple(2, () => { return (ft_strlen("1") == 1); }, "1"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("12") == 2); }, "2"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("123") == 3); }, "3"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("1234") == 4); }, "4"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("12345") == 5); }, "5"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("12\0abc") == 2); }, "strlen(12\\0abc)lire au dessus de 0?"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "des espaces"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("1") == 1); }, "1"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("12") == 2); }, "2"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("123") == 3); }, "3"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("1234") == 4); }, "4"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("12345") == 5); }, "5"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("12\0abc") == 2); }, "strlen(12\\0abc)lire au dessus de 0?"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "des espaces"); }catch (Test.TestValue e) { result += e.message; }
 		return result;
 	}
 	catch (Error e) {
@@ -170,21 +170,21 @@ string run_memset() {
 	string result = "MEMSET: ";
 	try {
 		var ft_memset = (d_memset)loader.symbol("ft_memset");
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 			uint8 buf[20];
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return((string)buf == "EEEEEE");
 		}, "memset(mem, E, 6)");
 		}catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 			uint8 buf[20];
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[7] != 'E');
 		}, "trop loin...");
 		}catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 			uint8 buf[20];
 			buf[5] = '\0';
 			ft_memset(buf, 'E', 6);
@@ -192,7 +192,7 @@ string run_memset() {
 			return(buf[5] == 'E');
 		}, "pas asser loin...");
 		}catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 			uint8 buf[5];
 			buf[0] = 'J';
 			ft_memset(buf, 'E', 0);
@@ -213,7 +213,7 @@ string run_bzero() {
 		var ft_bzero = (d_bzero)loader.symbol("ft_bzero");
 		for (int i = 0; i < 35; ++i)
 		{
-			try { Test.simple(2, () => {
+			try { Test.memory(2, () => {
 				uint8 buf1[40];
 				uint8 buf2[40];
 				Memory.set(buf1, 'X', 40);
@@ -251,7 +251,7 @@ string run_toupper() {
 		var n = 0;
 		for (int i = 0; i < 255; ++i)
 		{
-			try { Test.simple(2, () => { return (clang_s(ft_toupper(i)) == clang_s(clang_toupper(i))); }, i.to_string()); }
+			try { Test.memory(2, () => { return (clang_s(ft_toupper(i)) == clang_s(clang_toupper(i))); }, i.to_string()); }
 			catch (Test.TestValue e) {
 				if (e is Test.TestValue.OK)
 					++n;
@@ -279,7 +279,7 @@ string run_tolower() {
 		var n = 0;
 		for (int i = 0; i < 255; ++i)
 		{
-			try { Test.simple(2, () => { return (clang_s(ft_tolower(i)) == clang_s(clang_tolower(i))); }, i.to_string()); }
+			try { Test.memory(2, () => { return (clang_s(ft_tolower(i)) == clang_s(clang_tolower(i))); }, i.to_string()); }
 			catch (Test.TestValue e) {
 				if (e is Test.TestValue.OK)
 					++n;
@@ -307,31 +307,31 @@ string run_strchr() {
 	try {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
 		
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 's')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'v')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'X';
 				return (strchr(s, c) == ft_strchr(s, c));
@@ -354,31 +354,31 @@ string run_strrchr() {
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 		
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 's')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'v')"""); }
 		catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => {
+		try { Test.memory(2, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'X';
 				return (strrchr(s, c) == ft_strrchr(s, c));
@@ -405,27 +405,27 @@ string run_atoi() {
 	string result = "ATOI: ";
 	try {
 		var ft_atoi = (d_atoi)loader.symbol("ft_atoi");
-		try { Test.simple(2, () => { return (ft_atoi("2147483647") == 2147483647); }, "int MAX"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-2147483648") == -2147483648); }, "int MIN"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("0") == 0); }, "0"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("1") == 1); }, "1"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("2") == 2); }, "2"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("9") == 9); }, "9"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("10") == 10); }, "10"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("11") == 11); }, "11"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("42") == 42); }, "42"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-1") == -1); }, "-1"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-2") == -2); }, "-2"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-9") == -9); }, "-9"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-10") == -10); }, "-10"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-11") == -11); }, "-11"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("-42") == -42); }, "-42"); }catch (Test.TestValue e) { result += e.message; }
-		try { Test.simple(2, () => { return (ft_atoi("165468465") == 165468465); }, "165468465"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("2147483647") == 2147483647); }, "int MAX"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-2147483648") == -2147483648); }, "int MIN"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("0") == 0); }, "0"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("1") == 1); }, "1"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("2") == 2); }, "2"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("9") == 9); }, "9"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("10") == 10); }, "10"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("11") == 11); }, "11"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("42") == 42); }, "42"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-1") == -1); }, "-1"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-2") == -2); }, "-2"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-9") == -9); }, "-9"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-10") == -10); }, "-10"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-11") == -11); }, "-11"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("-42") == -42); }, "-42"); }catch (Test.TestValue e) { result += e.message; }
+		try { Test.memory(2, () => { return (ft_atoi("165468465") == 165468465); }, "165468465"); }catch (Test.TestValue e) { result += e.message; }
 		for (int N = 0; N < 5; ++N)
 		{
 			try {
 				var i = Random.int_range(int.MIN, int.MAX);
-				Test.simple(2, () => { return (ft_atoi(@"$i") == i); }, @"random test $i");
+				Test.memory(2, () => { return (ft_atoi(@"$i") == i); }, @"random test $i");
 			}catch (Test.TestValue e) { result += e.message; }
 		}
 		return result;

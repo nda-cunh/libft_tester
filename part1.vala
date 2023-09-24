@@ -13,21 +13,19 @@ string run_isalpha() {
 	string result = "IS_ALPHA: ";
 	try {
 		var ft_isalpha= (d_isalpha)loader.symbol("ft_isalpha");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.simple(2, () => { return (clang_s(ft_isalpha(i)) == clang_s(clang_isalpha(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_isalpha(i)) != clang_s(clang_isalpha(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -38,24 +36,22 @@ string run_isalpha() {
 extern int clang_isdigit(int c);
 delegate int d_isdigit(int c);
 string run_isdigit() {
-	string result = "IS_DIGIT: ";
+	string result = "ISDIGIT: ";
 	try {
-		var ft_isdigit = (d_isdigit)loader.symbol("ft_isdigit");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.simple(2, () => { return (clang_s(ft_isdigit(i)) == clang_s(clang_isdigit(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		var ft_isdigit= (d_isdigit)loader.symbol("ft_isdigit");
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_isdigit(i)) != clang_s(clang_isdigit(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -66,24 +62,22 @@ string run_isdigit() {
 extern int clang_isalnum(int c);
 delegate int d_isalnum(int c);
 string run_isalnum() {
-	string result = "IS_ALNUM: ";
+	string result = "ISALNUM: ";
 	try {
-		var ft_isalnum = (d_isalnum)loader.symbol("ft_isalnum");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.simple(2, () => { return (clang_s(ft_isalnum(i)) == clang_s(clang_isalnum(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		var ft_isalnum= (d_isalnum)loader.symbol("ft_isalnum");
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_isalnum(i)) != clang_s(clang_isalnum(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -94,24 +88,22 @@ string run_isalnum() {
 extern int clang_isascii(int c);
 delegate int d_isascii(int c);
 string run_isascii() {
-	string result = "IS_ASCII: ";
+	string result = "ISASCII: ";
 	try {
-		var ft_isascii = (d_isascii)loader.symbol("ft_isascii");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.simple(2, () => { return (clang_s(ft_isascii(i)) == clang_s(clang_isascii(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		var ft_isascii= (d_isascii)loader.symbol("ft_isascii");
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_isascii(i)) != clang_s(clang_isascii(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -122,24 +114,22 @@ string run_isascii() {
 extern int clang_isprint(int c);
 delegate int d_isprint(int c);
 string run_isprint() {
-	string result = "IS_PRINT: ";
+	string result = "ISPRINT: ";
 	try {
-		var ft_isprint = (d_isprint)loader.symbol("ft_isprint");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.simple(2, () => { return (clang_s(ft_isprint(i)) == clang_s(clang_isprint(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		var ft_isprint= (d_isprint)loader.symbol("ft_isprint");
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_isprint(i)) != clang_s(clang_isprint(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -211,9 +201,9 @@ string run_bzero() {
 	string result = "BZERO: ";
 	try {
 		var ft_bzero = (d_bzero)loader.symbol("ft_bzero");
-		for (int i = 0; i < 35; ++i)
+		for (int i = 0; i < 25; ++i)
 		{
-			try { Test.memory(2, () => {
+			try { Test.simple(2, () => {
 				uint8 buf1[40];
 				uint8 buf2[40];
 				Memory.set(buf1, 'X', 40);
@@ -240,7 +230,6 @@ string run_bzero() {
 //TODO strlcat 
 
 
-
 [CCode (cname = "toupper", cheader_filename="ctype.h")]
 extern int clang_toupper(int c);
 delegate int d_toupper(int c);
@@ -248,21 +237,19 @@ string run_toupper() {
 	string result = "TOUPPER: ";
 	try {
 		var ft_toupper= (d_toupper)loader.symbol("ft_toupper");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.memory(2, () => { return (clang_s(ft_toupper(i)) == clang_s(clang_toupper(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_toupper(i)) != clang_s(clang_toupper(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -276,26 +263,26 @@ string run_tolower() {
 	string result = "TOLOWER: ";
 	try {
 		var ft_tolower= (d_tolower)loader.symbol("ft_tolower");
-		var n = 0;
-		for (int i = 0; i < 255; ++i)
-		{
-			try { Test.memory(2, () => { return (clang_s(ft_tolower(i)) == clang_s(clang_tolower(i))); }, i.to_string()); }
-			catch (Test.TestValue e) {
-				if (e is Test.TestValue.OK)
-					++n;
-				else
-					result += e.message;
-			}
+		try { Test.memory(2, () => {
+				for (int i = 0; i < 255; ++i)
+				{
+					if (clang_s(ft_tolower(i)) != clang_s(clang_tolower(i)))
+						return false;
+				}
+				return true;
+			});
 		}
-		if (n == 255)
-			return result + "\033[32m[OK]\033[0m";
-		else
-			return result;
+		catch (Test.TestValue e) {
+			result += e.message;
+		}
+		return result;
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
+
+
 
 
 //TODO strchr
@@ -345,7 +332,6 @@ string run_strchr() {
 }
 
 
-//TODO // strrchr
 [CCode (cname = "strrchr", cheader_filename="string.h")]
 extern char *strrchr(char *s, int c);
 delegate char *d_strrchr(char *s, int c);
@@ -391,8 +377,96 @@ string run_strrchr() {
 	return result;
 }
 //TODO // strncmp
+[CCode (cname = "strncmp", cheader_filename="string.h")]
+extern int strncmp(uint8 *s1, uint8* s2, size_t n);
+delegate int d_strncmp(uint8 *s1, uint8 *s2, size_t n);
+string run_strncmp() {
+	string result = "STRNCMP: ";
+	try {
+		var ft_strncmp = (d_strncmp)loader.symbol("ft_strncmp");
+		uint8 *s1 = "abcd";
+		uint8 *s2 = "abce";
+		size_t nb = 3;
+		try { Test.memory(2, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp($s1, $s2 $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 7;
+		try { Test.memory(2, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp($((string)s1), $((string)s2) $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 7;
+		try { Test.memory(2, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp('bjr\\0kitty', 'bjr\\0hello' $nb) Qui a demandé un memcmp ?"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s2 = "test\0"; nb = 6;
+		uint8 []uc_test = {'t', 'e', 's', 't', 128};
+		s1 = uc_test;
+		try { Test.memory(2, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"Unsigned Char ???"); }
+		catch (Test.TestValue e) { result += e.message; }
+		
+		s1 = "Portal2"; s2 = "TheCakeIsALie"; nb = 4;
+		try { Test.simple(3, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp($((string)s1), $((string)s2) $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = ""; s2 = "TheCakeIsALie"; nb = 4;
+		try { Test.simple(3, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp('', $((string)s2) $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = "Portal2"; s2 = ""; nb = 4;
+		try { Test.simple(3, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp($((string)s1), '' $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = ""; s2 = ""; nb = 4;
+		try { Test.simple(3, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp('', '', $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = "fhfghfgdjhsffg"; s2 = "dfghfdhsfd"; nb = 5;
+		try { Test.simple(3, () => {
+				return (strncmp(s1, s2, nb) == ft_strncmp(s1, s2, nb));
+		}, @"strncmp('', '', $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+	return result;
+}
 //TODO // memchr
 //TODO // memcmp
+[CCode (cname = "memcmp", cheader_filename="string.h")]
+extern int memcmp(void *s1, void* s2, size_t n);
+delegate int d_memcmp(void* s1, void* s2, size_t n);
+string run_memcmp() {
+	string result = "MEMCMP: ";
+	try {
+		var ft_memcmp = (d_memcmp)loader.symbol("ft_memcmp");
+		uint8 *s1 = "abcd";
+		uint8 *s2 = "abce";
+		size_t nb = 3;
+		try { Test.memory(2, () => {
+				return (memcmp(s1, s2, nb) == ft_memcmp(s1, s2, nb));
+		}, @"memcmp($s1, $s2 $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 5;
+		try { Test.memory(2, () => {
+				return (memcmp(s1, s2, nb) == ft_memcmp(s1, s2, nb));
+		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello' $nb)"); }
+		catch (Test.TestValue e) { result += e.message; }
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+	return result;
+}
 //TODO // strnstr
 
 

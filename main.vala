@@ -23,7 +23,9 @@ class LibftTester{
 			run_strchr,
 			run_itoa,
 			run_atoi,
-			run_strrchr
+			run_strrchr,
+			run_strncmp,
+			run_memcmp
 		};
 		this.run();
 	}
@@ -39,6 +41,9 @@ class LibftTester{
 					if (finish_test == tab.length)
 						loop.quit();
 				});
+				if (get_num_processors() <= 2) {
+					Thread.usleep(10000);
+				}
 			}
 			loop.run();
 		}
@@ -48,17 +53,14 @@ class LibftTester{
 	}
 
 	async string worker(d_worker func) {
-		bool finish = false;
 		string? result = null;
-		new Thread<void>("work", ()=>{
+		var thread = new Thread<void>("work", ()=>{
 			result = func();
-			finish = true;
+			Idle.add(worker.callback);
 		});
 
-		while (finish == false) {
-			Timeout.add(200, worker.callback);
-			yield;
-		}
+		yield;
+		thread.join();
 		return result;
 	}
 
@@ -66,9 +68,8 @@ class LibftTester{
 }
 
 void main() {
-	print("\n\n\nBEGIN\n");
+	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
+	print("CPU: %u\n", get_num_processors());
 	new LibftTester();
-	print("\n [[[[[[[[[ END ]]]]]]]]]\n");
-	// print("%d\n", Posix.getpid());
-	// Posix.sleep(50);
+	print("====================================================");
 }

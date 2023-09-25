@@ -211,7 +211,50 @@ string run_bzero() {
 	}
 }
 
-//TODO memcpy
+// MEMCPY
+[CCode (cname = "memcpy", cheader_filename="string.h")]
+extern void *memcpy(void* dest, void* src, size_t n);
+delegate char *d_memcpy(void* dest, void* src, size_t n);
+string run_memcpy() {
+	string result = "MEMCPY:   ";
+	try {
+		var ft_memcpy = (d_memcpy)loader.symbol("ft_memcpy");
+		
+		result += Test.complex(2, () => {
+			uint8 dest[100];
+			Memory.set(dest, 'A', 100);
+			ft_memcpy(dest, "coucou", 0);
+			for (int i = 0; i < 100; ++i)
+				if (dest[i] != 'A')
+					return false;
+			return (true);
+		}, "memset(dest, 'A', 0) ").msg();
+		
+		result += Test.complex(2, () => {
+			uint8 dest[5];
+			Memory.set(dest, 'A', 5);
+			var r = memcpy(dest, null, 0);
+			return (r == dest);
+		}, "Return is not 'dest' ").msg();
+		
+		result += Test.complex(2, () => {
+			uint8 dest[100];
+			Memory.set(dest, 'A', 100);
+			char src[] = {0, 0};
+			ft_memcpy(dest, src, 2);
+			int i = 0;
+			for (; i < 100 && dest[i] == 0; ++i)
+				;
+			return (i == 2 && dest[2] == 'A');
+		}, "Complexe test").msg();
+	
+
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+	return result;
+}
 //TODO memmove
 //TODO strlcpy 
 //TODO strlcat 
@@ -500,26 +543,29 @@ string run_atoi() {
 	string result = "ATOI:     ";
 	try {
 		var ft_atoi = (d_atoi)loader.symbol("ft_atoi");
-		result += Test.complex(2, () => { return (ft_atoi("2147483647") == 2147483647); }, "int MAX").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-2147483648") == -2147483648); }, "int MIN").msg();
-		result += Test.complex(2, () => { return (ft_atoi("0") == 0); }, "0").msg();
-		result += Test.complex(2, () => { return (ft_atoi("1") == 1); }, "1").msg();
-		result += Test.complex(2, () => { return (ft_atoi("2") == 2); }, "2").msg();
-		result += Test.complex(2, () => { return (ft_atoi("9") == 9); }, "9").msg();
-		result += Test.complex(2, () => { return (ft_atoi("10") == 10); }, "10").msg();
-		result += Test.complex(2, () => { return (ft_atoi("11") == 11); }, "11").msg();
-		result += Test.complex(2, () => { return (ft_atoi("42") == 42); }, "42").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-1") == -1); }, "-1").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-2") == -2); }, "-2").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-9") == -9); }, "-9").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-10") == -10); }, "-10").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-11") == -11); }, "-11").msg();
-		result += Test.complex(2, () => { return (ft_atoi("-42") == -42); }, "-42").msg();
-		result += Test.complex(2, () => { return (ft_atoi("165468465") == 165468465); }, "165468465").msg();
+		string check(string s_nb, int nb, string? msg = null){
+			return Test.complex(2, () => { return (ft_atoi(s_nb) == nb); }, msg ?? "atoi(" + s_nb + ") ").msg();
+		}
+		result += check("2147483647", 2147483647, "int MAX ");
+		result += check("-2147483648", -2147483648, "int MIN ");
+		result += check("0", 0);
+		result += check("1", 1);
+		result += check("2", 2);
+		result += check("9", 9);
+		result += check("10", 10);
+		result += check("11", 11);
+		result += check("42", 42);
+		result += check("-1", -1);
+		result += check("-2", -2);
+		result += check("-9", -9);
+		result += check("-10", -10);
+		result += check("-11", -11);
+		result += check("-42", -42);
+		result += check("165468465", 165468465);
 		for (int N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);
-			result += Test.complex(2, () => { return (ft_atoi(@"$i") == i); }, @"random test $i").msg();
+			result += check(@"$i", i, @"Random Test $i ");
 		}
 		return result;
 	}

@@ -25,6 +25,8 @@ class LibftTester{
 			run_atoi,
 			run_strrchr,
 			run_strncmp,
+			run_strnstr,
+			run_memchr,
 			run_memcmp
 		};
 		this.run();
@@ -70,6 +72,14 @@ class LibftTester{
 void main() {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: %u\n", get_num_processors());
+
+	// var t = Test.test_output(1, ()=> {
+		// return false;
+	// }, "abc");
+	// print("status: [%d]\n", t.status);
+	// t.print_result();
+
+
 	new LibftTester();
 	print("====================================================");
 }

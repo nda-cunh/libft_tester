@@ -18,6 +18,9 @@ class LibftTester{
 			run_strlen,
 			run_memset,
 			run_bzero,
+			run_strlcat,
+			run_strlcpy,
+			run_memmove,
 			run_toupper,
 			run_tolower,
 			run_strchr,
@@ -28,7 +31,8 @@ class LibftTester{
 			run_strnstr,
 			run_memchr,
 			run_memcmp,
-			run_memcpy
+			run_memcpy,
+			run_calloc,
 		};
 		this.run();
 	}
@@ -84,7 +88,7 @@ class LibftTester{
 			// loop.run();
 			loader = new Loader("libft.so");
 			run_part1();
-			// run_part2();
+			run_part2();
 		}
 		catch (Error e) {
 			printerr(e.message);

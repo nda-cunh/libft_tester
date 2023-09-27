@@ -14,6 +14,7 @@ long clang_sl(long n) {
 
 [CCode (cname = "isalpha", cheader_filename="ctype.h")]
 extern int clang_isalpha(int c);
+[CCode (has_target = false)]
 delegate int d_isalpha(int c);
 string run_isalpha() {
 	string result = "IS_ALPHA: ";
@@ -36,6 +37,7 @@ string run_isalpha() {
 
 [CCode (cname = "isdigit", cheader_filename="ctype.h")]
 extern int clang_isdigit(int c);
+[CCode (has_target = false)]
 delegate int d_isdigit(int c);
 string run_isdigit() {
 	string result = "ISDIGIT:  ";
@@ -58,6 +60,7 @@ string run_isdigit() {
 
 [CCode (cname = "isalnum", cheader_filename="ctype.h")]
 extern int clang_isalnum(int c);
+[CCode (has_target = false)]
 delegate int d_isalnum(int c);
 string run_isalnum() {
 	string result = "ISALNUM:  ";
@@ -80,6 +83,7 @@ string run_isalnum() {
 
 [CCode (cname = "isascii", cheader_filename="ctype.h")]
 extern int clang_isascii(int c);
+[CCode (has_target = false)]
 delegate int d_isascii(int c);
 string run_isascii() {
 	string result = "ISASCII:  ";
@@ -102,6 +106,7 @@ string run_isascii() {
 
 [CCode (cname = "isprint", cheader_filename="ctype.h")]
 extern int clang_isprint(int c);
+[CCode (has_target = false)]
 delegate int d_isprint(int c);
 string run_isprint() {
 	string result = "ISPRINT:  ";
@@ -122,6 +127,7 @@ string run_isprint() {
 	}
 }
 
+[CCode (has_target = false)]
 delegate int d_strlen(string? s);
 string run_strlen() {
 	string result = "STRLEN:   ";
@@ -147,6 +153,7 @@ string run_strlen() {
 	}
 }
 
+[CCode (has_target = false)]
 delegate int d_memset(void* mem, char c, int nb);
 string run_memset() {
 	string result = "MEMSET:   ";
@@ -184,6 +191,7 @@ string run_memset() {
 	}
 }
 
+[CCode (has_target = false)]
 delegate int d_bzero(void* mem, int nb);
 string run_bzero() {
 	string result = "BZERO:    ";
@@ -214,6 +222,7 @@ string run_bzero() {
 // MEMCPY
 [CCode (cname = "memcpy", cheader_filename="string.h")]
 extern void *memcpy(void* dest, void* src, size_t n);
+[CCode (has_target = false)]
 delegate char *d_memcpy(void* dest, void* src, size_t n);
 string run_memcpy() {
 	string result = "MEMCPY:   ";
@@ -257,20 +266,19 @@ string run_memcpy() {
 }
 //TODO memmove
 
-[CCode (cname = "memmove", cheader_filename="ctype.h")]
-extern size_t memmove(void *dest, void *src, size_t size);
+// [CCode (cname = "memmove", cheader_filename="ctype.h")]
+// extern size_t memmove(void *dest, void *src, size_t size);
+[CCode (has_target = false)]
 delegate int d_memmove(void *dest, void *src, size_t size);
 string run_memmove() {
 	string result = "MEMMOVE:  ";
 	try {
 		var ft_memmove = (d_memmove)loader.symbol("ft_memmove");
-		SupraTest t;
-
 		result += Test.test(2, () => {
 			string mstr = "Hello, World!";
 			char *str = (char*)mstr;
 			size_t n = mstr.length + 1;
-			memmove(str + 7, str, n);
+			ft_memmove(str + 7, str, n);
 			return (str == "Hello, Hello, World!");
 		}, "test same_memory").msg();
 		
@@ -279,7 +287,7 @@ string run_memmove() {
 			string mstr = "Hello, World!";
 			char *str = (char*)mstr;
 			size_t n = mstr.length + 1;
-			memmove(str + 2, str, n);
+			ft_memmove(str + 2, str, n);
 			return (str == "HeHello, World!");
 		}, "test overlap").msg();
 		
@@ -288,7 +296,7 @@ string run_memmove() {
 			char *src = msrc;
 			char dest[20];
 			size_t n = msrc.length + 1;
-			memmove(dest, src, n);
+			ft_memmove(dest, src, n);
 			return ((char*)dest == "Source");
 			}, "test different_memory").msg();
 
@@ -301,6 +309,7 @@ string run_memmove() {
 
 [CCode (cname = "strlcpy", cheader_filename="ctype.h")]
 extern size_t strlcpy(char *dest, char *src, size_t size);
+[CCode (has_target = false)]
 delegate int d_strlcpy(char *dest, char *src, size_t size);
 string run_strlcpy() {
 	string result = "STRLCPY:  ";
@@ -382,6 +391,7 @@ string run_strlcpy() {
 
 [CCode (cname = "strlcat", cheader_filename="ctype.h")]
 extern size_t strlcat(char *dest, char *src, size_t size);
+[CCode (has_target = false)]
 delegate int d_strlcat(char *dest, char *src, size_t size);
 string run_strlcat() {
 	string result = "STRLCAT:  ";
@@ -462,6 +472,7 @@ string run_strlcat() {
 
 [CCode (cname = "toupper", cheader_filename="ctype.h")]
 extern int clang_toupper(int c);
+[CCode (has_target = false)]
 delegate int d_toupper(int c);
 string run_toupper() {
 	string result = "TOUPPER:  ";
@@ -484,6 +495,7 @@ string run_toupper() {
 
 [CCode (cname = "tolower", cheader_filename="ctype.h")]
 extern int clang_tolower(int c);
+[CCode (has_target = false)]
 delegate int d_tolower(int c);
 string run_tolower() {
 	string result = "TOLOWER:  ";
@@ -507,6 +519,7 @@ string run_tolower() {
 
 [CCode (cname = "strchr", cheader_filename="string.h")]
 extern char *strchr(char *s, int c);
+[CCode (has_target = false)]
 delegate char *d_strchr(char *s, int c);
 string run_strchr() {
 	string result = "STRCHR:   ";
@@ -548,6 +561,7 @@ string run_strchr() {
 
 [CCode (cname = "strrchr", cheader_filename="string.h")]
 extern char *strrchr(char *s, int c);
+[CCode (has_target = false)]
 delegate char *d_strrchr(char *s, int c);
 string run_strrchr() {
 	string result = "STRRCHR:  ";
@@ -588,6 +602,7 @@ string run_strrchr() {
 
 [CCode (cname = "strncmp", cheader_filename="string.h")]
 extern int strncmp(uint8 *s1, uint8* s2, size_t n);
+[CCode (has_target = false)]
 delegate int d_strncmp(uint8 *s1, uint8 *s2, size_t n);
 string run_strncmp() {
 	string result = "STRNCMP:  ";
@@ -641,6 +656,7 @@ string run_strncmp() {
 	return result;
 }
 
+[CCode (has_target = false)]
 delegate void* d_memchr(void* s1, int c, size_t n);
 string run_memchr() {
 	string result = "MEMCHR:   ";
@@ -678,6 +694,7 @@ string run_memchr() {
 //TODO upgrade test memcmp
 [CCode (cname = "memcmp", cheader_filename="string.h")]
 extern int memcmp(void *s1, void* s2, size_t n);
+[CCode (has_target = false)]
 delegate int d_memcmp(void* s1, void* s2, size_t n);
 string run_memcmp() {
 	string result = "MEMCMP:   ";
@@ -704,6 +721,7 @@ string run_memcmp() {
 
 [CCode (cname = "strnstr", cheader_filename="string.h")]
 extern char* strnstr(char *s1, char* s2, size_t n);
+[CCode (has_target = false)]
 delegate char* d_strnstr(char* s1, char* s2, size_t n);
 string run_strnstr() {
 	string result = "STRNSTR:  ";
@@ -740,6 +758,7 @@ string run_strnstr() {
 }
 
 // atoi
+[CCode (has_target = false)]
 delegate int d_atoi(string s);
 string run_atoi() {
 	string result = "ATOI:     ";
@@ -777,24 +796,23 @@ string run_atoi() {
 }
 
 // calloc  
-delegate void *d_calloc(size_t n);
+[CCode (has_target = false)]
+delegate void *d_calloc(size_t nmemb, size_t size);
 string run_calloc() {
 	string result = "CALLOC:   ";
 	try {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
 		
 		var t = Test.test(2, () => {
-			char *m = ft_calloc(52);
-			// char *t = ft_calloc(52);
+			char *m = ft_calloc(52, sizeof(char));
 
-			// uint8 over[3] = {'A', 'A', 'A'};
-			// for (int i = 0; i < 51; i++)
-			// {
-				// if (m[i] != '\0') {
-					// delete m;
-					// return false;
-				// }
-			// }
+			for (int i = 0; i < 52; i++)
+			{
+				if (m[i] != '\0') {
+					delete m;
+					return false;
+				}
+			}
 			delete m;
 			return (true);
 		}, "calloc(52)");

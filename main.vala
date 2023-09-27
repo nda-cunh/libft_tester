@@ -66,13 +66,16 @@ class LibftTester{
 		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
 		foreach(var i in tab) {
 			worker.begin(i, (obj, res) => {
+				print("                              \r");
 				print("%s\n", worker.end(res));
-				finish_test++;
+				++finish_test;
 				if (finish_test == tab.length)
 					loop.quit();
 			});
 			if (get_num_processors() <= 2) {
-				Thread.usleep(10000);
+				MainContext.default().iteration(true);
+				Posix.usleep(500);
+				// Posix.usleep(120000);
 			}
 		}
 		loop.run();

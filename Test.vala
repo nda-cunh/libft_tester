@@ -100,16 +100,17 @@ namespace Test {
 	public SupraTest test(uint timeout, testFunction func, string err_message = "") {
 		SupraTest result = SupraTest(err_message);
 		result.init_sig();
-		int fds[2];
-		Posix.pipe(fds);
+		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
+		int fd_err = mkstemp(template_stderr);
+		if (fd_err < 0)
+			Posix.perror("Erreur lors de la création du fichier temporaire");
 		int status;
 		var timer = new Timer();
 		var pid = Posix.fork();
 		reset_malloc();
 		if (pid == 0) {
-			Posix.dup2(fds[1], 2);
-			Posix.close(fds[1]);
-			Posix.close(fds[0]);
+			Posix.dup2(fd_err, 2);
+			Posix.close(fd_err);
 			bool b = func();
 			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
 			if (b == true) {
@@ -126,8 +127,8 @@ namespace Test {
 				break;
 			}
 		}
-		Posix.close(fds[1]);
-		var stream = FileStream.fdopen(fds[0], "r");
+		Posix.close(fd_err);
+		var stream = FileStream.open((string)template_stderr, "r");
 		if (stream != null) {
 			uint8 buf[2048];
 			if (stream.read(buf) > 0) {
@@ -141,7 +142,6 @@ namespace Test {
 				}
 			}
 		}
-		Posix.close(fds[0]);
 
 		result.status = (Status)exit_status(status);
 		if ((uint)timer.elapsed() >= timeout)
@@ -157,10 +157,10 @@ namespace Test {
 		int status;
 
 		uint8 template_stdout[20] = "/tmp/vala_XXXXXXXXX".data;
-		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_out = mkstemp(template_stdout);
 		if (fd_out < 0)
 			Posix.perror("Erreur lors de la création du fichier temporaire");
+		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
 		if (fd_err < 0)
 			Posix.perror("Erreur lors de la création du fichier temporaire");

@@ -1,3 +1,4 @@
+
 errordomain ErrLoader{
 	NOT_FOUND,
 	SYMBOL_NOTFOUND

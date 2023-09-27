@@ -38,7 +38,6 @@ class LibftTester{
 		this.run();
 	}
 
-
 	async void loading() {
 		var n = 0;
 		while (true) {
@@ -128,8 +127,6 @@ class LibftTester{
 		thread.join();
 		return result;
 	}
-
-
 }
 
 void main() {
@@ -139,3 +136,4 @@ void main() {
 	new LibftTester();
 	print("====================================================");
 }
+

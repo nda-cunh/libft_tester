@@ -12,7 +12,6 @@ extern int get_free_count();
 extern int get_malloc_count();
 extern void reset_malloc();
 
-
 //   SUPRATEST 
 public enum Status{
 	OK = 0,
@@ -24,6 +23,7 @@ public enum Status{
 	SIGSEGV = 11,
 	LEAK = 42
 }
+
 public struct SupraTest {
 	public string? 	message;
 	public string? 	stdout;
@@ -73,14 +73,16 @@ public struct SupraTest {
 	public void print_result() {
 		print(this.msg());
 	}
+
 	public void init_sig(){
 		int tab[] = {4, 8, 10, 11};
 		foreach (var i in tab) {
 			Posix.signal(i, (sg) => {
 					Posix.exit(sg);
-					});
+				});
 		}
 	}
+	
 	public void remove_sig() {
 		int tab[] = {4, 8, 10, 11};
 		foreach (var i in tab) {
@@ -88,6 +90,7 @@ public struct SupraTest {
 		}
 	}
 }
+
 namespace Test {
 	[CCode (cname = "mkstemp", cheader_filename="stdlib.h")]
 	extern int mkstemp(char *template);
@@ -149,7 +152,6 @@ namespace Test {
 			result.status = TIMEOUT;
 		return result;
 	}
-
 
 	public SupraTest complex(uint timeout, testFunction func, string err_message = "") {
 		SupraTest result = SupraTest(err_message);
@@ -213,3 +215,4 @@ namespace Test {
 		return result;
 	}
 }
+

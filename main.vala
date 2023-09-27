@@ -33,6 +33,7 @@ class LibftTester{
 			run_memcmp,
 			run_memcpy,
 			run_calloc,
+			run_strdup
 		};
 		this.run();
 	}

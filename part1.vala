@@ -795,7 +795,6 @@ string run_atoi() {
 	}
 }
 
-// calloc  
 [CCode (has_target = false)]
 delegate void *d_calloc(size_t nmemb, size_t size);
 string run_calloc() {
@@ -821,6 +820,55 @@ string run_calloc() {
 		else
 			result += t.msg_ok();
 		result += t.msg();
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
+
+[CCode (has_target = false)]
+delegate string d_strdup(char *str);
+string run_strdup() {
+	string result = "STRDUP:   ";
+	try {
+		var ft_strdup = (d_strdup)loader.symbol("ft_strdup");
+		SupraTest t;
+
+		t = Test.test(2, () => {
+			string s = ft_strdup("Abc");
+
+			if (s == "Abc")
+				return true;
+			return false;
+		}, "strdup('Abc')");
+		if (t.alloc != 1)
+			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
+		else
+			result += t.msg_ok();
+		result += t.msg();
+		
+		t = Test.test(2, () => {
+			string s = ft_strdup("");
+
+			if (s == "")
+				return true;
+			return false;
+		}, "strdup('')");
+		if (t.alloc != 1)
+			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
+		else
+			result += t.msg_ok();
+		result += t.msg();
+		
+		t = Test.test(2, () => {
+			ft_strdup(null);
+			return false;
+		}, "strdup(NULL) NOCRASH");
+		if (t.status != SIGSEGV)
+			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
+		else
+			result += t.msg_ok();
 		return result;
 	}
 	catch (Error e) {

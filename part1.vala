@@ -818,6 +818,8 @@ string run_calloc() {
 		}, "calloc(52)");
 		if (t.alloc != 1)
 			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
+		else
+			result += t.msg_ok();
 		result += t.msg();
 		return result;
 	}

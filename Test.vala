@@ -143,6 +143,7 @@ namespace Test {
 			}
 		}
 
+		FileUtils.unlink((string)template_stderr);
 		result.status = (Status)exit_status(status);
 		if ((uint)timer.elapsed() >= timeout)
 			result.status = TIMEOUT;
@@ -204,6 +205,8 @@ namespace Test {
 				return result;
 			}
 		}
+		FileUtils.unlink((string)template_stderr);
+		FileUtils.unlink((string)template_stdout);
 		result.status = (Status)exit_status(status);
 		if ((uint)timer.elapsed() >= timeout)
 			result.status = TIMEOUT;

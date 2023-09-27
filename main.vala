@@ -6,10 +6,11 @@ class LibftTester{
 
 	private int finish_test;
 	private MainLoop loop;
-	private d_worker[]tab;
+	private d_worker[] tab_func_p1;
+	private d_worker[] tab_func_p2;
 
 	public  LibftTester() {
-		tab = {
+		tab_func_p1 = {
 			run_isalpha,
 			run_isdigit,
 			run_isalnum,
@@ -24,7 +25,6 @@ class LibftTester{
 			run_toupper,
 			run_tolower,
 			run_strchr,
-			run_itoa,
 			run_atoi,
 			run_strrchr,
 			run_strncmp,
@@ -38,11 +38,6 @@ class LibftTester{
 		this.run();
 	}
 
-	void run_part2() {
-		print("\033[33m     <------------- [ PART 2 ] ------------->\n\033[0m");
-		Idle.add((SourceFunc)loop.quit);
-		loop.run();
-	}
 
 	async void loading() {
 		var n = 0;
@@ -65,18 +60,39 @@ class LibftTester{
 
 	void run_part1() {
 		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
-		foreach(var i in tab) {
+		foreach(var i in tab_func_p1) {
 			worker.begin(i, (obj, res) => {
 				print("                              \r");
 				print("%s\n", worker.end(res));
 				++finish_test;
-				if (finish_test == tab.length)
+				if (finish_test == tab_func_p1.length)
 					loop.quit();
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
 				Posix.usleep(500);
 				// Posix.usleep(120000);
+			}
+		}
+		loop.run();
+	}
+	
+	void run_part2() {
+		tab_func_p2 = {
+			run_itoa
+		};
+		print("\033[33m     <------------- [ PART 2 ] ------------->\n\033[0m");
+		foreach(var i in tab_func_p2) {
+			worker.begin(i, (obj, res) => {
+				print("                              \r");
+				print("%s\n", worker.end(res));
+				++finish_test;
+				if (finish_test == tab_func_p2.length)
+					loop.quit();
+			});
+			if (get_num_processors() <= 2) {
+				MainContext.default().iteration(true);
+				Posix.usleep(100000);
 			}
 		}
 		loop.run();
@@ -91,7 +107,9 @@ class LibftTester{
 			});
 			// loop.run();
 			loader = new Loader("libft.so");
+			finish_test = 0;
 			run_part1();
+			finish_test = 0;
 			run_part2();
 		}
 		catch (Error e) {

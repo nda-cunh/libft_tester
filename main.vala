@@ -91,7 +91,7 @@ class LibftTester{
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
-				Posix.usleep(100000);
+				Posix.usleep(190000);
 			}
 		}
 		loop.run();

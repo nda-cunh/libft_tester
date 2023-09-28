@@ -39,6 +39,8 @@ public struct SupraTest {
 		this.stderr = null;
 		this.stdin = null;
 		this.status = KO;
+		this.alloc = 0;
+		this.free = 0;
 	}
 
 	public string msg_ok() {
@@ -46,13 +48,13 @@ public struct SupraTest {
 	}
 
 	public string msg_ko(string? msg = null) {
-		return @"\033[31m[KO] $(msg ?? "")\033[0m";
+		return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
 	}
 
 	public string msg() {
 		if (status == LEAK)
 			return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(this.message)\033[0m";
-		if (status == SIGILL)
+		else if (status == SIGILL)
 			return @"\033[31m[SIGILL] $(this.message)\033[0m";
 		else if (status == SIGFPE)
 			return @"\033[31m[SIGFPE] $(this.message)\033[0m";
@@ -63,7 +65,7 @@ public struct SupraTest {
 		else if (status == OK)
 			return @"\033[32m[OK]\033[0m";
 		else if (status == KO)
-			return @"\033[31m[KO] $(this.message)\033[0m";
+			return msg_ko(this.message);
 		else if (status == TIMEOUT)
 			return @"\033[31m[TIMEOUT] $(this.message)\033[0m";
 		else
@@ -98,7 +100,7 @@ namespace Test {
 	public delegate bool testFunction();
 
 	[CCode (cname = "WEXITSTATUS", cheader_filename="sys/wait.h")]
-		extern int exit_status(int status);
+	extern int exit_status(int status);
 
 	public SupraTest test(uint timeout, testFunction func, string err_message = "") {
 		SupraTest result = SupraTest(err_message);
@@ -136,22 +138,30 @@ namespace Test {
 			uint8 buf[2048];
 			if (stream.read(buf) > 0) {
 				var s = (string)buf;
-				var sp = s.split("\n");
-				foreach(var i in sp) {
-					if ("[SupraLeak]" in i) {
-						i.scanf("[SupraLeak] %d Free, %d Malloc", out result.free, out result.alloc);
-					}else
-						printerr(i);
-				}
+				result.stderr = result.stderr ?? "" + s;
 			}
+		}
+	
+		// get SupraLeak alloc/free and remove it
+		if (result.stderr != null) {
+			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
+			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc", "");
 		}
 
 		FileUtils.unlink((string)template_stderr);
 		result.status = (Status)exit_status(status);
-		if ((uint)timer.elapsed() >= timeout)
+		if (result.free != result.alloc)
+			result.status = LEAK;
+		else if ((uint)timer.elapsed() >= timeout)
 			result.status = TIMEOUT;
 		return result;
 	}
+
+
+
+
+
 
 	public SupraTest complex(uint timeout, testFunction func, string err_message = "") {
 		SupraTest result = SupraTest(err_message);
@@ -176,8 +186,7 @@ namespace Test {
 			Posix.close(fd_out);
 			Posix.close(fd_err);
 			bool res = func();
-			if (get_free_count() != get_malloc_count())
-				printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
+			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
 			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);
@@ -198,19 +207,23 @@ namespace Test {
 		result.stdout = read_all(ref stream1);
 		var stream2 = FileStream.open((string)template_stderr, "r");
 		result.stderr = read_all(ref stream2);
-
-		var sp = result.stderr.split("\n");
-		foreach(var i in sp) {
-			if ("[SupraLeak]" in i) {
-				i.scanf("[SupraLeak] %d Free, %d Malloc", out result.free, out result.alloc);
-				result.status = Status.LEAK;
-				return result;
-			}
+		
+		// get SupraLeak alloc/free and remove it
+		if (result.stderr != null) {
+			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
+			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc", "");
 		}
+		
+		// remove stderr pipe
 		FileUtils.unlink((string)template_stderr);
 		FileUtils.unlink((string)template_stdout);
+
 		result.status = (Status)exit_status(status);
-		if ((uint)timer.elapsed() >= timeout)
+		printerr("TestERR: %s\n", result.stderr);
+		if (result.free != result.alloc)
+			result.status = LEAK;
+		else if ((uint)timer.elapsed() >= timeout)
 			result.status = TIMEOUT;
 		return result;
 	}

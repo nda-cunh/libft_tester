@@ -401,8 +401,11 @@ string run_strlcat() {
 			char *s1 = Memory.dup(src, src_len);
 			char *s2 = Memory.dup(src, src_len);
 
-			if (ft_strlcat(d1, s1, n) != strlcat(d2, s2, n))
+			if (ft_strlcat(d1, s1, n) != strlcat(d2, s2, n)) {
+				delete s1; delete s2;
 				return false;
+			}
+			delete s1; delete s2;
 			if (Memory.cmp(d1, d2, 20) == 0)
 				return true;
 			return false;
@@ -596,47 +599,30 @@ string run_strncmp() {
 	string result = "STRNCMP:  ";
 	try {
 		var ft_strncmp = (d_strncmp)loader.symbol("ft_strncmp");
-		uint8 *s1 = "abcd";
-		uint8 *s2 = "abce";
-		size_t nb = 3;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp($s1, $s2 $nb)").msg();
-		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 7;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp($((string)s1), $((string)s2) $nb)").msg();
-		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 7;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp('bjr\\0kitty', 'bjr\\0hello' $nb) Qui a demandé un memcmp ?").msg();
-		s2 = "test\0"; nb = 6;
+
+		string check(uint8 *s1, uint8 *s2, size_t n, string? msg = null) {
+			var t = Test.test(8, () => {
+				var a = strncmp(s1, s2, n);
+				var b = ft_strncmp(s1, s2, n);
+				printerr("libc: %d you: %d ", a, b);
+				return (clang_s(strncmp(s1, s2, n)) == clang_s(ft_strncmp(s1, s2, n)));
+			}, @"strncmp('$((string)s1)', '$((string)s2)', $n) ");
+			if (t.status == KO)
+				return t.msg_ko(msg ?? t.message + t.stderr);
+			return t.msg();
+		}
+		result += check("a", "b", 1);
+		result += check("", "", 4);
+		result += check("bjr\0kitty", "bjr\0hello", 7);
+		result += check("abcd", "abce", 3);
+		result += check("test\0", "", 6);
+		result += check("", "test\0", 6);
 		uint8 []uc_test = {'t', 'e', 's', 't', 128};
-		s1 = uc_test;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"Unsigned Char ???").msg();
-		
-		s1 = "Portal2"; s2 = "TheCakeIsALie"; nb = 4;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp($((string)s1), $((string)s2) $nb)").msg();
-		s1 = ""; s2 = "TheCakeIsALie"; nb = 4;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp('', $((string)s2) $nb)").msg();
-		s1 = "Portal2"; s2 = ""; nb = 4;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp($((string)s1), '' $nb)").msg();
-		s1 = ""; s2 = ""; nb = 4;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp('', '', $nb)").msg();
-		s1 = "fhfghfgdjhsffg"; s2 = "dfghfdhsfd"; nb = 5;
-		result += Test.test(8, () => {
-			return (clang_s(strncmp(s1, s2, nb)) == clang_s(ft_strncmp(s1, s2, nb)));
-		}, @"strncmp('', '', $nb)").msg();
+		result += check(uc_test, "test\0", 6, "Unsigned-Char ?");
+		result += check("Portal2", "TheCakeIsALie", 4);
+		result += check("", "TheCakeIsALie", 4);
+		result += check("Portal2", "", 4);
+		result += check("fhfghfgdjhsffg", "dfghfdhsfd", 5);
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -692,13 +678,13 @@ string run_memcmp() {
 		size_t nb = 3;
 		result += Test.test(8, () => {
 			return (clang_s(memcmp(s1, s2, nb)) == clang_s(ft_memcmp(s1, s2, nb)));
-		}, @"memcmp($s1, $s2 $nb)").msg(); 
+		}, @"memcmp($s1, $s2, $nb)").msg(); 
 		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 5;
 		result += Test.test(8, () => {
 			printerr("ft: %d ", ft_memcmp(s1, s2, nb));
 			printerr("gc: %d ", memcmp(s1, s2, nb));
 			return (clang_s(memcmp(s1, s2, nb)) == clang_s(ft_memcmp(s1, s2, nb)));
-		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello' $nb)").msg();
+		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello', $nb)").msg();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -717,7 +703,7 @@ string run_strnstr() {
 		string check(char* s1, char* s2, size_t n) {
 			var t = Test.test(8, ()=>{
 				return (clang_sl((long)ft_strnstr(s1, s2, n)) == clang_sl((long)strnstr(s1, s2, n)));
-			}, @"strncmp('$((string)s1)', '$((string)s2)')");
+			}, @"strnstr('$((string)s1)', '$((string)s2)', $(n)) ");
 			return t.msg();
 		}
 		result += check("t", "", 0);
@@ -788,7 +774,7 @@ string run_calloc() {
 	string result = "CALLOC:   ";
 	try {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
-		
+
 		var t = Test.test(8, () => {
 			char *m = ft_calloc(52, sizeof(char));
 

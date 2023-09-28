@@ -1,5 +1,4 @@
 
-
 int clang_s(int n) {
 	if (n == 0)
 		return 0;
@@ -264,7 +263,6 @@ string run_memcpy() {
 	}
 	return result;
 }
-//TODO memmove
 
 // [CCode (cname = "memmove", cheader_filename="ctype.h")]
 // extern size_t memmove(void *dest, void *src, size_t size);
@@ -336,7 +334,6 @@ string run_strlcpy() {
 			return false;
 		}
 
-
 		result += Test.test(8, () => {
 			return (check("abc\0", "yopato", 4));
 		}, "").msg();
@@ -377,9 +374,6 @@ string run_strlcpy() {
 			result += t.msg_ok();
 		else
 			result += t.msg();
-		
-
-
 
 		return result;
 	}
@@ -387,7 +381,6 @@ string run_strlcpy() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-
 
 [CCode (cname = "strlcat", cheader_filename="ctype.h")]
 extern size_t strlcat(char *dest, char *src, size_t size);
@@ -414,7 +407,6 @@ string run_strlcat() {
 				return true;
 			return false;
 		}
-
 
 		result += Test.test(8, () => {
 			return (check("abc\0", 4, "yopato", 6, 4));
@@ -468,8 +460,6 @@ string run_strlcat() {
 	}
 }
 
-
-
 [CCode (cname = "toupper", cheader_filename="ctype.h")]
 extern int clang_toupper(int c);
 [CCode (has_target = false)]
@@ -516,7 +506,6 @@ string run_tolower() {
 	}
 }
 
-
 [CCode (cname = "strchr", cheader_filename="string.h")]
 extern char *strchr(char *s, int c);
 [CCode (has_target = false)]
@@ -557,7 +546,6 @@ string run_strchr() {
 	}
 	return result;
 }
-
 
 [CCode (cname = "strrchr", cheader_filename="string.h")]
 extern char *strrchr(char *s, int c);
@@ -689,7 +677,6 @@ string run_memchr() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-
 
 //TODO upgrade test memcmp
 [CCode (cname = "memcmp", cheader_filename="string.h")]
@@ -875,3 +862,4 @@ string run_strdup() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
+

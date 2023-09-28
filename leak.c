@@ -69,9 +69,9 @@ void* malloc(size_t size)
 	// write(2, "1 Malloc !\n", 11);
 	if (libc_malloc == NULL)
 		init_malloc();
-    void * p = libc_malloc(size);
+	void * p = libc_malloc(size);
 	malloc_counter++;
-    return (p);
+	return (p);
 }
 
 void free(void * p)
@@ -79,6 +79,6 @@ void free(void * p)
 	// write(2, "1 Free!\n", 8);
 	if (libc_free == NULL)
 		init_malloc();
-    libc_free(p);
+	libc_free(p);
 	free_counter++;
 }

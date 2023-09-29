@@ -51,23 +51,24 @@ public struct SupraTest {
 		return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
 	}
 
-	public string msg() {
+	public string msg(string? message = null) {
+		var msg = message ?? this.message; 
 		if (status == LEAK)
-			return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(this.message)\033[0m";
+			return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
 		else if (status == SIGILL)
-			return @"\033[31m[SIGILL] $(this.message)\033[0m";
+			return @"\033[31m[SIGILL] $(msg)\033[0m";
 		else if (status == SIGFPE)
-			return @"\033[31m[SIGFPE] $(this.message)\033[0m";
+			return @"\033[31m[SIGFPE] $(msg)\033[0m";
 		else if (status == SIGBUS)
-			return @"\033[31m[SIGBUS] $(this.message)\033[0m";
+			return @"\033[31m[SIGBUS] $(msg)\033[0m";
 		else if (status == SIGSEGV)
-			return @"\033[31m[SIGSEGV] $(this.message)\033[0m";
+			return @"\033[31m[SIGSEGV] $(msg)\033[0m";
 		else if (status == OK)
 			return @"\033[32m[OK]\033[0m";
 		else if (status == KO)
-			return msg_ko(this.message);
+			return msg_ko(msg);
 		else if (status == TIMEOUT)
-			return @"\033[31m[TIMEOUT] $(this.message)\033[0m";
+			return @"\033[31m[TIMEOUT] $(msg)\033[0m";
 		else
 			return @"\033[31m[???] \033[0m";
 	}
@@ -146,7 +147,7 @@ namespace Test {
 		if (result.stderr != null) {
 			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
 			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
-			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc", "");
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc\n", "");
 		}
 
 		FileUtils.unlink((string)template_stderr);
@@ -212,7 +213,7 @@ namespace Test {
 		if (result.stderr != null) {
 			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
 			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
-			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc", "");
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc\n", "");
 		}
 		
 		// remove stderr pipe
@@ -220,7 +221,6 @@ namespace Test {
 		FileUtils.unlink((string)template_stdout);
 
 		result.status = (Status)exit_status(status);
-		printerr("TestERR: %s\n", result.stderr);
 		if (result.free != result.alloc)
 			result.status = LEAK;
 		else if ((uint)timer.elapsed() >= timeout)

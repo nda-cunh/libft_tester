@@ -16,7 +16,8 @@ extern void reset_malloc();
 public enum Status{
 	OK = 0,
 	KO = 1,
-	TIMEOUT = 2,
+	SIGINT = 2,
+	TIMEOUT = 3,
 	SIGILL = 4,
 	SIGFPE = 8,
 	SIGBUS = 10,
@@ -152,10 +153,12 @@ namespace Test {
 
 		FileUtils.unlink((string)template_stderr);
 		result.status = (Status)exit_status(status);
-		if (result.free != result.alloc)
-			result.status = LEAK;
-		else if ((uint)timer.elapsed() >= timeout)
-			result.status = TIMEOUT;
+		if (result.status == OK || result.status == KO) {
+			if (result.free != result.alloc)
+				result.status = LEAK;
+			else if ((uint)timer.elapsed() >= timeout)
+				result.status = TIMEOUT;
+		}
 		return result;
 	}
 

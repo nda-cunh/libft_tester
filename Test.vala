@@ -8,10 +8,6 @@ public string read_all(ref FileStream stream) {
 	return str.str;
 }
 
-extern int get_free_count();
-extern int get_malloc_count();
-extern void reset_malloc();
-
 //   SUPRATEST 
 public enum Status{
 	OK = 0,
@@ -52,6 +48,11 @@ public struct SupraTest {
 		return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
 	}
 
+	public string msg_err(string? message = null) {
+		var s = message ?? this.message; 
+		return msg(@"$s $(this.stderr)");
+	}
+	
 	public string msg(string? message = null) {
 		var msg = message ?? this.message; 
 		if (status == LEAK)
@@ -114,12 +115,12 @@ namespace Test {
 		int status;
 		var timer = new Timer();
 		var pid = Posix.fork();
-		reset_malloc();
+		SupraLeak.reset();
 		if (pid == 0) {
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_err);
 			bool b = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
+			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
 			if (b == true) {
 				Posix.exit(0);
 			}
@@ -183,14 +184,14 @@ namespace Test {
 			Posix.perror("Erreur lors de la création du fichier temporaire");
 
 		var pid = Posix.fork();
-		reset_malloc();
+		SupraLeak.reset();
 		if (pid == 0) {
 			Posix.dup2(fd_out, 1);
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_out);
 			Posix.close(fd_err);
 			bool res = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
+			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
 			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);

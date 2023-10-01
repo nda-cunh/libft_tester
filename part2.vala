@@ -67,6 +67,13 @@ string run_substr() {
 		/* 8 */ result += check("salut !", 100, 1, "");
 		/* 9 */ result += check("0123456789", 9, 10, "9");
 		/* 10 */ result += check("BONJOUR LES HARICOTS !", 8, 14, "LES HARICOTS !");
+		/* 11 */ result += Test.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_substr("abc", 1, 3);
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err();
 
 
 		return result;
@@ -123,6 +130,13 @@ string run_split() {
 		/* 14 */ result += check(",,,", ',', {""});
 		/* 15 */ result += check(",,,", '\0', {",,,"});
 		/* 16 */ result += check(" ", ',', {" "});
+		/* 17 */ result += Test.test(8, ()=>{
+			SupraLeak.send_null();
+			char **s = ft_split("abc", 'a');
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err();
 
 		return result;
 	}

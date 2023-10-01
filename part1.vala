@@ -676,15 +676,15 @@ string run_memcmp() {
 		uint8 *s1 = "abcd";
 		uint8 *s2 = "abce";
 		size_t nb = 3;
+
 		result += Test.test(8, () => {
 			return (clang_s(memcmp(s1, s2, nb)) == clang_s(ft_memcmp(s1, s2, nb)));
-		}, @"memcmp($s1, $s2, $nb)").msg(); 
-		s1 = "bjr\0kitty"; s2 = "bjr\0hello"; nb = 5;
+		}, @"memcmp('abcd', 'abce', 3)").msg(); 
+
+		s1 = "bjr\0kitty"; s2 = "bjr\0hello";
 		result += Test.test(8, () => {
-			printerr("ft: %d ", ft_memcmp(s1, s2, nb));
-			printerr("gc: %d ", memcmp(s1, s2, nb));
-			return (clang_s(memcmp(s1, s2, nb)) == clang_s(ft_memcmp(s1, s2, nb)));
-		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello', $nb)").msg();
+			return (clang_s(memcmp(s1, s2, 5)) == clang_s(ft_memcmp(s1, s2, 5)));
+		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello', 5)").msg();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

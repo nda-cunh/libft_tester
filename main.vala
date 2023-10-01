@@ -78,6 +78,8 @@ class LibftTester{
 	void run_part2() {
 		tab_func_p2 = {
 			run_itoa,
+			run_split,
+			run_substr,
 			run_putchar_fd,
 			run_putstr_fd,
 			run_putendl_fd,
@@ -107,7 +109,6 @@ class LibftTester{
 				loading.begin();
 				return false;
 			});
-			// loop.run();
 			loader = new Loader("libft.so");
 			finish_test = 0;
 			run_part1();

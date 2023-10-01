@@ -38,14 +38,102 @@ string run_itoa() {
 }
 
 // ft_substr
+[CCode (has_target = false)]
+delegate string d_substr(char *s, uint start, size_t len);
+string run_substr() {
+	string result = "SUBSTR:   ";
+	try {
+		var ft_substr = (d_substr)loader.symbol("ft_substr");
+
+		string check(string str, uint start, size_t len, string sp) {
+			var t = Test.test(8, () => {
+				string? splice = sp; 
+				var sp1 = ft_substr(str, start, len);
+				if (sp1 == splice)
+					return true;
+				printerr("[You:'%s' != Me:'%s'] ", sp1, splice); 
+				return false;
+			});
+			return t.msg(@"test: ('$str', $start, $len) $(t.stderr)");
+		}
+
+		/* 1 */ result += check("hello salut", 0, 5, "hello");
+		/* 2 */ result += check("hello salut", 1, 5, "ello ");
+		/* 3 */ result += check("hello salut", 0, 10, "hello salu");
+		/* 4 */ result += check("hello salut", 0, 0, "");
+		/* 5 */ result += check("hello salut", 5, 5, " salu");
+		/* 6 */ result += check("", 0, 5, "");
+		/* 7 */ result += check("salut !", 0, int.MAX, "salut !");
+		/* 8 */ result += check("salut !", 100, 1, "");
+		/* 9 */ result += check("0123456789", 9, 10, "9");
+		/* 10 */ result += check("BONJOUR LES HARICOTS !", 8, 14, "LES HARICOTS !");
+
+
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 // ft_strjoin
 // ft_strtrim
-// ft_split
-// ft_itoa
+
+[CCode (has_target = false)]
+delegate char** d_split(char *s, char c);
+string run_split() {
+	string result = "SPLIT:    ";
+	try {
+		var ft_split = (d_split)loader.symbol("ft_split");
+
+		string check(string str, char c, string []cmp) {
+			var t = Test.test(8, () => {
+				var sp1 = ft_split(str, c);
+			
+				for (int i = 0; sp1[i] != null; ++i)
+				{
+					if ((string)sp1[i] != cmp[i]) {
+						printerr(" You:'%s' Me:'%s' ", (string)sp1[i], cmp[i]);
+						for (int j = 0; sp1[j] != null; ++j)
+							free(sp1[j]);
+						free(sp1);
+						return false;
+					}
+				}
+				for (int j = 0; sp1[j] != null; ++j)
+					free(sp1[j]);
+				free(sp1);
+				return true;
+			});
+			return t.msg(@"test: '$str' $(t.stderr)");
+		}
+
+		/* 1 */ result += check("a,a,a,a", ',', {"a", "a", "a", "a"});
+		/* 2 */ result += check("", ',', {""});
+		/* 3 */ result += check("a", ',', {"a"});
+		/* 4 */ result += check(",a", ',', {"a"});
+		/* 5 */ result += check("a,", ',', {"a"});
+		/* 6 */ result += check(",a,", ',', {"a"});
+		/* 7 */ result += check("salut", ',', {"salut"});
+		/* 8 */ result += check(",salut", ',', {"salut"});
+		/* 9 */ result += check("salut,", ',', {"salut"});
+		/* 10 */ result += check(",salut,", ',', {"salut"});
+		/* 11 */ result += check("--1-2--3---4----5-----42", '-', {"1", "2", "3", "4", "5", "42"});
+		/* 12 */ result += check(",", ',', {""});
+		/* 13 */ result += check(",,", ',', {""});
+		/* 14 */ result += check(",,,", ',', {""});
+		/* 15 */ result += check(",,,", '\0', {",,,"});
+		/* 16 */ result += check(" ", ',', {" "});
+
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 // ft_strmapi
 // ft_striteri
 
-// ft_putchar_fd
+
 [CCode (has_target = false)]
 delegate void d_putchar_fd(char c, int fd);
 string run_putchar_fd() {
@@ -88,7 +176,7 @@ string run_putchar_fd() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-// ft_putstr_fd
+
 [CCode (has_target = false)]
 delegate size_t  d_putstr_fd(char *s, int fd);
 string run_putstr_fd() {
@@ -145,7 +233,7 @@ string run_putstr_fd() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-// ft_putendl_fd
+
 [CCode (has_target = false)]
 delegate size_t  d_putendl_fd(char *s, int fd);
 string run_putendl_fd() {
@@ -202,7 +290,7 @@ string run_putendl_fd() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-// ft_putnbr_fd
+
 [CCode (has_target = false)]
 delegate void d_putnbr_fd(int n, int fd);
 string run_putnbr_fd() {

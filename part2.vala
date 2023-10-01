@@ -9,27 +9,34 @@ string run_itoa() {
 				return (ft_itoa(n) == @"$n");
 			}, msg ?? @"$n").msg();
 		}
-		result += check(2147483647, "INT MAX ");
-		result += check(-2147483648, "INT MIN ");
-		result += check(0);
-		result += check(1);
-		result += check(2);
-		result += check(9);
-		result += check(10);
-		result += check(11);
-		result += check(42);
-		result += check(-1);
-		result += check(-2);
-		result += check(-9);
-		result += check(-10);
-		result += check(-11);
-		result += check(-42);
-		result += check(165468465);
-		for (var N = 0; N < 5; ++N)
+		/* 1 */ result += check(2147483647, "INT MAX ");
+		/* 2 */ result += check(-2147483648, "INT MIN ");
+		/* 3 */ result += check(0);
+		/* 4 */ result += check(1);
+		/* 5 */ result += check(2);
+		/* 6 */ result += check(9);
+		/* 7 */ result += check(10);
+		/* 8 */ result += check(11);
+		/* 9 */ result += check(42);
+		/* 10 */ result += check(-1);
+		/* 11 */ result += check(-2);
+		/* 12 */ result += check(-9);
+		/* 13 */ result += check(-10);
+		/* 14 */ result += check(-11);
+		/* 15 */ result += check(-42);
+		/* 16 */ result += check(165468465);
+		/* 17 */ for (var N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);
 			result += check(i);
 		}
+		/* 18 */ result += Test.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_itoa(42);
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err();
 		return result;
 	}
 	catch (Error e) {
@@ -132,7 +139,7 @@ string run_split() {
 		/* 16 */ result += check(" ", ',', {" "});
 		/* 17 */ result += Test.test(8, ()=>{
 			SupraLeak.send_null();
-			char **s = ft_split("abc", 'a');
+			char **s = ft_split("bababababhc", 'a');
 			if (s != null)
 				delete s;
 			return (s == null);

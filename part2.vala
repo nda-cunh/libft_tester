@@ -130,11 +130,10 @@ string run_strjoin() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-// ft_strtrim
+
 [CCode (has_target = false)]
 delegate string d_strtrim(char *s1, char *set);
 string run_strtrim() {
-	// var str = new StringBuilder();
 	string result = "STRTRIM:  ";
 	try {
 		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
@@ -236,8 +235,106 @@ string run_split() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
+
 // ft_strmapi
+
+[CCode (has_target = false)]
+delegate char d_param_strmapi(uint n, char c);
+[CCode (has_target = false)]
+delegate string d_strmapi(char *s, d_param_strmapi func);
+string run_strmapi() {
+	string result = "STRMAPI:  ";
+	try {
+		var ft_strmapi = (d_strmapi)loader.symbol("ft_strmapi");
+
+		string check(string s1, d_param_strmapi func, string cmp) {
+			return SupraTest.test(8, () => {
+				var s = ft_strmapi(s1, func);
+				if (s == cmp)
+					return true;
+				stderr.printf("You:'%s' Me:'%s'", (string)s, cmp);
+				return false;
+			}).msg_err("");
+		}
+
+		/* 1 */ result += check("salut", (n, c)=>{
+				return 'e'; 
+			}, "eeeee");
+		/* 2 */ result += check("abcde", (n, c)=>{
+				return c + 1; 
+			}, "bcdef");
+		/* 3 */ result += check("chocolat", (n, c)=>{
+				if (n % 2 == 0)
+					return c;
+				return c - 32; 
+			}, "cHoCoLaT");
+		/* 4 */ result += check("chocolat", (n, c)=>{
+				if (n == 3 || n == 5)
+					return c - 32; 
+				return c;
+			}, "choCoLat");
+		/* 5 */ result += SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_strmapi("abc", ()=>{return 'e';});
+			return (s == null);
+		}, "no protect ").msg_err();
+			
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 // ft_striteri
+
+[CCode (has_target = false)]
+delegate void d_param_striteri(uint n, char *s);
+[CCode (has_target = false)]
+delegate void d_striteri(char *s, d_param_striteri func);
+string run_striteri() {
+	string result = "STRITERI: ";
+	try {
+		var ft_striteri = (d_striteri)loader.symbol("ft_striteri");
+
+		string check(string s1, d_param_striteri func, string cmp) {
+			return SupraTest.test(8, () => {
+				ft_striteri(s1, func);
+				if (s1 == cmp)
+					return true;
+				stderr.printf("You:'%s' Me:'%s'", s1, cmp);
+				return false;
+			}).msg_err("");
+		}
+
+		/* 1 */ result += check("salut", (n, s)=>{
+				s[0] = 'e';
+			}, "eeeee");
+		/* 2 */ result += check("abcde", (n, s)=>{
+				s[0] = s[0] + 1;
+			}, "bcdef");
+		/* 3 */ result += check("chocolat", (n, s)=>{
+				if (n % 2 != 0)
+					s[0] = s[0] - 32;
+			}, "cHoCoLaT");
+		/* 4 */ result += check("chocolat", (n, s)=>{
+				if (n == 3 || n == 5)
+					s[0] = s[0] - 32;
+			}, "choCoLat");
+		/* 5 */ result += check("chocolat", (n, s)=>{
+				if (n == 0){
+					s[1] = 'V';
+					s[3] = 'V';
+				}
+				if (n == 5){
+					s[-1] = 'h';
+				}
+			}, "cVoVhlat");
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 
 
 [CCode (has_target = false)]

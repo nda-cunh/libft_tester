@@ -81,6 +81,8 @@ class LibftTester{
 			run_split,
 			run_strjoin,
 			run_strtrim,
+			run_strmapi,
+			run_striteri,
 			run_substr,
 			run_putchar_fd,
 			run_putstr_fd,

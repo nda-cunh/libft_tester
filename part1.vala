@@ -753,14 +753,14 @@ string run_atoi() {
 	string result = "ATOI:     ";
 	try {
 		var ft_atoi = (d_atoi)loader.symbol("ft_atoi");
-		string check(string s_nb){
-			return SupraTest.test(8, () => {
-				var a = ft_atoi(s_nb);
-				var b = atoi(s_nb);
-				stderr.printf("You:%d Me:%d", a, b);
-				return (a == b);
-			}).msg_err(@"Atoi('$s_nb')");
-		}
+string check(string s_nb){
+	return SupraTest.test(8, () => {
+		var a = ft_atoi(s_nb);
+		var b = atoi(s_nb);
+		stderr.printf("You:%d Me:%d", a, b);
+		return (a == b);
+	}).msg_err(@"Atoi('$s_nb')");
+}
 		/* 1 */ result += check("2147483647");
 		/* 2 */ result += check("-2147483648");
 		/* 3 */ result += check("0");
@@ -783,10 +783,11 @@ string run_atoi() {
 		/* 20 */ result += check("   \t\t-8a2145");
 		/* 21 */ result += check("   \n 28fkldjgd42");
 		/* 22 */ result += check("   \n\f\r\n\t\v");
-		/* 23 */ result += check(" 000002147483647");
-		/* 24 */ result += check(" 000-2147483648");
+		/* 23 */ result += check("+999");
+		/* 24 */ result += check(" 000002147483647");
+		/* 25 */ result += check(" 000-2147483648");
 
-		/* 25 */
+		/* 26 */
 		for (int N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);

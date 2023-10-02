@@ -2,13 +2,18 @@
 int clang_s(int n) {
 	if (n == 0)
 		return 0;
-	return 1;
+	else if (n > 0)
+		return 1;
+	return -1;
 }
 
 long clang_sl(long n) {
-	if (n == 0)
-		return 0;
-	return 1;
+	if (n > 0)
+        return 1;
+	else if (n < 0)
+        return -1;
+    else
+        return 0;
 }
 
 [CCode (cname = "isalpha", cheader_filename="ctype.h")]
@@ -22,12 +27,14 @@ string run_isalpha() {
 		var t = SupraTest.test(8, () => {
 			for (int i = 0; i < 255; ++i)
 			{
-				if (clang_s(ft_isalpha(i)) != clang_s(clang_isalpha(i)))
+				if (clang_s(ft_isalpha(i)) != clang_s(clang_isalpha(i))) {
+					stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isalpha(i), clang_isalpha(i));
 					return false;
+				}
 			}
 			return true;
 		});
-		return result + t.msg();
+		return result + t.msg_err();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -45,12 +52,14 @@ string run_isdigit() {
 		var t = SupraTest.test(8, () => {
 				for (int i = 0; i < 255; ++i)
 				{
-					if (clang_s(ft_isdigit(i)) != clang_s(clang_isdigit(i)))
+					if (clang_s(ft_isdigit(i)) != clang_s(clang_isdigit(i))) {
+						stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isdigit(i), clang_isdigit(i));
 						return false;
+					}
 				}
 				return true;
 			});
-		return result + t.msg();
+		return result + t.msg_err();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -68,8 +77,10 @@ string run_isalnum() {
 		var t = SupraTest.test(8, () => {
 			for (int i = 0; i < 255; ++i)
 			{
-				if (clang_s(ft_isalnum(i)) != clang_s(clang_isalnum(i)))
+				if (clang_s(ft_isalnum(i)) != clang_s(clang_isalnum(i))) {
+						stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isalnum(i), clang_isalnum(i));
 					return false;
+				}
 			}
 			return true;
 		});
@@ -132,12 +143,13 @@ string run_strlen() {
 	string result = "STRLEN:   ";
 	try {
 		var ft_strlen = (d_strlen)loader.symbol("ft_strlen");
-		result += SupraTest.test(8, () => { return (ft_strlen("1") == 1); }, "1").msg();
-		result += SupraTest.test(2, () => { return (ft_strlen("12") == 2); }, "2").msg();
-		result += SupraTest.test(8, () => { return (ft_strlen("123") == 3); }, "3").msg();
-		result += SupraTest.test(2, () => { return (ft_strlen("1234") == 4); }, "4").msg();
-		result += SupraTest.test(8, () => { return (ft_strlen("12345") == 5); }, "5").msg();
-		result += SupraTest.test(2, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "8 spaces").msg();
+		/* 1 */ result += SupraTest.test(8, () => { return (ft_strlen("1") == 1); }, "1").msg();
+		/* 2 */ result += SupraTest.test(2, () => { return (ft_strlen("12") == 2); }, "2").msg();
+		/* 3 */ result += SupraTest.test(8, () => { return (ft_strlen("123") == 3); }, "3").msg();
+		/* 4 */ result += SupraTest.test(2, () => { return (ft_strlen("1234") == 4); }, "4").msg();
+		/* 5 */ result += SupraTest.test(8, () => { return (ft_strlen("12345") == 5); }, "5").msg();
+		/* 6 */ result += SupraTest.test(2, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "8 spaces").msg();
+		/* 7 */
 		var t = SupraTest.test(8, ()=>{
 			ft_strlen(null);
 			return false;
@@ -305,7 +317,7 @@ string run_memmove() {
 	}
 }
 
-[CCode (cname = "strlcpy", cheader_filename="ctype.h")]
+[CCode (cname = "strlcpy", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcpy(char *dest, char *src, size_t size);
 [CCode (has_target = false)]
 delegate int d_strlcpy(char *dest, char *src, size_t size);
@@ -382,7 +394,7 @@ string run_strlcpy() {
 	}
 }
 
-[CCode (cname = "strlcat", cheader_filename="ctype.h")]
+[CCode (cname = "strlcat", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcat(char *dest, char *src, size_t size);
 [CCode (has_target = false)]
 delegate int d_strlcat(char *dest, char *src, size_t size);
@@ -611,18 +623,18 @@ string run_strncmp() {
 				return t.msg_ko(msg ?? t.message + t.stderr);
 			return t.msg();
 		}
-		result += check("a", "b", 1);
-		result += check("", "", 4);
-		result += check("bjr\0kitty", "bjr\0hello", 7);
-		result += check("abcd", "abce", 3);
-		result += check("test\0", "", 6);
-		result += check("", "test\0", 6);
+		/* 1 */ result += check("a", "b", 1);
+		/* 2 */ result += check("", "", 4);
+		/* 3 */ result += check("bjr\0kitty", "bjr\0hello", 7);
+		/* 4 */ result += check("abcd", "abce", 3);
+		/* 5 */ result += check("test\0", "", 6);
+		/* 6 */ result += check("", "test\0", 6);
 		uint8 []uc_test = {'t', 'e', 's', 't', 128};
-		result += check(uc_test, "test\0", 6, "Unsigned-Char ?");
-		result += check("Portal2", "TheCakeIsALie", 4);
-		result += check("", "TheCakeIsALie", 4);
-		result += check("Portal2", "", 4);
-		result += check("fhfghfgdjhsffg", "dfghfdhsfd", 5);
+		/* 7 */ result += check(uc_test, "test\0", 6, "Unsigned-Char ?");
+		/* 8 */ result += check("Portal2", "TheCakeIsALie", 4);
+		/* 9 */ result += check("", "TheCakeIsALie", 4);
+		/* 10 */ result += check("Portal2", "", 4);
+		/* 11 */ result += check("fhfghfgdjhsffg", "dfghfdhsfd", 5);
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -692,37 +704,39 @@ string run_memcmp() {
 	return result;
 }
 
-[CCode (cname = "strnstr", cheader_filename="string.h")]
-extern char* strnstr(char *s1, char* s2, size_t n);
+[CCode (cname = "strnstr", cheader_filename="bsd/string.h")]
+extern unowned string? strnstr(char *s1, char* s2, size_t n);
 [CCode (has_target = false)]
-delegate char* d_strnstr(char* s1, char* s2, size_t n);
+delegate unowned string? d_strnstr(char* s1, char* s2, size_t n);
 string run_strnstr() {
 	string result = "STRNSTR:  ";
 	try {
 		var ft_strnstr= (d_strnstr)loader.symbol("ft_strnstr");
 		string check(char* s1, char* s2, size_t n) {
-			var t = SupraTest.test(8, ()=>{
-				return (clang_sl((long)ft_strnstr(s1, s2, n)) == clang_sl((long)strnstr(s1, s2, n)));
-			}, @"strnstr('$((string)s1)', '$((string)s2)', $(n)) ");
-			return t.msg();
+			return SupraTest.test(8, ()=>{
+				unowned string? a = ft_strnstr(s1, s2, n);
+				unowned string? b = strnstr(s1, s2, n);
+				if (a != b) {
+					stderr.printf("strnstr('%s', '%s', %ld) you: %s, me: %s ", (string)s1, (string)s2, (long)n, a, b);
+					return false;
+				}
+				return true;
+			}).msg_err();
 		}
-		result += check("t", "", 0);
-		result += check("1234", "1235", 3);
-		result += check("1234", "1235", 4);
-		result += check("1234", "1235", -1);
-		result += check("", "", 42);
-		result += check("SupraVim", "Supravim", 42);
-		result += check("SupraVim", "supravim", 42);
-		result += check("SupraVim", "supraVim", 42);
-		result += check("SupraVim", "SuprAviM", 42);
-		result += check("SupraVim", "SupraVimX", 42);
-		result += check("SupraVim", "SupraVi", 42);
-		result += check("Sup\0raVime", "Sup\0raVi", 42);
-		result += check("", "1", 0);
-		result += check("1", "", 0);
-		result += check("", "1", 1);
-		result += check("1", "", 1);
-		result += check("", "", 1);
+		/* 1 */  result += check("a", "super magique", 3);
+		/* 2 */  result += check("a", "super magique", 42);
+		/* 3 */  result += check("abc", "zzzzzzzzzzzabczzzzzzzzz", 3);
+		/* 4 */  result += check("abc", "zzzzzzzzzzzabczzzzzzzzz", 42);
+		/* 5 */  result += check("", "zzzzzzzzzzzabczzzzzzzzz", 42);
+		/* 6 */  result += check("", "", 42);
+		/* 7 */  result += check("", "", 0);
+		/* 8 */  result += check("zzzzzzzzzzzabczzzzzzzzz", "", 42);
+		/* 9 */  result += check("supravim n'est point un IDE", "vim", 42);
+		/* 10 */  result += check("supravim n'est point un IDE", "vim", 8);
+		/* 11 */  result += check("supravim n'est point un IDE", "vim", 7);
+		/* 12 */  result += check("supravim n'est point un IDE", "vim", 6);
+		/* 12 */  result += check("hello\0world", "world", 42);
+
 		return result;
 	}
 	catch (Error e) {
@@ -740,22 +754,22 @@ string run_atoi() {
 		string check(string s_nb, int nb, string? msg = null){
 			return SupraTest.test(8, () => { return (ft_atoi(s_nb) == nb); }, msg ?? "atoi(" + s_nb + ") ").msg();
 		}
-		result += check("2147483647", 2147483647, "int MAX ");
-		result += check("-2147483648", -2147483648, "int MIN ");
-		result += check("0", 0);
-		result += check("1", 1);
-		result += check("2", 2);
-		result += check("9", 9);
-		result += check("10", 10);
-		result += check("11", 11);
-		result += check("42", 42);
-		result += check("-1", -1);
-		result += check("-2", -2);
-		result += check("-9", -9);
-		result += check("-10", -10);
-		result += check("-11", -11);
-		result += check("-42", -42);
-		result += check("165468465", 165468465);
+		/* 1 */ result += check("2147483647", 2147483647, "int MAX ");
+		/* 2 */ result += check("-2147483648", -2147483648, "int MIN ");
+		/* 3 */ result += check("0", 0);
+		/* 4 */ result += check("1", 1);
+		/* 5 */ result += check("2", 2);
+		/* 6 */ result += check("9", 9);
+		/* 7 */ result += check("10", 10);
+		/* 8 */ result += check("11", 11);
+		/* 9 */ result += check("42", 42);
+		/* 10 */ result += check("-1", -1);
+		/* 11 */ result += check("-2", -2);
+		/* 12 */ result += check("-9", -9);
+		/* 13 */ result += check("-10", -10);
+		/* 14 */ result += check("-11", -11);
+		/* 15 */ result += check("-42", -42);
+		/* 16 */ result += check("165468465", 165468465);
 		for (int N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);

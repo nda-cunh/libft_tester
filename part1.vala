@@ -333,8 +333,8 @@ string run_strlcpy() {
 			Memory.set(d2, '\0', 20);
 			Memory.copy(d1, dest, dest.length);
 			Memory.copy(d2, dest, dest.length);
-			char *s1 = Memory.dup(src, src.length);
-			char *s2 = Memory.dup(src, src.length);
+			char *s1 = Memory.dup2(src, src.length);
+			char *s2 = Memory.dup2(src, src.length);
 
 			if (ft_strlcpy(d1, s1, n) != strlcpy(d2, s2, n)) {
 				delete s1; delete s2;
@@ -410,8 +410,8 @@ string run_strlcat() {
 			Memory.set(d2, '\0', 20);
 			Memory.copy(d1, dest, len);
 			Memory.copy(d2, dest, len);
-			char *s1 = Memory.dup(src, src_len);
-			char *s2 = Memory.dup(src, src_len);
+			char *s1 = Memory.dup2(src, src_len);
+			char *s2 = Memory.dup2(src, src_len);
 
 			if (ft_strlcat(d1, s1, n) != strlcat(d2, s2, n)) {
 				delete s1; delete s2;
@@ -745,35 +745,52 @@ string run_strnstr() {
 }
 
 // atoi
+[CCode (cname = "atoi", cheader_filename="stdlib.h")]
+extern int atoi(string s1); 
 [CCode (has_target = false)]
 delegate int d_atoi(string s);
 string run_atoi() {
 	string result = "ATOI:     ";
 	try {
 		var ft_atoi = (d_atoi)loader.symbol("ft_atoi");
-		string check(string s_nb, int nb, string? msg = null){
-			return SupraTest.test(8, () => { return (ft_atoi(s_nb) == nb); }, msg ?? "atoi(" + s_nb + ") ").msg();
+		string check(string s_nb){
+			return SupraTest.test(8, () => {
+				var a = ft_atoi(s_nb);
+				var b = atoi(s_nb);
+				stderr.printf("You:%d Me:%d", a, b);
+				return (a == b);
+			}).msg_err(@"Atoi('$s_nb')");
 		}
-		/* 1 */ result += check("2147483647", 2147483647, "int MAX ");
-		/* 2 */ result += check("-2147483648", -2147483648, "int MIN ");
-		/* 3 */ result += check("0", 0);
-		/* 4 */ result += check("1", 1);
-		/* 5 */ result += check("2", 2);
-		/* 6 */ result += check("9", 9);
-		/* 7 */ result += check("10", 10);
-		/* 8 */ result += check("11", 11);
-		/* 9 */ result += check("42", 42);
-		/* 10 */ result += check("-1", -1);
-		/* 11 */ result += check("-2", -2);
-		/* 12 */ result += check("-9", -9);
-		/* 13 */ result += check("-10", -10);
-		/* 14 */ result += check("-11", -11);
-		/* 15 */ result += check("-42", -42);
-		/* 16 */ result += check("165468465", 165468465);
+		/* 1 */ result += check("2147483647");
+		/* 2 */ result += check("-2147483648");
+		/* 3 */ result += check("0");
+		/* 4 */ result += check("1");
+		/* 5 */ result += check("2");
+		/* 6 */ result += check("9");
+		/* 7 */ result += check("10");
+		/* 8 */ result += check("11");
+		/* 9 */ result += check("42");
+		/* 10 */ result += check("-1"); 
+		/* 11 */ result += check("-2");
+		/* 12 */ result += check("-9");
+		/* 13 */ result += check("-10");
+		/* 14 */ result += check("-11");
+		/* 15 */ result += check("-42");
+		/* 16 */ result += check("165468465");
+		/* 17 */ result += check("   \t\r\f\v\t-2145");
+		/* 18 */ result += check("   \t\t--2145");
+		/* 19 */ result += check("   \t\t-a2145");
+		/* 20 */ result += check("   \t\t-8a2145");
+		/* 21 */ result += check("   \n 28fkldjgd42");
+		/* 22 */ result += check("   \n\f\r\n\t\v");
+		/* 23 */ result += check(" 000002147483647");
+		/* 24 */ result += check(" 000-2147483648");
+
+		/* 25 */
 		for (int N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);
-			result += check(@"$i", i, @"Random Test $i ");
+			result += check(@"$i");
 		}
 		return result;
 	}

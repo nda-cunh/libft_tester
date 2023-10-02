@@ -139,6 +139,9 @@ void main() {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
+
+	// Remove Vala DEBUGING LOG
+	Log.set_default_handler(()=> {});
 	new LibftTester();
 	print("====================================================");
 }

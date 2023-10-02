@@ -24,7 +24,7 @@ $(NAME) : generate_c $(OBJ)
 	@printf "$(WHITE)compiling $< >>> $@$(NC)\n"
 
 generate_c: $(SRC_VALA)
-	@valac --enable-experimental dllloader.vapi $(SRC_VALA) $(LIB_VALA) -C
+	@valac --disable-warnings --enable-experimental dllloader.vapi $(SRC_VALA) $(LIB_VALA) -C
 	@echo -e "$(GREEN)[ Generation of all C Files ]$(NC)"
 
 clean:

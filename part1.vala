@@ -775,10 +775,10 @@ string run_calloc() {
 	try {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
 
-		var t = SupraTest.test(8, () => {
+		/* 1 */ var t = SupraTest.test(8, () => {
 			char *m = ft_calloc(52, sizeof(char));
 
-			for (int i = 0; i < 52; i++)
+			for (int i = 0; i < 52; ++i)
 			{
 				if (m[i] != '\0') {
 					delete m;
@@ -792,7 +792,16 @@ string run_calloc() {
 			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
 		else
 			result += t.msg_ok();
-		result += t.msg();
+		/* 2 */ result += t.msg();
+		
+		/* 3 */ result += SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_calloc(42, 1);
+			if (s != null)
+				delete s;
+			return (s == null);
+		}).msg_err("no protect ");
+
 		return result;
 	}
 	catch (Error e) {
@@ -806,35 +815,24 @@ string run_strdup() {
 	string result = "STRDUP:   ";
 	try {
 		var ft_strdup = (d_strdup)loader.symbol("ft_strdup");
-		SupraTest.Test t;
 
-		t = SupraTest.test(8, () => {
-			string s = ft_strdup("Abc");
+		string check(string cmp) {
+			var t = SupraTest.test(8, () => {
+				string s = ft_strdup(cmp);
 
-			if (s == "Abc")
-				return true;
-			return false;
-		}, "strdup('Abc')");
-		if (t.alloc != 1)
-			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
-		else
-			result += t.msg_ok();
-		result += t.msg();
+				return (s == cmp);
+			}, "strdup('$cmp')");
+			if (t.alloc != 1)
+				return t.msg_ko(@"No alloc ??? $(t.alloc)");
+			return t.msg_ok();
+		}
 		
-		t = SupraTest.test(8, () => {
-			string s = ft_strdup("");
-
-			if (s == "")
-				return true;
-			return false;
-		}, "strdup('')");
-		if (t.alloc != 1)
-			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
-		else
-			result += t.msg_ok();
-		result += t.msg();
+		/* 1 */ result += check("abc");	
+		/* 2 */ result += check("Abc");	
+		/* 3 */ result += check("");	
 		
-		t = SupraTest.test(8, () => {
+		// Test if strdup segfault
+		/* 4 */ var	t = SupraTest.test(8, () => {
 			ft_strdup(null);
 			return false;
 		}, "strdup(NULL) NOCRASH");
@@ -842,6 +840,17 @@ string run_strdup() {
 			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
 		else
 			result += t.msg_ok();
+
+
+		// Test if strdup protect (malloc) 
+		/* 5 */ result += SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_strdup("bababababhc");
+			if (s != null)
+				delete s;
+			return (s == null);
+		}).msg_err("no protect ");
+
 		return result;
 	}
 	catch (Error e) {

@@ -8,15 +8,12 @@ public string read_all(ref FileStream stream) {
 	return str.str;
 }
 
-extern int get_free_count();
-extern int get_malloc_count();
-extern void reset_malloc();
-
 //   SUPRATEST 
 public enum Status{
 	OK = 0,
 	KO = 1,
-	TIMEOUT = 2,
+	SIGINT = 2,
+	TIMEOUT = 3,
 	SIGILL = 4,
 	SIGFPE = 8,
 	SIGBUS = 10,
@@ -24,77 +21,82 @@ public enum Status{
 	LEAK = 42
 }
 
-public struct SupraTest {
-	public string? 	message;
-	public string? 	stdout;
-	public string? 	stderr;
-	public string? 	stdin;
-	public Status	status;
-	int				alloc;
-	int				free;
 
-	public SupraTest(string message) {
-		this.message = message;
-		this.stdout = null;
-		this.stderr = null;
-		this.stdin = null;
-		this.status = KO;
-		this.alloc = 0;
-		this.free = 0;
-	}
+namespace SupraTest{
+	public struct Test {
+		public string? 	message;
+		public string? 	stdout;
+		public string? 	stderr;
+		public string? 	stdin;
+		public Status	status;
+		int				alloc;
+		int				free;
 
-	public string msg_ok() {
-		return "\033[32m[OK]\033[0m";
-	}
+		public Test(string message) {
+			this.message = message;
+			this.stdout = null;
+			this.stderr = null;
+			this.stdin = null;
+			this.status = KO;
+			this.alloc = 0;
+			this.free = 0;
+		}
 
-	public string msg_ko(string? msg = null) {
-		return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
-	}
+		public string msg_ok() {
+			return "\033[32m[OK]\033[0m";
+		}
 
-	public string msg(string? message = null) {
-		var msg = message ?? this.message; 
-		if (status == LEAK)
-			return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
-		else if (status == SIGILL)
-			return @"\033[31m[SIGILL] $(msg)\033[0m";
-		else if (status == SIGFPE)
-			return @"\033[31m[SIGFPE] $(msg)\033[0m";
-		else if (status == SIGBUS)
-			return @"\033[31m[SIGBUS] $(msg)\033[0m";
-		else if (status == SIGSEGV)
-			return @"\033[31m[SIGSEGV] $(msg)\033[0m";
-		else if (status == OK)
-			return @"\033[32m[OK]\033[0m";
-		else if (status == KO)
-			return msg_ko(msg);
-		else if (status == TIMEOUT)
-			return @"\033[31m[TIMEOUT] $(msg)\033[0m";
-		else
-			return @"\033[31m[???] \033[0m";
-	}
+		public string msg_ko(string? msg = null) {
+			return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
+		}
 
-	public void print_result() {
-		print(this.msg());
-	}
+		public string msg_err(string? message = null) {
+			var s = message ?? this.message; 
+			return msg(@"$s $(this.stderr)");
+		}
+		
+		public string msg(string? message = null) {
+			var msg = message ?? this.message; 
+			if (status == LEAK)
+				return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
+			else if (status == SIGILL)
+				return @"\033[31m[SIGILL] $(msg)\033[0m";
+			else if (status == SIGFPE)
+				return @"\033[31m[SIGFPE] $(msg)\033[0m";
+			else if (status == SIGBUS)
+				return @"\033[31m[SIGBUS] $(msg)\033[0m";
+			else if (status == SIGSEGV)
+				return @"\033[31m[SIGSEGV] $(msg)\033[0m";
+			else if (status == OK)
+				return @"\033[32m[OK]\033[0m";
+			else if (status == KO)
+				return msg_ko(msg);
+			else if (status == TIMEOUT)
+				return @"\033[31m[TIMEOUT] $(msg)\033[0m";
+			else
+				return @"\033[31m[???] \033[0m";
+		}
 
-	public void init_sig(){
-		int tab[] = {4, 8, 10, 11};
-		foreach (var i in tab) {
-			Posix.signal(i, (sg) => {
-					Posix.exit(sg);
-				});
+		public void print_result() {
+			print(this.msg());
+		}
+
+		public void init_sig(){
+			int tab[] = {4, 8, 10, 11};
+			foreach (var i in tab) {
+				Posix.signal(i, (sg) => {
+						Posix.exit(sg);
+					});
+			}
+		}
+		
+		public void remove_sig() {
+			int tab[] = {4, 8, 10, 11};
+			foreach (var i in tab) {
+				Posix.signal(i, Posix.SIG_DFL);
+			}
 		}
 	}
-	
-	public void remove_sig() {
-		int tab[] = {4, 8, 10, 11};
-		foreach (var i in tab) {
-			Posix.signal(i, Posix.SIG_DFL);
-		}
-	}
-}
-
-namespace Test {
 	[CCode (cname = "mkstemp", cheader_filename="stdlib.h")]
 	extern int mkstemp(char *template);
 
@@ -103,8 +105,8 @@ namespace Test {
 	[CCode (cname = "WEXITSTATUS", cheader_filename="sys/wait.h")]
 	extern int exit_status(int status);
 
-	public SupraTest test(uint timeout, testFunction func, string err_message = "") {
-		SupraTest result = SupraTest(err_message);
+	public Test test(uint timeout, testFunction func, string err_message = "") {
+		Test result = Test(err_message);
 		result.init_sig();
 		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
@@ -113,12 +115,12 @@ namespace Test {
 		int status;
 		var timer = new Timer();
 		var pid = Posix.fork();
-		reset_malloc();
+		SupraLeak.reset();
 		if (pid == 0) {
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_err);
 			bool b = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
+			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
 			if (b == true) {
 				Posix.exit(0);
 			}
@@ -152,10 +154,12 @@ namespace Test {
 
 		FileUtils.unlink((string)template_stderr);
 		result.status = (Status)exit_status(status);
-		if (result.free != result.alloc)
-			result.status = LEAK;
-		else if ((uint)timer.elapsed() >= timeout)
-			result.status = TIMEOUT;
+		if (result.status == OK || result.status == KO) {
+			if (result.free != result.alloc)
+				result.status = LEAK;
+			else if ((uint)timer.elapsed() >= timeout)
+				result.status = TIMEOUT;
+		}
 		return result;
 	}
 
@@ -164,8 +168,8 @@ namespace Test {
 
 
 
-	public SupraTest complex(uint timeout, testFunction func, string err_message = "") {
-		SupraTest result = SupraTest(err_message);
+	public Test complex(uint timeout, testFunction func, string err_message = "") {
+		Test result = Test(err_message);
 		result.init_sig();
 		var timer = new Timer();
 		int status;
@@ -180,14 +184,14 @@ namespace Test {
 			Posix.perror("Erreur lors de la création du fichier temporaire");
 
 		var pid = Posix.fork();
-		reset_malloc();
+		SupraLeak.reset();
 		if (pid == 0) {
 			Posix.dup2(fd_out, 1);
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_out);
 			Posix.close(fd_err);
 			bool res = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", get_free_count(), get_malloc_count());
+			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
 			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);

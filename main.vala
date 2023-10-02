@@ -69,7 +69,7 @@ class LibftTester{
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
-				Posix.usleep(120000);
+				Posix.usleep(100000);
 			}
 		}
 		loop.run();
@@ -78,6 +78,12 @@ class LibftTester{
 	void run_part2() {
 		tab_func_p2 = {
 			run_itoa,
+			run_split,
+			run_strjoin,
+			run_strtrim,
+			run_strmapi,
+			run_striteri,
+			run_substr,
 			run_putchar_fd,
 			run_putstr_fd,
 			run_putendl_fd,
@@ -94,7 +100,7 @@ class LibftTester{
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
-				Posix.usleep(190000);
+				Posix.usleep(100000);
 			}
 		}
 		loop.run();
@@ -107,7 +113,6 @@ class LibftTester{
 				loading.begin();
 				return false;
 			});
-			// loop.run();
 			loader = new Loader("libft.so");
 			finish_test = 0;
 			run_part1();
@@ -136,6 +141,9 @@ void main() {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
+
+	// Remove Vala DEBUGING LOG
+	Log.set_default_handler(()=> {});
 	new LibftTester();
 	print("====================================================");
 }

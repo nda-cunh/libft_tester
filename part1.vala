@@ -7,15 +7,6 @@ int clang_s(int n) {
 	return -1;
 }
 
-long clang_sl(long n) {
-	if (n > 0)
-        return 1;
-	else if (n < 0)
-        return -1;
-    else
-        return 0;
-}
-
 [CCode (cname = "isalpha", cheader_filename="ctype.h")]
 extern int clang_isalpha(int c);
 [CCode (has_target = false)]
@@ -890,4 +881,3 @@ string run_strdup() {
 		return @"$result \033[31m$(e.message)\033[0m";
 	}
 }
-

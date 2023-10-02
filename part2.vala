@@ -5,7 +5,7 @@ string run_itoa() {
 	try {
 		var ft_itoa = (d_itoa)loader.symbol("ft_itoa");
 		string check(int n, string? msg = null) {
-			return Test.test(8, () => {
+			return SupraTest.test(8, () => {
 				return (ft_itoa(n) == @"$n");
 			}, msg ?? @"$n").msg();
 		}
@@ -30,7 +30,7 @@ string run_itoa() {
 			var i = Random.int_range(int.MIN, int.MAX);
 			result += check(i);
 		}
-		/* 18 */ result += Test.test(8, ()=>{
+		/* 18 */ result += SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_itoa(42);
 			if (s != null)
@@ -44,7 +44,6 @@ string run_itoa() {
 	}
 }
 
-// ft_substr
 [CCode (has_target = false)]
 delegate string d_substr(char *s, uint start, size_t len);
 string run_substr() {
@@ -53,12 +52,12 @@ string run_substr() {
 		var ft_substr = (d_substr)loader.symbol("ft_substr");
 
 		string check(string str, uint start, size_t len, string sp) {
-			var t = Test.test(8, () => {
+			var t = SupraTest.test(8, () => {
 				string? splice = sp; 
 				var sp1 = ft_substr(str, start, len);
 				if (sp1 == splice)
 					return true;
-				printerr("[You:'%s' != Me:'%s'] ", sp1, splice); 
+				stderr.printf("[You:'%s' != Me:'%s'] ", sp1, splice); 
 				return false;
 			});
 			return t.msg(@"test: ('$str', $start, $len) $(t.stderr)");
@@ -74,7 +73,7 @@ string run_substr() {
 		/* 8 */ result += check("salut !", 100, 1, "");
 		/* 9 */ result += check("0123456789", 9, 10, "9");
 		/* 10 */ result += check("BONJOUR LES HARICOTS !", 8, 14, "LES HARICOTS !");
-		/* 11 */ result += Test.test(8, ()=>{
+		/* 11 */ result += SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_substr("abc", 1, 3);
 			if (s != null)
@@ -90,7 +89,93 @@ string run_substr() {
 	}
 }
 // ft_strjoin
+[CCode (has_target = false)]
+delegate string d_strjoin(char *s1, char *s2);
+string run_strjoin() {
+	string result = "STRJOIN:  ";
+	try {
+		var ft_strjoin = (d_strjoin)loader.symbol("ft_strjoin");
+
+		string check(string s1, string s2, string cmp) {
+			return SupraTest.test(8, () => {
+				var s = ft_strjoin(s1, s2);
+				if (s == cmp)
+					return true;
+				stderr.printf("You:'%s' Me:'%s'", s, cmp);
+				return false;
+			}).msg_err(@"test: ('$s1', $s2) ");
+		}
+
+		/* 1 */ result += check("hello ", "salut", "hello salut");
+		/* 2 */ result += check("a", "b", "ab");
+		/* 3 */ result += check("", "b", "b");
+		/* 4 */ result += check("a", "", "a");
+		/* 5 */ result += check("", "", "");
+		/* 6 */ result += check("lusersupra testu le dartien", "supra test", "lusersupra testu le dartiensupra test");
+		/* 7 */ result += check("", "suprluserbu le dartien test", "suprluserbu le dartien test");
+		/* 8 */ result += check("luserbu le dartien", "", "luserbu le dartien");
+		/* 9 */ result += check("a a a a a a a", "a a a a a a a  a a  a   a a  ", "a a a a a a aa a a a a a a  a a  a   a a  ");
+		
+		/* 10 */ result += SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_strjoin("ab", "ab");
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err();
+		
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 // ft_strtrim
+[CCode (has_target = false)]
+delegate string d_strtrim(char *s1, char *set);
+string run_strtrim() {
+	// var str = new StringBuilder();
+	string result = "STRTRIM:  ";
+	try {
+		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
+
+		string check(string s1, string s2, string cmp) {
+			return SupraTest.test(8, () => {
+				var s = ft_strtrim(s1, s2);
+				if (s == cmp)
+					return true;
+				stderr.printf("You:'%s' Me:'%s'", s, cmp);
+				return false;
+			}).msg_err(@"test: ('$s1', $s2) ");
+		}
+
+		/* 1 */ result += check("hello salut", "salut", "hello ");
+		/* 2 */ result += check("abracadabra", "a", "bracadabr");
+		/* 3 */ result += check("aaaaaaaaaaaaaaaa", "a", "");
+		/* 4 */ result += check("", "123", "");
+		/* 5 */ result += check("", "", "");
+		/* 6 */ result += check("123", "", "123");
+		/* 7 */ result += check(" bcadsalutbacddcdc  ", "ab cd", "salut");
+		/* 8 */ result += check("nabila: 2x2=4 ? non 2+2 = 4! je pense qu'il se sont trompe", "ab:cde'fghijklmnopq rstuvwxyz", "2x2=4 ? non 2+2 = 4!");
+		/* 9 */ result += check("   xxx   xxx", " x", "");
+		/* 10 */ result += check("abcdba", "acb", "d");
+		/* 11 */ result += check("      supra         ", "      ", "supra");
+		/* 12 */ result += check("      sup  ra         ", "      ", "sup  ra");
+		
+		/* 13 */ result += SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_strtrim("ab", "ab");
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err();
+		
+		return result;
+	}
+	catch (Error e) {
+		return @"$result \033[31m$(e.message)\033[0m";
+	}
+}
 
 [CCode (has_target = false)]
 delegate char** d_split(char *s, char c);
@@ -100,13 +185,13 @@ string run_split() {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
 		string check(string str, char c, string []cmp) {
-			var t = Test.test(8, () => {
+			var t = SupraTest.test(8, () => {
 				var sp1 = ft_split(str, c);
 			
 				for (int i = 0; sp1[i] != null; ++i)
 				{
 					if ((string)sp1[i] != cmp[i]) {
-						printerr(" You:'%s' Me:'%s' ", (string)sp1[i], cmp[i]);
+						stderr.printf(" You:'%s' Me:'%s' ", (string)sp1[i], cmp[i]);
 						for (int j = 0; sp1[j] != null; ++j)
 							free(sp1[j]);
 						free(sp1);
@@ -137,7 +222,7 @@ string run_split() {
 		/* 14 */ result += check(",,,", ',', {""});
 		/* 15 */ result += check(",,,", '\0', {",,,"});
 		/* 16 */ result += check(" ", ',', {" "});
-		/* 17 */ result += Test.test(8, ()=>{
+		/* 17 */ result += SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char **s = ft_split("bababababhc", 'a');
 			if (s != null)
@@ -161,9 +246,9 @@ string run_putchar_fd() {
 	string result = "PUTCHARFD:";
 	try {
 		var ft_putchar_fd = (d_putchar_fd)loader.symbol("ft_putchar_fd");
-		SupraTest t;
+		SupraTest.Test t;
 		//test 1
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			ft_putchar_fd('e', 1);
 			return true;
 		});
@@ -173,7 +258,7 @@ string run_putchar_fd() {
 		
 		//test 2
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			ft_putchar_fd('v', 2);
 			return true;
 		});
@@ -183,7 +268,7 @@ string run_putchar_fd() {
 		
 		//test 3
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			ft_putchar_fd('e', -1);
 			return true;
 		});
@@ -204,10 +289,10 @@ string run_putstr_fd() {
 	string result = "PUTSTRFD: ";
 	try {
 		var ft_putstr_fd = (d_putstr_fd)loader.symbol("ft_putstr_fd");
-		SupraTest t;
+		SupraTest.Test t;
 		
 		//test 1
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putstr_fd("abcdefghijklmnopqrstuvwxyz", 1) == 26);
 		});
 		if (t.status == KO && t.stdout == "abcdefghijklmnopqrstuvxyz" && t.stderr == "")
@@ -216,7 +301,7 @@ string run_putstr_fd() {
 		
 		//test 2
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putstr_fd("abcdefghijklmnopqrstuvwxyz", 2) == 26);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "v")
@@ -225,7 +310,7 @@ string run_putstr_fd() {
 		
 		//test 3
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putstr_fd("please dont write", -1) == 0);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "")
@@ -233,7 +318,7 @@ string run_putstr_fd() {
 		result += t.msg(@"putstr('please dont write', -1) you '$(t.stderr)' ");
 
 		//test 4
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putstr_fd("", 1) == 0);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "")
@@ -241,7 +326,7 @@ string run_putstr_fd() {
 		result += t.msg(@"putstr('', 1) you '$(t.stdout)' ");
 		
 		//test 5
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putstr_fd("", 2) == 0);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "")
@@ -261,10 +346,10 @@ string run_putendl_fd() {
 	string result = "PUTENDLFD:";
 	try {
 		var ft_putendl_fd = (d_putendl_fd)loader.symbol("ft_putendl_fd");
-		SupraTest t;
+		SupraTest.Test t;
 		
 		//test 1
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putendl_fd("abcdefghijklmnopqrstuvwxyz", 1) == 27);
 		});
 		if (t.status == KO && t.stdout == "abcdefghijklmnopqrstuvxyz\n" && t.stderr == "")
@@ -273,7 +358,7 @@ string run_putendl_fd() {
 		
 		//test 2
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putendl_fd("abcdefghijklmnopqrstuvwxyz", 2) == 27);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "abcdefghijklmnopqrstuvwxyz\n")
@@ -282,7 +367,7 @@ string run_putendl_fd() {
 		
 		//test 3
 		
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putendl_fd("please dont write", -1) == 0);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "")
@@ -290,7 +375,7 @@ string run_putendl_fd() {
 		result += t.msg(@"putendl('please dont write', -1) you '$(t.stderr)' ");
 
 		//test 4
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putendl_fd("", 1) == 1);
 		});
 		if (t.status == KO && t.stdout == "\n" && t.stderr == "")
@@ -298,7 +383,7 @@ string run_putendl_fd() {
 		result += t.msg(@"putendl('', 1) you '$(t.stdout)' ");
 		
 		//test 5
-		t = Test.complex(8, () => {
+		t = SupraTest.complex(8, () => {
 			return (ft_putendl_fd("", 2) == 1);
 		});
 		if (t.status == KO && t.stdout == "" && t.stderr == "\n")
@@ -319,7 +404,7 @@ string run_putnbr_fd() {
 	try {
 		var ft_putnbr_fd = (d_putnbr_fd)loader.symbol("ft_putnbr_fd");
 		string check(int nb, int fd) {
-			var t = Test.complex(8, () => {
+			var t = SupraTest.complex(8, () => {
 				ft_putnbr_fd(nb, 1);
 				return true;
 			});

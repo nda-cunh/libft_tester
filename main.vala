@@ -69,7 +69,7 @@ class LibftTester{
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
-				Posix.usleep(120000);
+				Posix.usleep(100000);
 			}
 		}
 		loop.run();
@@ -79,6 +79,8 @@ class LibftTester{
 		tab_func_p2 = {
 			run_itoa,
 			run_split,
+			run_strjoin,
+			run_strtrim,
 			run_substr,
 			run_putchar_fd,
 			run_putstr_fd,
@@ -96,7 +98,7 @@ class LibftTester{
 			});
 			if (get_num_processors() <= 2) {
 				MainContext.default().iteration(true);
-				Posix.usleep(190000);
+				Posix.usleep(100000);
 			}
 		}
 		loop.run();

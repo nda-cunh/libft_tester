@@ -6,12 +6,12 @@ private bool g_is_null = false;
 public class SupraLeak {
 	public static int free {
 		get {
-			return g_alloc_count;
+			return g_free_count;
 		}
 	}
 	public static int malloc{
 		get {
-			return g_free_count;
+			return g_alloc_count;
 		}
 	}
 	public static void send_null() {

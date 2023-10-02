@@ -1,4 +1,4 @@
-SRC_VALA = main.vala module.vala part1.vala part2.vala supraleak.vala Test.vala
+SRC_VALA = main.vala module.vala part1.vala part2.vala SupraLeak.vala SupraTest.vala
 LIB_VALA = --pkg=posix --pkg=gmodule-2.0 --pkg=gio-2.0
 LIB = $$(pkg-config --libs gmodule-2.0 gio-2.0) -lbsd -ldl
 CFLAGS = $$(pkg-config --cflags gmodule-2.0 gio-2.0) -O2 -w

@@ -381,55 +381,42 @@ string run_putchar_fd() {
 }
 
 [CCode (has_target = false)]
-delegate size_t  d_putstr_fd(char *s, int fd);
+delegate void d_putstr_fd(char *s, int fd);
 string run_putstr_fd() {
 	string result = "PUTSTRFD: ";
 	try {
 		var ft_putstr_fd = (d_putstr_fd)loader.symbol("ft_putstr_fd");
-		SupraTest.Test t;
-		
-		//test 1
-		t = SupraTest.complex(8, () => {
-			return (ft_putstr_fd("abcdefghijklmnopqrstuvwxyz", 1) == 26);
-		});
-		if (t.status == KO && t.stdout == "abcdefghijklmnopqrstuvxyz" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putstr('abcdefghijklmnopqrstuvxyz', 1) you '$(t.stdout)' ");
-		
-		//test 2
-		
-		t = SupraTest.complex(8, () => {
-			return (ft_putstr_fd("abcdefghijklmnopqrstuvwxyz", 2) == 26);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "v")
-			t.status = OK;
-		result += t.msg(@"putstr('', 2) you '$(t.stderr)' ");
-		
-		//test 3
-		
-		t = SupraTest.complex(8, () => {
-			return (ft_putstr_fd("please dont write", -1) == 0);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putstr('please dont write', -1) you '$(t.stderr)' ");
-
-		//test 4
-		t = SupraTest.complex(8, () => {
-			return (ft_putstr_fd("", 1) == 0);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putstr('', 1) you '$(t.stdout)' ");
-		
-		//test 5
-		t = SupraTest.complex(8, () => {
-			return (ft_putstr_fd("", 2) == 0);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putstr('', 2) you '$(t.stdout)' ");
-
+		string check(string s, int fd) {
+			var t = SupraTest.complex(8, () => {
+				ft_putstr_fd(s, fd);
+				return false;
+			});
+			if (t.status == KO) {
+				if (fd == 1 && t.stdout == s && t.stderr == "") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd == -1 && t.stdout == "" && t.stderr == "") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd != -1 && t.stdout == "" && t.stderr == s) {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 2) you '$(t.stderr)' ");
+				}
+			}
+			return t.msg(@"putstr('$s', $fd) ");
+		}
+		result += check("abc", 1);
+		result += check("abc", 2);
+		result += check(" \f\r\n\t\v", 1);
+		result += check(" \f\r\n\t\v", 2);
+		result += check("abcdefghijklmnopqrstuvwxyz", 1);
+		result += check("abcdefghijklmnopqrstuvwxyz", 2);
+		result += check("v", 1);
+		result += check("v", 2);
+		result += check("please dont write", -1);
+		result += check("", -1);
+		result += check("", 1);
+		result += check("", 2);
 		return result;
 	}
 	catch (Error e) {
@@ -438,55 +425,42 @@ string run_putstr_fd() {
 }
 
 [CCode (has_target = false)]
-delegate size_t  d_putendl_fd(char *s, int fd);
+delegate void d_putendl_fd(char *s, int fd);
 string run_putendl_fd() {
 	string result = "PUTENDLFD:";
 	try {
 		var ft_putendl_fd = (d_putendl_fd)loader.symbol("ft_putendl_fd");
-		SupraTest.Test t;
-		
-		//test 1
-		t = SupraTest.complex(8, () => {
-			return (ft_putendl_fd("abcdefghijklmnopqrstuvwxyz", 1) == 27);
-		});
-		if (t.status == KO && t.stdout == "abcdefghijklmnopqrstuvxyz\n" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putendl('abcdefghijklmnopqrstuvxyz', 1) you '$(t.stdout)' ");
-		
-		//test 2
-		
-		t = SupraTest.complex(8, () => {
-			return (ft_putendl_fd("abcdefghijklmnopqrstuvwxyz", 2) == 27);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "abcdefghijklmnopqrstuvwxyz\n")
-			t.status = OK;
-		result += t.msg(@"putendl('abcdefghijklmnopqrstuvwxyz', 2) you '$(t.stderr)' ");
-		
-		//test 3
-		
-		t = SupraTest.complex(8, () => {
-			return (ft_putendl_fd("please dont write", -1) == 0);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putendl('please dont write', -1) you '$(t.stderr)' ");
-
-		//test 4
-		t = SupraTest.complex(8, () => {
-			return (ft_putendl_fd("", 1) == 1);
-		});
-		if (t.status == KO && t.stdout == "\n" && t.stderr == "")
-			t.status = OK;
-		result += t.msg(@"putendl('', 1) you '$(t.stdout)' ");
-		
-		//test 5
-		t = SupraTest.complex(8, () => {
-			return (ft_putendl_fd("", 2) == 1);
-		});
-		if (t.status == KO && t.stdout == "" && t.stderr == "\n")
-			t.status = OK;
-		result += t.msg(@"putendl('', 2) you '$(t.stdout)' ");
-
+		string check(string s, int fd) {
+			var t = SupraTest.complex(8, () => {
+				ft_putendl_fd(s, fd);
+				return false;
+			});
+			if (t.status == KO) {
+				if (fd == 1 && t.stdout == @"$s\n" && t.stderr == "") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd == -1 && t.stdout == "" && t.stderr == "") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd != -1 && t.stdout == "" && t.stderr == @"$s\n") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 2) you '$(t.stderr)' ");
+				}
+			}
+			return t.msg(@"putstr('$s', $fd) ");
+		}
+		result += check("abc", 1);
+		result += check("abc", 2);
+		result += check(" \f\r\n\t\v", 1);
+		result += check(" \f\r\n\t\v", 2);
+		result += check("abcdefghijklmnopqrstuvwxyz", 1);
+		result += check("abcdefghijklmnopqrstuvwxyz", 2);
+		result += check("v", 1);
+		result += check("v", 2);
+		result += check("please dont write", -1);
+		result += check("", -1);
+		result += check("", 1);
+		result += check("", 2);
 		return result;
 	}
 	catch (Error e) {
@@ -500,20 +474,39 @@ string run_putnbr_fd() {
 	string result = "PUTNBRFD: ";
 	try {
 		var ft_putnbr_fd = (d_putnbr_fd)loader.symbol("ft_putnbr_fd");
-		string check(int nb, int fd) {
+		// string check(int nb, int fd) {
+			// var t = SupraTest.complex(8, () => {
+				// ft_putnbr_fd(nb, 1);
+				// return true;
+			// });
+			// if (fd == 1) {
+				// if (t.status == OK && t.stdout == @"$nb" && t.stderr == "")
+					// t.status = OK;
+			// }
+			// if (fd == 2) {
+				// if (t.status == OK && t.stdout == "" && t.stderr == @"$nb")
+					// t.status = OK;
+			// }
+			// return t.msg(@"putnbr('e', 1) you '$(t.stdout)' ");
+		// }
+		string check(int s, int fd) {
 			var t = SupraTest.complex(8, () => {
-				ft_putnbr_fd(nb, 1);
-				return true;
+				ft_putnbr_fd(s, fd);
+				return false;
 			});
-			if (fd == 1) {
-				if (t.status == OK && t.stdout == @"$nb" && t.stderr == "")
+			if (t.status == KO) {
+				if (fd == 1 && t.stdout == @"$s" && t.stderr == "") {
 					t.status = OK;
-			}
-			if (fd == 2) {
-				if (t.status == OK && t.stdout == "" && t.stderr == @"$nb")
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd == -1 && t.stdout == "" && t.stderr == "") {
 					t.status = OK;
+					return t.msg(@"putstr('$s', 1) you '$(t.stdout)' ");
+				} else if (fd != -1 && t.stdout == "" && t.stderr == @"$s") {
+					t.status = OK;
+					return t.msg(@"putstr('$s', 2) you '$(t.stderr)' ");
+				}
 			}
-			return t.msg(@"putnbr('e', 1) you '$(t.stdout)' ");
+			return t.msg(@"putstr('$s', $fd) ");
 		}
 		for (int i = 1; i != 3; ++i)
 		{
@@ -529,6 +522,8 @@ string run_putnbr_fd() {
 			result += check(11, i);
 			result += check(42, i);
 		}
+		result += check(0, -1);
+		result += check(42, -1);
 		return result;
 	}
 	catch (Error e) {

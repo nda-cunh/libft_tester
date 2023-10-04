@@ -15,17 +15,18 @@ NC = \033[0m
 
 all: $(NAME)
 
-$(NAME) : generate_c $(OBJ)
+$(NAME) : $(OBJ)
 	@gcc $(OBJ) $(LIB) -o $(NAME)
-	@echo -e "$(YELLOW)[ LINKING ]$(NC)"
+	@printf "$(YELLOW)[ LINKING ]$(NC)\n"
 
-%.o : %.c
+%.o : %.c 
 	@gcc $(CFLAGS) $< -c -o $@
 	@printf "$(WHITE)compiling $< >>> $@$(NC)\n"
 
-generate_c: $(SRC_VALA)
-	@valac --disable-warnings --enable-experimental dllloader.vapi $(SRC_VALA) $(LIB_VALA) -C
-	@echo -e "$(GREEN)[ Generation of all C Files ]$(NC)"
+$(SRC_VALA:.vala=.c): $(SRC_VALA)
+	@! [ -f $@ ] \
+		&& valac --disable-warnings --enable-experimental dllloader.vapi $(SRC_VALA) $(LIB_VALA) -C \
+		&& printf "$(GREEN)[ Generation of all C Files ]$(NC)\n"
 
 clean:
 	rm -rf $(SRC_VALA:.vala=.c)

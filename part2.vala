@@ -30,7 +30,7 @@ string run_itoa() {
 			var i = Random.int_range(int.MIN, int.MAX);
 			result += check(i);
 		}
-		/* 18 */ result += SupraTest.test(8, ()=>{
+		/* 18 */ result += SupraTest.test(4, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_itoa(42);
 			if (s != null)

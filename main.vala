@@ -3,41 +3,21 @@ delegate string d_worker();
 Loader loader;
 
 class LibftTester{
-
-	private int finish_test;
+	
 	private MainLoop loop;
-	private d_worker[] tab_func_p1;
-	private d_worker[] tab_func_p2;
 
 	public  LibftTester() {
-		tab_func_p1 = {
-			run_isalpha,
-			run_isdigit,
-			run_isalnum,
-			run_isascii,
-			run_isprint,
-			run_strlen,
-			run_memset,
-			run_bzero,
-			run_strlcat,
-			run_strlcpy,
-			run_memmove,
-			run_toupper,
-			run_tolower,
-			run_strchr,
-			run_atoi,
-			run_strrchr,
-			run_strncmp,
-			run_strnstr,
-			run_memchr,
-			run_memcmp,
-			run_memcpy,
-			run_calloc,
-			run_strdup
-		};
-		this.run();
+		try {
+			loop = new MainLoop();
+			loader = new Loader("libft.so");
+			this.run();
+		}
+		catch (Error e) {
+			printerr(e.message);
+		}
 	}
 
+	// SupraLoading
 	async void loading() {
 		var n = 0;
 		while (true) {
@@ -57,83 +37,81 @@ class LibftTester{
 		}
 	}
 
-	void run_part1() {
+	// PART 1
+	async void run_part1() {
+		d_worker []tab_func_p1 = { run_isalpha, run_isdigit, run_isalnum, run_isascii, run_isprint, run_strlen, run_memset, run_bzero, run_strlcat, run_strlcpy, run_memmove, run_toupper, run_tolower, run_strchr, run_atoi, run_strrchr, run_strncmp, run_strnstr, run_memchr, run_memcmp, run_memcpy, run_calloc, run_strdup };
 		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
-		foreach(var i in tab_func_p1) {
+		bool work = false;
+
+		foreach(var i in tab_func_p1)
+		{
+			work = true;
 			worker.begin(i, (obj, res) => {
 				print("                              \r");
 				print("%s\n", worker.end(res));
-				++finish_test;
-				if (finish_test == tab_func_p1.length)
-					loop.quit();
+				work = false;
 			});
-			if (get_num_processors() <= 2) {
-				MainContext.default().iteration(true);
-				Posix.usleep(100000);
+
+			while (work == true) {
+				Idle.add(run_part1.callback);
+				yield;
 			}
 		}
-		loop.run();
+
 	}
 	
-	void run_part2() {
-		tab_func_p2 = {
-			run_itoa,
-			run_split,
-			run_strjoin,
-			run_strtrim,
-			run_strmapi,
-			run_striteri,
-			run_substr,
-			run_putchar_fd,
-			run_putstr_fd,
-			run_putendl_fd,
-			run_putnbr_fd,
-		};
+	// PART 2
+	async void run_part2() {
+		d_worker []tab_func_p2 = { run_itoa, run_split, run_strjoin, run_strtrim, run_strmapi, run_striteri, run_substr, run_putchar_fd, run_putstr_fd, run_putendl_fd, run_putnbr_fd, };
 		print("\033[33m     <------------- [ PART 2 ] ------------->\n\033[0m");
+		bool work = true;
+
 		foreach(var i in tab_func_p2) {
+			work = true;
 			worker.begin(i, (obj, res) => {
 				print("                              \r");
 				print("%s\n", worker.end(res));
-				++finish_test;
-				if (finish_test == tab_func_p2.length)
-					loop.quit();
+				work = false;
 			});
-			if (get_num_processors() <= 2) {
-				MainContext.default().iteration(true);
-				Posix.usleep(100000);
+			while (work == true) {
+				Idle.add(run_part2.callback);
+				yield;
 			}
 		}
-		loop.run();
 	}
 
+
+
 	void run(){	
-		try {
-			loop = new MainLoop();
-			Idle.add(()=> {
-				loading.begin();
-				return false;
+		// load function SupraLoading
+		Idle.add(()=> {
+			loading.begin();
+			return false;
+		});
+
+		// load function Part 1 and Part 2 
+		Idle.add(()=> {
+			run_part1.begin(()=> {
+				run_part2.begin(()=>{
+					loop.quit();
+				});
 			});
-			loader = new Loader("libft.so");
-			finish_test = 0;
-			run_part1();
-			finish_test = 0;
-			run_part2();
-		}
-		catch (Error e) {
-			printerr(e.message);
-		}
+			return false;
+		});
+		// Run async mode
+		loop.run();
 	}
 
 	async string worker(d_worker func) {
-		string? result = null;
-		var thread = new Thread<void>("work", ()=>{
-			result = func();
+		// run the func to test in a thread
+		var thread = new Thread<string>("work", ()=>{
+			string result = func();
 			Idle.add(worker.callback);
+			return result;
 		});
 
 		yield;
-		thread.join();
-		return result;
+		return thread.join();
 	}
 }
 
@@ -172,21 +150,6 @@ Vous pouvez aussi juste cree le libft.so avec
 }
 
 void libft_found(string []args) {
-	if (Environment.get_variable("LD_LIBRARY_PATH") == null){
-		var dir = Environment.get_current_dir();
-		if (FileUtils.test(@"$dir/libft.so", FileTest.EXISTS)) {
-			Environment.set_variable("LD_LIBRARY_PATH", "./", true);
-		}
-		else if (FileUtils.test(@"$dir/libft", FileTest.IS_DIR)) {
-			Environment.set_variable("LD_LIBRARY_PATH", "./libft", true);
-			generate_so(@"$dir/libft");
-		}
-		else if (FileUtils.test(@"$dir/../Makefile", FileTest.EXISTS)) {
-			Environment.set_variable("LD_LIBRARY_PATH", "../", true);
-			generate_so(@"$dir/..");
-		}
-		Posix.execv(args[0], args);
-	}
 }
 
 void main(string []args) {

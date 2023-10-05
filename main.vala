@@ -6,11 +6,12 @@ class LibftTester{
 	
 	private MainLoop loop;
 
-	public  LibftTester() {
+	public  LibftTester(string []args) {
 		try {
 			loop = new MainLoop();
-			loader = new Loader("libft.so");
-			this.run();
+			find_libft(args);
+			// loader = new Loader("libft.so");
+			// this.run();
 		}
 		catch (Error e) {
 			printerr(e.message);
@@ -115,51 +116,12 @@ class LibftTester{
 	}
 }
 
-public const string p_supra= "\033[33;1m[SupraTester]\033[0m\033[37m ";
-public const string p_none = "\033[0m";
-
-void generate_so(string dir) {
-	printerr("%sLibft found: %s\n%s", p_supra, dir, p_none);
-	try {
-		if (FileUtils.test(@"$dir/libft.so", FileTest.EXISTS))
-			return ;
-		if (FileUtils.test(@"$dir/Makefile", FileTest.EXISTS)) {
-			var pid = new Subprocess.newv({"make", "so", "-C", @"$dir/"}, SubprocessFlags.STDERR_SILENCE); 
-			pid.wait();
-			if (pid.get_status() != 0) {
-				printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
-				printerr("%s", p_supra);
-				printerr("""
-exemple d'une regle `so`
-```makefile
-so:
-  gcc $(OBJS) --shared -o libft.so
-```
-	(Ca reviens a la regle avec ar -rc mais avec gcc et --shared)
-Vous pouvez aussi juste cree le libft.so avec
-```bash
-	gcc *.c --shared -o libft.so
-```
-""");
-				Posix.exit(0);
-			}
-		}
-	} catch (Error e) {
-		error(e.message);
-	}
-}
-
-void libft_found(string []args) {
-}
-
 void main(string []args) {
-	libft_found(args);
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
 	// Remove Vala DEBUGING LOG
 	Log.set_default_handler(()=> {});
-	new LibftTester();
-	print("====================================================");
+	new LibftTester(args);
+	print("====================================================\n");
 }
-

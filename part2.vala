@@ -184,13 +184,21 @@ string run_split() {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
 		string check(string str, char c, string []cmp) {
-			var t = SupraTest.test(8, () => {
+			return SupraTest.test(8, () => {
 				var sp1 = ft_split(str, c);
 			
 				for (int i = 0; sp1[i] != null; ++i)
 				{
 					if ((string)sp1[i] != cmp[i]) {
-						stderr.printf(" You:'%s' Me:'%s' ", (string)sp1[i], cmp[i]);
+						stderr.printf("You: [");
+						for (int e = 0; sp1[e] != null; ++e) {
+							stderr.printf("'%s',", (string)sp1[e]);
+						}
+						stderr.printf("(null)] Me: [");
+						foreach (var e in cmp) {
+							stderr.printf("'%s',", e);
+						}
+						stderr.printf("(null)]");
 						for (int j = 0; sp1[j] != null; ++j)
 							free(sp1[j]);
 						free(sp1);
@@ -201,8 +209,7 @@ string run_split() {
 					free(sp1[j]);
 				free(sp1);
 				return true;
-			});
-			return t.msg(@"test: '$str' $(t.stderr)");
+			}).msg_err(@"split(\"$str\", '$c')");
 		}
 
 		/* 1 */ result += check("a,a,a,a", ',', {"a", "a", "a", "a"});

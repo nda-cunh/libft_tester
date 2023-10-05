@@ -89,13 +89,6 @@ namespace SupraTest{
 					});
 			}
 		}
-		
-		public void remove_sig() {
-			int tab[] = {4, 8, 10, 11};
-			foreach (var i in tab) {
-				Posix.signal(i, Posix.SIG_DFL);
-			}
-		}
 	}
 	[CCode (cname = "mkstemp", cheader_filename="stdlib.h")]
 	extern int mkstemp(char *template);
@@ -107,7 +100,6 @@ namespace SupraTest{
 
 	public Test test(uint timeout, testFunction func, string err_message = "") {
 		Test result = Test(err_message);
-		result.init_sig();
 		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
 		if (fd_err < 0)
@@ -115,18 +107,15 @@ namespace SupraTest{
 		int status;
 		var timer = new Timer();
 		var pid = Posix.fork();
-		SupraLeak.reset();
 		if (pid == 0) {
+			result.init_sig();
+			SupraLeak.reset();
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_err);
 			bool b = func();
 			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
-			if (b == true) {
-				Posix.exit(0);
-			}
-			Posix.exit(1);
+			Posix.exit((b == true) ? 0 : 1);
 		}
-		result.remove_sig();
 		while (true) {
 			if (0 != Posix.waitpid(pid, out status, Posix.WNOHANG))
 				break;
@@ -170,7 +159,6 @@ namespace SupraTest{
 
 	public Test complex(uint timeout, testFunction func, string err_message = "") {
 		Test result = Test(err_message);
-		result.init_sig();
 		var timer = new Timer();
 		int status;
 
@@ -184,8 +172,9 @@ namespace SupraTest{
 			Posix.perror("Erreur lors de la création du fichier temporaire");
 
 		var pid = Posix.fork();
-		SupraLeak.reset();
 		if (pid == 0) {
+			result.init_sig();
+			SupraLeak.reset();
 			Posix.dup2(fd_out, 1);
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_out);
@@ -197,7 +186,6 @@ namespace SupraTest{
 				Posix.exit(0);
 			Posix.exit(1);
 		}
-		result.remove_sig();
 		while (true) {
 			if (0 != Posix.waitpid(pid, out status, Posix.WNOHANG))
 				break;

@@ -43,52 +43,100 @@ class LibftTester{
 		}
 	}
 
-	// PART 1
-	async void run_part1() {
-		d_worker []tab_func_p1 = { run_isalpha, run_isdigit, run_isalnum, run_isascii, run_isprint, run_strlen, run_memset, run_bzero, run_strlcat, run_strlcpy, run_memmove, run_toupper, run_tolower, run_strchr, run_atoi, run_strrchr, run_strncmp, run_strnstr, run_memchr, run_memcmp, run_memcpy, run_calloc, run_strdup };
-		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
-		bool work = false;
 
-		foreach(var i in tab_func_p1)
+
+	async void run_part(d_worker[] tab_func) {
+		const int max = 2;
+		int work = 0;
+
+		foreach(var i in tab_func)
 		{
-			work = true;
+			work++;
 			worker.begin(i, (obj, res) => {
 				print("                              \r");
 				print("%s\n", worker.end(res));
-				work = false;
+				work--;
 			});
 
-			while (work == true) {
-				Idle.add(run_part1.callback);
+			while (work == max) {
+				Idle.add(run_part.callback);
 				yield;
 			}
 		}
+		while (work != 0) {
+		Idle.add(run_part.callback);
+			yield;
+		}
+	}
 
+
+                                      
+	// ,------.                  ,--.    ,--.
+	// |  .--. ' ,--,--.,--.--.,-'  '-. /   |
+	// |  '--' |' ,-.  ||  .--''-.  .-' `|  |
+	// |  | --' \ '-'  ||  |     |  |    |  |
+	// `--'      `--`--'`--'     `--'    `--'
+
+	async void run_part1() {
+		d_worker []tab_func_p1 = {
+			run_isalpha,
+			run_isdigit,
+			run_isalnum,
+			run_isascii,
+			run_isprint,
+			run_strlen,
+			run_memset,
+			run_bzero,
+			run_strlcat,
+			run_strlcpy,
+			run_memmove,
+			run_toupper,
+			run_tolower,
+			run_strchr,
+			run_atoi,
+			run_strrchr,
+			run_strncmp,
+			run_strnstr,
+			run_memchr,
+			run_memcmp,
+			run_memcpy,
+			run_calloc,
+			run_strdup
+		};
+		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
+		yield run_part(tab_func_p1);
 	}
 	
-	// PART 2
+	
+	
+	// ,------.                  ,--.    ,---.
+	// |  .--. ' ,--,--.,--.--.,-'  '-. '.-.  \
+	// |  '--' |' ,-.  ||  .--''-.  .-'  .-' .'
+	// |  | --' \ '-'  ||  |     |  |   /   '-.
+	// `--'      `--`--'`--'     `--'   '-----'
+	
 	async void run_part2() {
-		d_worker []tab_func_p2 = { run_itoa, run_split, run_strjoin, run_strtrim, run_strmapi, run_striteri, run_substr, run_putchar_fd, run_putstr_fd, run_putendl_fd, run_putnbr_fd, };
+		d_worker []tab_func_p2 = {
+			run_itoa,
+			run_split,
+			run_strjoin,
+			run_strtrim,
+			run_strmapi,
+			run_striteri,
+			run_substr,
+			run_putchar_fd,
+			run_putstr_fd,
+			run_putendl_fd,
+			run_putnbr_fd
+		};
 		print("\033[33m     <------------- [ PART 2 ] ------------->\n\033[0m");
-		bool work = true;
-
-		foreach(var i in tab_func_p2) {
-			work = true;
-			worker.begin(i, (obj, res) => {
-				print("                              \r");
-				print("%s\n", worker.end(res));
-				work = false;
-			});
-			while (work == true) {
-				Idle.add(run_part2.callback);
-				yield;
-			}
-		}
+		yield run_part(tab_func_p2);
 	}
 
 
 
-	void run(){	
+
+	void run(){
 		// load function SupraLoading
 		Idle.add(()=> {
 			loading.begin();
@@ -125,7 +173,6 @@ void main(string []args) {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
-	// Remove Vala DEBUGING LOG
 	Log.set_default_handler(()=> {});
 	new LibftTester(args);
 	print("====================================================\n");

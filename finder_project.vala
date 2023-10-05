@@ -35,10 +35,14 @@ string? generate_libft_so (string dir_makefile) {
 	try {
 			var pid = new Subprocess.newv({"make", "so", "-C", dir_makefile}, SubprocessFlags.STDERR_SILENCE); 
 			pid.wait();
-			if (pid.get_status() != 0) {
-				printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
-				printerr("%s", p_supra);
-				printerr("""
+	} catch (Error e) {
+		error(e.message);
+	}
+	if (FileUtils.test(@"$dir_makefile/libft.so", FileTest.EXISTS))
+		return @"$dir_makefile/libft.so";
+	printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
+	printerr("%s", p_supra);
+	printerr("""
 exemple d'une regle `so`
 ```makefile
 so:
@@ -48,15 +52,8 @@ so:
 Vous pouvez aussi juste cree le libft.so avec
 ```bash
 	gcc *.c --shared -o libft.so
-```
-""");
-				Posix.exit(0);
-		}
-	} catch (Error e) {
-		error(e.message);
-	}
-	if (FileUtils.test(@"$dir_makefile/libft.so", FileTest.EXISTS))
-		return @"$dir_makefile/libft.so";
+```""");
+	printerr("\n\n");
 	return null;
 }
 

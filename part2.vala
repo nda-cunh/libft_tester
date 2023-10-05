@@ -481,21 +481,6 @@ string run_putnbr_fd() {
 	string result = "PUTNBRFD: ";
 	try {
 		var ft_putnbr_fd = (d_putnbr_fd)loader.symbol("ft_putnbr_fd");
-		// string check(int nb, int fd) {
-			// var t = SupraTest.complex(8, () => {
-				// ft_putnbr_fd(nb, 1);
-				// return true;
-			// });
-			// if (fd == 1) {
-				// if (t.status == OK && t.stdout == @"$nb" && t.stderr == "")
-					// t.status = OK;
-			// }
-			// if (fd == 2) {
-				// if (t.status == OK && t.stdout == "" && t.stderr == @"$nb")
-					// t.status = OK;
-			// }
-			// return t.msg(@"putnbr('e', 1) you '$(t.stdout)' ");
-		// }
 		string check(int s, int fd) {
 			var t = SupraTest.complex(8, () => {
 				ft_putnbr_fd(s, fd);

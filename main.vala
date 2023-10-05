@@ -9,9 +9,14 @@ class LibftTester{
 	public  LibftTester(string []args) {
 		try {
 			loop = new MainLoop();
-			find_libft(args);
-			// loader = new Loader("libft.so");
-			// this.run();
+			var libft = find_libft(args);
+			if (libft != null) {
+				loader = new Loader(libft);
+				this.run();
+			}
+			else {
+				printerr("libft.so introuvable !\n");
+			}
 		}
 		catch (Error e) {
 			printerr(e.message);

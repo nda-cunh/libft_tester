@@ -19,7 +19,7 @@ class Loader {
 			return ptr;
 		}
 		mutex.unlock();
-		throw new ErrLoader.SYMBOL_NOTFOUND(@"$name not found\n");
+		throw new ErrLoader.SYMBOL_NOTFOUND(@"$name not found");
 	}
 	private Mutex mutex;
 	private Module handle;

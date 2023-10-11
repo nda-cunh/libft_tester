@@ -30,16 +30,56 @@ string? find_libft(string []args) {
 	return null;
 }
 
-string? generate_libft_so (string dir_makefile) {
-	print("Makefile found here: %s/Makefile\n", dir_makefile);
+void run_command(string []av) {
 	try {
-			var pid = new Subprocess.newv({"make", "so", "-C", dir_makefile}, SubprocessFlags.STDERR_SILENCE); 
-			pid.wait();
+		SubprocessFlags flags = SEARCH_PATH_FROM_ENVP | STDERR_SILENCE | STDOUT_SILENCE;
+		var pid = new Subprocess.newv(av, flags); 
+		pid.wait();
 	} catch (Error e) {
 		error(e.message);
 	}
+}
+
+string extract_libft_dll(string libft_a) {
+	string tmp_dir;
+	try {
+		tmp_dir = DirUtils.make_tmp("vala_libsoXXXXXX");
+		run_command({"ar", "-xv", libft_a, @"--output=$tmp_dir"});
+		Dir dir = Dir.open (tmp_dir);
+		string []result = {"gcc"};
+		string name;
+		while ((name = dir.read_name ()) != null) {
+			if (name.has_suffix(".o"))
+				result += @"$tmp_dir/$name";
+		}
+		result += "--shared";
+		result += "-o";
+		result += @"$tmp_dir/libft.so";
+		run_command(result);
+		return @"$tmp_dir/libft.so";
+	} catch(Error e) {
+		printerr(@"$(e.message)\n");
+		return "";
+	}
+}
+
+string? generate_libft_so (string dir_makefile) {
+	print(@"$(p_supra)Makefile found here: %s/Makefile\n$p_none", dir_makefile);
+	// Test run so
+	run_command({"make", "so", "-C", dir_makefile});
+
+	// Test if libft.so exist
 	if (FileUtils.test(@"$dir_makefile/libft.so", FileTest.EXISTS))
 		return @"$dir_makefile/libft.so";
+
+	// Test with libft.a
+	run_command({"make", "-C", dir_makefile});
+	if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
+		print(@"$p_supra[Generate] libft.so from libft.a\n$p_none");
+		string libft_so = extract_libft_dll(@"$dir_makefile/libft.a");
+		if (FileUtils.test(libft_so, FileTest.EXISTS))
+			return libft_so;
+	}
 	printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
 	printerr("%s", p_supra);
 	printerr("""
@@ -56,35 +96,3 @@ Vous pouvez aussi juste cree le libft.so avec
 	printerr("\n\n");
 	return null;
 }
-
-/*
-   void generate_so(string dir) {
-	printerr("%sLibft found: %s\n%s", p_supra, dir, p_none);
-	try {
-		if (FileUtils.test(@"$dir/libft.so", FileTest.EXISTS))
-			return ;
-		if (FileUtils.test(@"$dir/Makefile", FileTest.EXISTS)) {
-			var pid = new Subprocess.newv({"make", "so", "-C", @"$dir/"}, SubprocessFlags.STDERR_SILENCE); 
-			pid.wait();
-			if (pid.get_status() != 0) {
-				printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
-				printerr("%s", p_supra);
-				printerr("""
-exemple d'une regle `so`
-```makefile
-so:
-  gcc $(OBJS) --shared -o libft.so
-```
-	(Ca reviens a la regle avec ar -rc mais avec gcc et --shared)
-Vous pouvez aussi juste cree le libft.so avec
-```bash
-	gcc *.c --shared -o libft.so
-```
-""");
-				Posix.exit(0);
-			}
-		}
-	} catch (Error e) {
-		error(e.message);
-	}
-}*/

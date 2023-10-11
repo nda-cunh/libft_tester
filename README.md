@@ -1,4 +1,4 @@
-le SupraTester pour la libft de l'école 42 (Linux -Mac-)
+le SupraTester pour la libft de l'école 42 (Linux ~~Mac Os~~)
 
 # REQUIS
     ``vala et gcc``

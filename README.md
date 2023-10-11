@@ -1,4 +1,4 @@
-le SupraTester pour la libft de l'école 42
+le SupraTester pour la libft de l'école 42 (Linux -Mac-)
 
 # REQUIS
     ``vala et gcc``
@@ -11,10 +11,10 @@ le SupraTester pour la libft de l'école 42
             gcc *.o --shared -o libft.so
   
     ```
+    autrement il tentera de crée un libft.so de lui même , mais ça lui rajoute des tâches inutile.
 # INSTALLATION
 
     cloner le repo dans votre libft ou à sa racine.
-
     executer `make run`
 
 # SupraTester

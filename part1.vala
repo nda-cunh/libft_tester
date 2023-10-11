@@ -69,7 +69,7 @@ string run_isalnum() {
 			for (int i = 0; i < 255; ++i)
 			{
 				if (clang_s(ft_isalnum(i)) != clang_s(clang_isalnum(i))) {
-						stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isalnum(i), clang_isalnum(i));
+					stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isalnum(i), clang_isalnum(i));
 					return false;
 				}
 			}
@@ -93,12 +93,14 @@ string run_isascii() {
 		var t = SupraTest.test(8, () => {
 				for (int i = 0; i < 255; ++i)
 				{
-					if (clang_s(ft_isascii(i)) != clang_s(clang_isascii(i)))
+					if (clang_s(ft_isascii(i)) != clang_s(clang_isascii(i))) {
+						stderr.printf("%d", i);
 						return false;
+					}
 				}
 				return true;
 			});
-		return result + t.msg();
+		return result + t.msg_err("Bad Input:");
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -116,12 +118,14 @@ string run_isprint() {
 		var t = SupraTest.test(8, () => {
 				for (int i = 0; i < 255; ++i)
 				{
-					if (clang_s(ft_isprint(i)) != clang_s(clang_isprint(i)))
+					if (clang_s(ft_isprint(i)) != clang_s(clang_isprint(i))) {
+						stderr.printf("%d", i);
 						return false;
+					}
 				}
 				return true;
 			});
-		return result + t.msg();
+		return result + t.msg_err("Input:");
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -836,7 +840,7 @@ string run_strdup() {
 				return (s == cmp);
 			}, "strdup('$cmp')");
 			if (t.alloc != 1)
-				return t.msg_ko(@"No alloc ??? $(t.alloc)");
+				return t.msg_ko(@"No alloc ??? $(t.alloc) alloc");
 			return t.msg_ok();
 		}
 		

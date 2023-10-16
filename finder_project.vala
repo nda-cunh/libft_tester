@@ -7,8 +7,10 @@ string? find_libft(string []args) {
 	
 	// search in folder pwd/../Makefile
 	if (FileUtils.test(@"$pwd/../Makefile", FileTest.EXISTS)) {
-		print("Makefile found here: %s\n", @"$pwd/../Makefile");
-		return null;
+		var folder = @"$pwd/../";
+		if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
+			return generate_libft_so (folder);
+		}
 	}
 
 	// search in folder pwd/**/Makefile
@@ -32,7 +34,7 @@ string? find_libft(string []args) {
 
 void run_command(string []av) {
 	try {
-		SubprocessFlags flags = SEARCH_PATH_FROM_ENVP | STDERR_SILENCE | STDOUT_SILENCE;
+		SubprocessFlags flags = STDERR_SILENCE | STDOUT_SILENCE;
 		var pid = new Subprocess.newv(av, flags); 
 		pid.wait();
 	} catch (Error e) {

@@ -4,6 +4,7 @@ VAPI = Module.vapi
 LIB_VALA = --pkg=posix --pkg=gmodule-2.0 --pkg=gio-2.0 -X -lbsd -X -ldl
 CFLAGS = --enable-experimental -X -O2 -X -w
 NAME = libft_tester 
+URL_BOOTSTRAP=https://gitlab.com/hydrasho/libft_tester/uploads/b807fe1db0a242d7a4ffb9a7283b6dad/bootstrap.tar
 
 # Color
 GREEN = \033[32;1m
@@ -27,6 +28,14 @@ ninja:
 	ninja install -C build
 # END 
 
+bootstrap.tar:
+	wget $(URL_BOOTSTRAP)
+
+
+bootstrap: bootstrap.tar
+	mkdir -p bootstrap
+	tar -xf bootstrap.tar -C bootstrap
+	$(CC) bootstrap/*.c $$(pkg-config --cflags --libs glib-2.0 gobject-2.0 gio-2.0) -w -lbsd -ldl -o $(NAME)
 
 clean:
 	rm -rf $(SRC_VALA:.vala=.c)
@@ -44,3 +53,5 @@ run: all
 
 run2:
 	./$(NAME)
+
+.PHONY: all run run2 re fclean clean bootstrap ninja

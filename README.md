@@ -1,7 +1,9 @@
 le SupraTester pour la libft de l'école 42 (Linux ~~Mac Os~~)
 
 # REQUIS
-    ``vala et gcc``
+    ``vala et un compileur C (clang ou gcc)``
+
+	vous pouvez esquiver la dependance à vala avec ``make bootstrap``
 
     UNE REGLE `so elle doit cree libft.so !
     

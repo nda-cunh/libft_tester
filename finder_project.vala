@@ -5,6 +5,14 @@ public const string p_none = "\033[0m";
 string? find_libft(string []args) {
 	var pwd = Environment.get_current_dir();
 	
+	// search in folder pwd/../libft/Makefile
+	if (FileUtils.test(@"$pwd/../libft/Makefile", FileTest.EXISTS)) {
+		var folder = @"$pwd/../libft/";
+		if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
+			return generate_libft_so (folder);
+		}
+	}
+	
 	// search in folder pwd/../Makefile
 	if (FileUtils.test(@"$pwd/../Makefile", FileTest.EXISTS)) {
 		var folder = @"$pwd/../";
@@ -90,8 +98,8 @@ exemple d'une regle `so`
 so:
   gcc $(OBJS) --shared -o libft.so
 ```
-	(Ca reviens a la regle avec ar -rc mais avec gcc et --shared)
-Vous pouvez aussi juste cree le libft.so avec
+	(Ca revient a la regle avec ar -rc mais avec gcc et --shared)
+Vous pouvez aussi juste creer le libft.so avec
 ```bash
 	gcc *.c --shared -o libft.so
 ```""");

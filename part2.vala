@@ -81,7 +81,13 @@ string run_substr() {
 				delete s;
 			return (s == null);
 		}, "no protect ").msg_err());
-
+		/* 12 */ result.append(SupraTest.test(8, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_substr("abc", 5, 3);
+			if (s != null)
+				delete s;
+			return (s == null);
+		}, "no protect ").msg_err());
 
 		return result.str;
 	}

@@ -398,10 +398,10 @@ string run_strlcat() {
 
 		string check(string dest, string src, size_t n) {
 			return SupraTest.test(8, () => {
-				char d1[21];
-				char d2[21];
-				char s1[21];
-				char s2[21];
+				char d1[61];
+				char d2[61];
+				char s1[61];
+				char s2[61];
 				Memory.set(d1, '\0', 20); Memory.copy(d1, dest, dest.length);
 				Memory.set(d2, '\0', 20); Memory.copy(d2, dest, dest.length);
 				Memory.set(s1, '\0', 20); Memory.copy(s1, src, src.length);
@@ -835,7 +835,6 @@ string run_strdup() {
 		var ft_strdup = (d_strdup)loader.symbol("ft_strdup");
 
 		string check(char *cmp) {
-			int len = ((string)cmp).length;
 			var t = SupraTest.test(3, () => {
 				string s = ft_strdup(cmp);
 

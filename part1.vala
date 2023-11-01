@@ -670,18 +670,37 @@ string run_memcmp() {
 	string result = "MEMCMP:   ";
 	try {
 		var ft_memcmp = (d_memcmp)loader.symbol("ft_memcmp");
-		uint8 *s1 = "abcd";
-		uint8 *s2 = "abce";
-		size_t nb = 3;
+		string check(void *m1, void *m2, size_t len, owned string msg? = null) {
+			var t = SupraTest.test(2, ()=> {
+				var y = ft_memcmp(m1, m2, len);
+				var m = Memory.cmp(m1, m2, len);
+				if (m == y)
+					return true;
+				stderr.printf("you: %d, Me: %d", y, m);
+				return false;
+			});
+			string s1;
+			string s2;
+			if (msg == null){
+				s1 = ((string)m1).dup();
+				s2 = ((string)m2).dup();
+				msg = "memcmp('$s1', '$s2', $len)";
+			}
 
-		result += SupraTest.test(8, () => {
-			return (clang_s(memcmp(s1, s2, nb)) == clang_s(ft_memcmp(s1, s2, nb)));
-		}, @"memcmp('abcd', 'abce', 3)").msg(); 
+			return t.msg_err(msg);
+		}
 
-		s1 = "bjr\0kitty"; s2 = "bjr\0hello";
-		result += SupraTest.test(8, () => {
-			return (clang_s(memcmp(s1, s2, 5)) == clang_s(ft_memcmp(s1, s2, 5)));
-		}, @"memcmp('bjr\\0kitty', 'bjr\\0hello', 5)").msg();
+		uint8 p = {'t', 128};
+
+		result += check("salut", "salut", 5);
+		result += check(p, "t\0", 2, "memcmp('t\\200', 't\\0', 2)");
+		result += check("testss", "test", 5);
+		result += check("test", "tEst", 4);
+		result += check("", "test", 4);
+		result += check("test", "", 4);
+		result += check("abcdefghij", "abcdefgxyz", 7);
+		result += check("abcdefgh", "abcdwxyz", 6);
+		result += check("zyxbcdefgh", "abcdefgxyz", 0);
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

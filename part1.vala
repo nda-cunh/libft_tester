@@ -410,7 +410,7 @@ string run_strlcat() {
 				size_t len2 = 0;
 
 				if ((len1 = ft_strlcat(d1, s1, n)) != (len2 = strlcat(d2, s2, n))) {
-					printerr(">> you: ('%s' %zu) Me: ('%s' %zu)", (string)d1, len1, (string)s2, len2);
+					printerr(">> you: ('%s' %zu) Me: ('%s' %zu)", (string)d1, len1, (string)d2, len2);
 					return false;
 				}
 				if (Memory.cmp(d1, d2, 20) == 0)
@@ -436,13 +436,14 @@ string run_strlcat() {
 		/* 15 */ result.append(check("2", "1", 1));
 		/* 16 */ result.append(check("1", "2", 2));
 		/* 17 */ result.append(check("", "", 12));
+		/* 18 */ result.append(check("rrrrrrrrrrrrrrr", "lorem ipsum dolor sit amet", 5));
 
-		/* 18 */ result.append(SupraTest.test(8, () => {
+		/* 19 */ result.append(SupraTest.test(8, () => {
 			ft_strlcat(null, "", 0);
 			return true;
 		}, "strlcat(NULL, '', 0)").msg());
 	
-		/* 19 */ var t = SupraTest.test(8, () => {
+		/* 20 */ var t = SupraTest.test(8, () => {
 			ft_strlcat(null, "", 1);
 			return false;
 		}, "strlcat(null, '', 1) No Crash");
@@ -833,8 +834,9 @@ string run_strdup() {
 	try {
 		var ft_strdup = (d_strdup)loader.symbol("ft_strdup");
 
-		string check(string cmp) {
-			var t = SupraTest.test(8, () => {
+		string check(char *cmp) {
+			int len = ((string)cmp).length;
+			var t = SupraTest.test(3, () => {
 				string s = ft_strdup(cmp);
 
 				return (s == cmp);
@@ -846,7 +848,8 @@ string run_strdup() {
 		
 		/* 1 */ result += check("abc");	
 		/* 2 */ result += check("Abc");	
-		/* 3 */ result += check("");	
+		/* 1 */ result += check("abc\0yop");	
+		/* 3 */ result += check("");
 		
 		// Test if strdup segfault
 		/* 4 */ var	t = SupraTest.test(8, () => {

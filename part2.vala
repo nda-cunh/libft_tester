@@ -55,10 +55,15 @@ string run_substr() {
 
 		string check(string str, uint start, size_t len, string sp) {
 			var t = SupraTest.test(8, () => {
-				var sp1 = ft_substr(str, start, len);
-				if (sp1 == sp)
-					return true;
-				stderr.printf("[You:'%s' != Me:'%s'] ", sp1, sp); 
+				char *sp1 = ft_substr(str, start, len);
+				if (sp1 != null) {
+					if (((string)sp1).ascii_casecmp(sp) == 0) {
+						free(sp1);
+						return true;
+					}
+				}
+				stderr.printf("[You:'%s' != Me:'%s'] ", (string)sp1, sp); 
+				free(sp1);
 				return false;
 			});
 			return t.msg(@"test: ('$str', $start, $len) $(t.stderr)");

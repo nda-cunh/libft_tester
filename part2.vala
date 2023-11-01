@@ -6,7 +6,7 @@ string run_itoa() {
 	try {
 		var ft_itoa = (d_itoa)loader.symbol("ft_itoa");
 		string check(int n, string? msg = null) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				return (ft_itoa(n) == @"$n");
 			}, msg ?? @"$n").msg();
 		}
@@ -54,7 +54,8 @@ string run_substr() {
 		var ft_substr = (d_substr)loader.symbol("ft_substr");
 
 		string check(string str, uint start, size_t len, string sp) {
-			var t = SupraTest.test(8, () => {
+
+			var t = SupraTest.test(3, () => {
 				char *sp1 = ft_substr(str, start, len);
 				if (sp1 != null) {
 					if (((string)sp1).ascii_casecmp(sp) == 0) {
@@ -66,6 +67,8 @@ string run_substr() {
 				free(sp1);
 				return false;
 			});
+
+			
 			return t.msg(@"test: ('$str', $start, $len) $(t.stderr)");
 		}
 
@@ -110,7 +113,7 @@ string run_strjoin() {
 		var ft_strjoin = (d_strjoin)loader.symbol("ft_strjoin");
 
 		string check(string s1, string s2, string cmp) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				var s = ft_strjoin(s1, s2);
 				if (s == cmp)
 					return true;
@@ -153,7 +156,7 @@ string run_strtrim() {
 		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
 
 		string check(string s1, string s2, string cmp) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				var s = ft_strtrim(s1, s2);
 				if (s == cmp)
 					return true;
@@ -199,7 +202,7 @@ string run_split() {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
 		string check(string str, char c, string []cmp) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				var sp1 = ft_split(str, c);
 			
 				for (int i = 0; sp1[i] != null; ++i)
@@ -271,7 +274,7 @@ string run_strmapi() {
 		var ft_strmapi = (d_strmapi)loader.symbol("ft_strmapi");
 
 		string check(string s1, d_param_strmapi func, string cmp) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				var s = ft_strmapi(s1, func);
 				if (s == cmp)
 					return true;
@@ -296,7 +299,7 @@ string run_strmapi() {
 					return c - 32; 
 				return c;
 			}, "choCoLat"));
-		/* 5 */ result.append(SupraTest.test(8, ()=>{
+		/* 5 */ result.append(SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strmapi("abc", ()=>{return 'e';});
 			return (s == null);
@@ -321,7 +324,7 @@ string run_striteri() {
 		var ft_striteri = (d_striteri)loader.symbol("ft_striteri");
 
 		string check(string s1, d_param_striteri func, string cmp) {
-			return SupraTest.test(8, () => {
+			return SupraTest.test(3, () => {
 				ft_striteri(s1, func);
 				if (s1 == cmp)
 					return true;
@@ -370,7 +373,7 @@ string run_putchar_fd() {
 		var ft_putchar_fd = (d_putchar_fd)loader.symbol("ft_putchar_fd");
 		SupraTest.Test t;
 		//test 1
-		t = SupraTest.complex(8, () => {
+		t = SupraTest.complex(3, () => {
 			ft_putchar_fd('e', 1);
 			return true;
 		});
@@ -380,7 +383,7 @@ string run_putchar_fd() {
 		
 		//test 2
 		
-		t = SupraTest.complex(8, () => {
+		t = SupraTest.complex(3, () => {
 			ft_putchar_fd('v', 2);
 			return true;
 		});
@@ -390,7 +393,7 @@ string run_putchar_fd() {
 		
 		//test 3
 		
-		t = SupraTest.complex(8, () => {
+		t = SupraTest.complex(3, () => {
 			ft_putchar_fd('e', -1);
 			return true;
 		});
@@ -413,7 +416,7 @@ string run_putstr_fd() {
 	try {
 		var ft_putstr_fd = (d_putstr_fd)loader.symbol("ft_putstr_fd");
 		string check(string s, int fd) {
-			var t = SupraTest.complex(8, () => {
+			var t = SupraTest.complex(3, () => {
 				ft_putstr_fd(s, fd);
 				return false;
 			});
@@ -458,7 +461,7 @@ string run_putendl_fd() {
 	try {
 		var ft_putendl_fd = (d_putendl_fd)loader.symbol("ft_putendl_fd");
 		string check(string s, int fd) {
-			var t = SupraTest.complex(8, () => {
+			var t = SupraTest.complex(3, () => {
 				ft_putendl_fd(s, fd);
 				return false;
 			});
@@ -503,7 +506,7 @@ string run_putnbr_fd() {
 	try {
 		var ft_putnbr_fd = (d_putnbr_fd)loader.symbol("ft_putnbr_fd");
 		string check(int s, int fd) {
-			var t = SupraTest.complex(8, () => {
+			var t = SupraTest.complex(3, () => {
 				ft_putnbr_fd(s, fd);
 				return false;
 			});

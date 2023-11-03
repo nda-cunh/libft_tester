@@ -438,12 +438,12 @@ string run_strlcat() {
 		/* 17 */ result.append(check("", "", 12));
 		/* 18 */ result.append(check("rrrrrrrrrrrrrrr", "lorem ipsum dolor sit amet", 5));
 
-		/* 19 */ result.append(SupraTest.test(8, () => {
+		/* 19 */ result.append(SupraTest.test(3, () => {
 			ft_strlcat(null, "", 0);
 			return true;
 		}, "strlcat(NULL, '', 0)").msg());
 	
-		/* 20 */ var t = SupraTest.test(8, () => {
+		/* 20 */ var t = SupraTest.test(3, () => {
 			ft_strlcat(null, "", 1);
 			return false;
 		}, "strlcat(null, '', 1) No Crash");
@@ -468,7 +468,7 @@ string run_toupper() {
 	string result = "TOUPPER:  ";
 	try {
 		var ft_toupper= (d_toupper)loader.symbol("ft_toupper");
-		var t = SupraTest.test(8, () => {
+		var t = SupraTest.test(3, () => {
 			for (int i = 0; i < 255; ++i)
 			{
 				if (clang_s(ft_toupper(i)) != clang_s(clang_toupper(i)))
@@ -491,7 +491,7 @@ string run_tolower() {
 	string result = "TOLOWER:  ";
 	try {
 		var ft_tolower= (d_tolower)loader.symbol("ft_tolower");
-		var t = SupraTest.test(8, () => {
+		var t = SupraTest.test(3, () => {
 				for (int i = 0; i < 255; ++i)
 				{
 					if (clang_s(ft_tolower(i)) != clang_s(clang_tolower(i)))
@@ -515,29 +515,34 @@ string run_strchr() {
 	try {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
 		
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 's')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'v')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'X';
+				return (strchr(s, c) == ft_strchr(s, c));
+		}, """strchr("suprapatata\0vttiX", 'X')""").msg();
+		result += SupraTest.test(3, () => {
+				string s = "\0";
+				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'X')""").msg();
 	}
@@ -556,30 +561,35 @@ string run_strrchr() {
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 		
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 's')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'v')""").msg();
-		result += SupraTest.test(8, () => {
+		result += SupraTest.test(3, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'X';
 				return (strrchr(s, c) == ft_strrchr(s, c));
+		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
+		result += SupraTest.test(3, () => {
+				string s = "bonjour";
+				int c = 'b';
+				return (strrchr(s.offset(2), c) == ft_strrchr(s.offset(2), c));
 		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
 	}
 	catch (Error e) {
@@ -620,6 +630,9 @@ string run_strncmp() {
 		/* 9 */ result += check("", "TheCakeIsALie", 4);
 		/* 10 */ result += check("Portal2", "", 4);
 		/* 11 */ result += check("fhfghfgdjhsffg", "dfghfdhsfd", 5);
+		/* 11 */ result += check("abcdefgh", "abcdwxyz", 4);
+		/* 11 */ result += check("zyxbcdefgh", "abcdwxyz", 0);
+		/* 11 */ result += check("abcdefgh", "", 0);
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -725,7 +738,7 @@ string run_strnstr() {
 	try {
 		var ft_strnstr= (d_strnstr)loader.symbol("ft_strnstr");
 		string check(char* s1, char* s2, size_t n) {
-			return SupraTest.test(8, ()=>{
+			return SupraTest.test(3, ()=>{
 				unowned string? a = ft_strnstr(s1, s2, n);
 				unowned string? b = strnstr(s1, s2, n);
 				if (a != b) {
@@ -747,7 +760,12 @@ string run_strnstr() {
 		/* 10 */  result += check("supravim n'est point un IDE", "vim", 8);
 		/* 11 */  result += check("supravim n'est point un IDE", "vim", 7);
 		/* 12 */  result += check("supravim n'est point un IDE", "vim", 6);
-		/* 12 */  result += check("hello\0world", "world", 42);
+		/* 13 */  result += check("hello\0world", "world", 42);
+		/* 14 */  result += check("lorem ipsum dolor sit amet", "dol", 30);
+		/* 15 */  result += check("lorem ipsum dolor sit amet", "consectetur", 30);
+		/* 16 */  result += check("lorem ipsum dolor sit amet", "sit", 10);
+		/* 17 */  result += check("lorem ipsum dolor sit amet", "dolor", 15);
+		/* 18 */  result += check("lorem ipsum dolor sit amet", "dolor", 0);
 
 		return result;
 	}
@@ -820,7 +838,7 @@ string run_calloc() {
 	try {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
 
-		/* 1 */ var t = SupraTest.test(8, () => {
+		/* 1 */ var t = SupraTest.test(3, () => {
 			char *m = ft_calloc(52, sizeof(char));
 
 			for (int i = 0; i < 52; ++i)
@@ -839,13 +857,40 @@ string run_calloc() {
 			result += t.msg_ok();
 		/* 2 */ result += t.msg();
 		
-		/* 3 */ result += SupraTest.test(8, ()=>{
+		/* 3 */ result += SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_calloc(42, 1);
 			if (s != null)
 				delete s;
 			return (s == null);
 		}).msg_err("no protect ");
+		
+		/* 4 */ result += SupraTest.test(3, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_calloc(0, 1);
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}).msg_err("dont return null with calloc(0)");
+		
+		/* 5 */ result += SupraTest.test(3, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_calloc(0, 0);
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}).msg_err("dont return null with calloc(0)");
+		
+		/* 6 */ result += SupraTest.test(3, ()=>{
+			SupraLeak.send_null();
+			char *s = ft_calloc(6, 0);
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}).msg_err("dont return null with calloc(0)");
 
 		return result;
 	}

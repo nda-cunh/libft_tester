@@ -82,14 +82,20 @@ string run_substr() {
 		/* 8 */ result.append(check("salut !", 100, 1, ""));
 		/* 9 */ result.append(check("0123456789", 9, 10, "9"));
 		/* 10 */ result.append(check("BONJOUR LES HARICOTS !", 8, 14, "LES HARICOTS !"));
-		/* 11 */ result.append(SupraTest.test(8, ()=>{
+		/* 11 */ result.append(check("lorem ipsum dolor sit amet", 0, 10, "lorem ipsu"));
+		/* 12 */ result.append(check("lorem ipsum dolor sit amet", 7, 10, "psum dolor"));
+		/* 13 */ result.append(check("lorem ipsum dolor sit amet", 7, 0, ""));
+		/* 14 */ result.append(check("lorem ipsum dolor sit amet", 40000, 20, ""));
+		/* 15 */ result.append(check("lorem ipsum dolor sit amet", 400, 20, ""));
+
+		/* 16 */ result.append(SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_substr("abc", 1, 3);
 			if (s != null)
 				delete s;
 			return (s == null);
 		}, "no protect ").msg_err());
-		/* 12 */ result.append(SupraTest.test(8, ()=>{
+		/* 17 */ result.append(SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_substr("abc", 5, 3);
 			if (s != null)

@@ -670,27 +670,35 @@ string run_memcmp() {
 	string result = "MEMCMP:   ";
 	try {
 		var ft_memcmp = (d_memcmp)loader.symbol("ft_memcmp");
-		string check(void *m1, void *m2, size_t len, owned string msg? = null) {
+		string check(void *m1, void *m2, size_t len, string msg = ""){
 			var t = SupraTest.test(2, ()=> {
 				var y = ft_memcmp(m1, m2, len);
-				var m = Memory.cmp(m1, m2, len);
-				if (m == y)
+				var m = memcmp(m1, m2, len);
+				// 656584 -> 1
+				// -514984fgh  -> -1
+				// 0 =---> 0
+				if (clang_s(m) == clang_s(y))
 					return true;
 				stderr.printf("you: %d, Me: %d", y, m);
 				return false;
 			});
-			string s1;
-			string s2;
-			if (msg == null){
-				s1 = ((string)m1).dup();
-				s2 = ((string)m2).dup();
-				msg = "memcmp('$s1', '$s2', $len)";
+			string msg_dup;
+
+			if (msg == ""){
+				string s1;
+				string s2;
+				s1 = (string)m1;
+				s2 = (string)m2;
+				msg_dup = @"memcmp('$s1', '$s2', $len)";
+			}
+			else {
+				msg_dup = msg;
 			}
 
-			return t.msg_err(msg);
+			return t.msg_err(msg_dup);
 		}
 
-		uint8 p = {'t', 128};
+		uint8 []p = {'t', 128};
 
 		result += check("salut", "salut", 5);
 		result += check(p, "t\0", 2, "memcmp('t\\200', 't\\0', 2)");
@@ -855,22 +863,30 @@ string run_strdup() {
 
 		string check(char *cmp) {
 			var t = SupraTest.test(3, () => {
-				string s = ft_strdup(cmp);
+				char* s = ft_strdup(cmp);
 
-				return (s == cmp);
+				if (s == null)
+					return false;
+				return ((string)s == (string)cmp);
 			}, "strdup('$cmp')");
 			if (t.alloc != 1)
 				return t.msg_ko(@"No alloc ??? $(t.alloc) alloc");
+			if (t.bytes != ((string)cmp).length + 1)
+				return t.msg_ko(@"Bad alloc size $(t.bytes)");
 			return t.msg_ok();
 		}
 		
 		/* 1 */ result += check("abc");	
 		/* 2 */ result += check("Abc");	
-		/* 1 */ result += check("abc\0yop");	
-		/* 3 */ result += check("");
+		/* 3 */ result += check("abc\0yop");	
+		/* 4 */ result += check("abc 12345\0yop");	
+		/* 5 */ result += check("abc 12345\0yop");	
+		/* 6 */ result += check("lorem ipsum dolor sit amet");	
+		/* 7 */ result += check("lorem ipsum dolor sit amet lorem ipsum dolor sit amet");	
+		/* 8 */ result += check("");
 		
 		// Test if strdup segfault
-		/* 4 */ var	t = SupraTest.test(8, () => {
+		/* 9 */ var	t = SupraTest.test(8, () => {
 			ft_strdup(null);
 			return false;
 		}, "strdup(NULL) NOCRASH");

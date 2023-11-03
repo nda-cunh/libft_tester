@@ -1,5 +1,8 @@
 
-public string read_all(ref FileStream stream) {
+public string read_all(string file) {
+	var stream = FileStream.open(file, "r");
+	if (stream == null)
+		return "";
 	var str = new StringBuilder();
 	uint8 buff[8192];
 	size_t len = 0;
@@ -31,6 +34,7 @@ namespace SupraTest{
 		public Status	status;
 		int				alloc;
 		int				free;
+		size_t			bytes;
 
 		public Test(string message) {
 			this.message = message;
@@ -100,54 +104,54 @@ namespace SupraTest{
 
 	public Test test(uint timeout, testFunction func, string err_message = "") {
 		Test result = Test(err_message);
+
 		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
 		if (fd_err < 0)
 			Posix.perror("Erreur lors de la création du fichier temporaire");
-		int status;
-		var timer = new Timer();
-		var pid = Posix.fork();
-		if (pid == 0) {
+		
+
+		// FORK
+		var child_pid = Posix.fork();
+		if (child_pid == 0) {
 			result.init_sig();
 			SupraLeak.reset();
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_err);
 			bool b = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
+			stderr.printf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
 			Posix.exit((b == true) ? 0 : 1);
 		}
-		while (true) {
-			if (0 != Posix.waitpid(pid, out status, Posix.WNOHANG))
-				break;
-			if ((uint)timer.elapsed() >= timeout){
-				Posix.kill(pid, Posix.Signal.INT);
-				break;
-			}
-		}
-		Posix.close(fd_err);
-		var stream = FileStream.open((string)template_stderr, "r");
-		if (stream != null) {
-			uint8 buf[2048];
-			if (stream.read(buf) > 0) {
-				var s = (string)buf;
-				result.stderr = result.stderr ?? "" + s;
-			}
-		}
 	
+
+		// Async waitpid
+		var timer = new Timer();
+		while (true) {
+			int status;
+			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
+				result.status = (Status)exit_status(status);
+				break;
+			}
+			if ((uint)timer.elapsed() >= timeout){
+				Posix.kill(child_pid, Posix.Signal.INT);
+				break;
+			}
+		}
+
+		Posix.close(fd_err);
+		result.stderr = read_all((string)template_stderr);
+
 		// get SupraLeak alloc/free and remove it
 		if (result.stderr != null) {
 			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
-			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
-			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc\n", "");
+			begin.scanf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", ref result.free, ref result.alloc, ref result.bytes);
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}
 
 		FileUtils.unlink((string)template_stderr);
-		result.status = (Status)exit_status(status);
 		if (result.status == OK || result.status == KO) {
 			if (result.free != result.alloc)
 				result.status = LEAK;
-			else if ((uint)timer.elapsed() >= timeout)
-				result.status = TIMEOUT;
 		}
 		return result;
 	}
@@ -159,8 +163,6 @@ namespace SupraTest{
 
 	public Test complex(uint timeout, testFunction func, string err_message = "") {
 		Test result = Test(err_message);
-		var timer = new Timer();
-		int status;
 
 		uint8 template_stdout[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_out = mkstemp(template_stdout);
@@ -171,8 +173,8 @@ namespace SupraTest{
 		if (fd_err < 0)
 			Posix.perror("Erreur lors de la création du fichier temporaire");
 
-		var pid = Posix.fork();
-		if (pid == 0) {
+		var child_pid = Posix.fork();
+		if (child_pid == 0) {
 			result.init_sig();
 			SupraLeak.reset();
 			Posix.dup2(fd_out, 1);
@@ -180,43 +182,46 @@ namespace SupraTest{
 			Posix.close(fd_out);
 			Posix.close(fd_err);
 			bool res = func();
-			printerr("[SupraLeak] %d Free, %d Malloc\n", SupraLeak.free, SupraLeak.malloc);
+			printerr("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
 			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);
 			Posix.exit(1);
 		}
+		
+
+		// Async waitpid
+		var timer = new Timer();
 		while (true) {
-			if (0 != Posix.waitpid(pid, out status, Posix.WNOHANG))
+			int status;
+			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
+				result.status = (Status)exit_status(status);
 				break;
-			if ((uint)timer.elapsed() >= timeout) {
-				Posix.kill(pid, Posix.Signal.INT);
+			}
+			if ((uint)timer.elapsed() >= timeout){
+				Posix.kill(child_pid, Posix.Signal.INT);
 				break;
 			}
 		}
+
 		Posix.close(fd_out);
 		Posix.close(fd_err);
-		var stream1 = FileStream.open((string)template_stdout, "r");
-		result.stdout = read_all(ref stream1);
-		var stream2 = FileStream.open((string)template_stderr, "r");
-		result.stderr = read_all(ref stream2);
+		result.stdout = read_all((string)template_stdout);
+		result.stderr = read_all((string)template_stderr);
 		
 		// get SupraLeak alloc/free and remove it
 		if (result.stderr != null) {
 			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
-			begin.scanf("[SupraLeak] %d Free, %d Malloc\n", ref result.free, ref result.alloc);
-			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc\n", "");
+			begin.scanf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", ref result.free, ref result.alloc, ref result.bytes);
+			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}
 		
 		// remove stderr pipe
 		FileUtils.unlink((string)template_stderr);
 		FileUtils.unlink((string)template_stdout);
 
-		result.status = (Status)exit_status(status);
 		if (result.free != result.alloc)
 			result.status = LEAK;
-		else if ((uint)timer.elapsed() >= timeout)
-			result.status = TIMEOUT;
 		return result;
 	}
 }

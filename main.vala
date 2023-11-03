@@ -46,7 +46,7 @@ class LibftTester{
 
 
 	async void run_part(d_worker[] tab_func) {
-		const int max = 2;
+		const int max = 1;
 		int work = 0;
 
 		foreach(var i in tab_func)

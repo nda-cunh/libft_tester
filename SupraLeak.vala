@@ -1,5 +1,5 @@
 
-private size_t g_bytes = 0;
+private size_t g_alloc_bytes = 0;
 private int g_alloc_count = 0;
 private int g_free_count = 0;
 private bool g_is_null = false;
@@ -7,7 +7,7 @@ private bool g_is_null = false;
 public class SupraLeak {
 	public static size_t bytes{
 		get {
-			return g_bytes;
+			return g_alloc_bytes;
 		}
 	}
 	public static int free {
@@ -26,7 +26,7 @@ public class SupraLeak {
 	public static void reset() {
 		g_alloc_count = 0;
 		g_free_count = 0;
-		g_bytes = 0;
+		g_alloc_bytes = 0;
 	}
 }
 
@@ -39,7 +39,8 @@ public void* vala_malloc(void *ptr, size_t len) {
 		return null;
 	}
 	g_alloc_count++;
-	g_bytes += len;
+	g_alloc_bytes += len;
+	Memory.set(ptr, 'E', len);
 	return ptr;
 }
 

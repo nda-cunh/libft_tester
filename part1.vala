@@ -838,7 +838,9 @@ string run_calloc() {
 	try {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
 
-		/* 1 */ var t = SupraTest.test(3, () => {
+		SupraTest.Test t;
+		
+		/* 1 */ t = SupraTest.test(3, () => {
 			char *m = ft_calloc(52, sizeof(char));
 
 			for (int i = 0; i < 52; ++i)
@@ -864,33 +866,38 @@ string run_calloc() {
 				delete s;
 			return (s == null);
 		}).msg_err("no protect ");
-		
-		/* 4 */ result += SupraTest.test(3, ()=>{
+	
+
+		/* 4 */ t = SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
-			char *s = ft_calloc(0, 1);
-			if (s == null)
-				return false;
-			delete s;
+			(string)ft_calloc(0, 1);
 			return true;
-		}).msg_err("dont return null with calloc(0)");
-		
-		/* 5 */ result += SupraTest.test(3, ()=>{
+		});
+		if (t.bytes == 0)
+			result += t.msg_ok();
+		else
+			result += t.msg_ko("dont alloc with calloc(0, 1)");
+
+		/* 5 */ t = SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
-			char *s = ft_calloc(0, 0);
-			if (s == null)
-				return false;
-			delete s;
+			(string)ft_calloc(1, 0);
 			return true;
-		}).msg_err("dont return null with calloc(0)");
-		
-		/* 6 */ result += SupraTest.test(3, ()=>{
+		});
+		if (t.bytes == 0)
+			result += t.msg_ok();
+		else
+			result += t.msg_ko("dont alloc with calloc(1, 0)");
+
+		/* 6 */ t = SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
-			char *s = ft_calloc(6, 0);
-			if (s == null)
-				return false;
-			delete s;
+			(string)ft_calloc(0, 0);
 			return true;
-		}).msg_err("dont return null with calloc(0)");
+		});
+		if (t.bytes == 0)
+			result += t.msg_ok();
+		else
+			result += t.msg_ko("dont alloc with calloc(0, 0)");
+
 
 		return result;
 	}

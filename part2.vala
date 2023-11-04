@@ -183,8 +183,15 @@ string run_strtrim() {
 		/* 10 */ result.append(check("abcdba", "acb", "d"));
 		/* 11 */ result.append(check("      supra         ", "      ", "supra"));
 		/* 12 */ result.append(check("      sup  ra         ", "      ", "sup  ra"));
+
+		/* 13 */ result.append(check("lorem \n ipsum \t dolor \n sit \t amet", " ", "lorem \n ipsum \t dolor \n sit \t amet"));
+		/* 14 */ result.append(check("lorem ipsum dolor sit amet", "te", "lorem ipsum dolor sit am"));
+		/* 15 */ result.append(check(" lorem ipsum dolor sit amet", "1 ", "lorem ipsum dolor sit amet"));
+		/* 16 */ result.append(check("lorem ipsum dolor sit amet", "tel", "orem ipsum dolor sit am"));
+		/* 17 */ result.append(check("          ", " ", ""));
+		/* 18 */ result.append(check("          ", "          ", ""));
 		
-		/* 13 */ result.append(SupraTest.test(8, ()=>{
+		/* 19 */ result.append(SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strtrim("ab", "ab");
 			if (s != null)
@@ -208,12 +215,19 @@ string run_split() {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
 		string check(string str, char c, string []cmp) {
-			return SupraTest.test(3, () => {
+			var t = SupraTest.test(3, () => {
 				var sp1 = ft_split(str, c);
+				if (cmp[0] == null) {
+					if (sp1[0] == null) {
+						delete sp1[0];
+						return true;
+					}
+				}
 			
-				for (int i = 0; sp1[i] != null; ++i)
+				for (int i = 0; i != cmp.length; ++i)
 				{
-					if ((string)sp1[i] != cmp[i]) {
+					
+					if (sp1[i] == null || (string)sp1[i] != cmp[i]) {
 						stderr.printf("You: [");
 						for (int e = 0; sp1[e] != null; ++e) {
 							stderr.printf("'%s',", (string)sp1[e]);
@@ -233,11 +247,12 @@ string run_split() {
 					free(sp1[j]);
 				free(sp1);
 				return true;
-			}).msg_err(@"split(\"$str\", '$c')");
+			});
+			return t.msg_err(@"split(\"$str\", '$c')");
 		}
 
 		/* 1 */ result.append(check("a,a,a,a", ',', {"a", "a", "a", "a"}));
-		/* 2 */ result.append(check("", ',', {""}));
+		/* 2 */ result.append(check("", ',', {null}));
 		/* 3 */ result.append(check("a", ',', {"a"}));
 		/* 4 */ result.append(check(",a", ',', {"a"}));
 		/* 5 */ result.append(check("a,", ',', {"a"}));
@@ -247,11 +262,23 @@ string run_split() {
 		/* 9 */ result.append(check("salut,", ',', {"salut"}));
 		/* 10 */ result.append(check(",salut,", ',', {"salut"}));
 		/* 11 */ result.append(check("--1-2--3---4----5-----42", '-', {"1", "2", "3", "4", "5", "42"}));
-		/* 12 */ result.append(check(",", ',', {""}));
-		/* 13 */ result.append(check(",,", ',', {""}));
-		/* 14 */ result.append(check(",,,", ',', {""}));
+		/* 12 */ result.append(check(",", ',', {null}));
+		/* 13 */ result.append(check(",,", ',', {null}));
+		/* 14 */ result.append(check(",,,", ',', {null}));
 		/* 15 */ result.append(check(",,,", '\0', {",,,"}));
 		/* 16 */ result.append(check(" ", ',', {" "}));
+		/* 16 */ result.append(check("          ", ' ', {null}));
+		
+		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse", ' ',
+		{"lorem","ipsum","dolor","sit","amet,","consectetur","adipiscing","elit.","Sed","non","risus.","Suspendisse"}));
+		/* 16 */ result.append(check("   lorem   ipsum dolor     sit amet, consectetur   adipiscing elit. Sed non risus. Suspendisse  ", ' ',
+{"lorem","ipsum","dolor","sit","amet,","consectetur","adipiscing","elit.","Sed","non","risus.","Suspendisse"}));
+		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'i',
+{"lorem ","psum dolor s","t amet, consectetur ad","p","sc","ng el","t. Sed non r","sus. Suspend","sse lectus tortor, d","gn","ss","m s","t amet, ad","p","sc","ng nec, ultr","c","es sed, dolor. Cras elementum ultr","c","es d","am. Maecenas l","gula massa, var","us a, semper congue, eu","smod non, m","."}));
+		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'z',
+{"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
+		/* 16 */ result.append(check("", 'z', {null}));
+		
 		/* 17 */ result.append(SupraTest.test(8, ()=>{
 			SupraLeak.send_null();
 			char **s = ft_split("bababababhc", 'a');

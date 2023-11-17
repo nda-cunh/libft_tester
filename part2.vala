@@ -161,14 +161,20 @@ string run_strtrim() {
 	try {
 		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
 
-		string check(string s1, string s2, string cmp) {
+		string check(string? s1, string? s2, string? cmp) {
 			return SupraTest.test(3, () => {
-				var s = ft_strtrim(s1, s2);
-				if (s == cmp)
+				char *s = ft_strtrim(s1, s2);
+				if (s == null) {
+					return (cmp == null);
+				}
+				if ((string)s == cmp) {
+					free(s);
 					return true;
-				stderr.printf("You:'%s' Me:'%s'", s, cmp);
+				}
+				stderr.printf("You:'%s' Me:'%s'", (string)s, cmp);
+				free(s);
 				return false;
-			}).msg_err(@"test: ('$s1', $s2) ");
+			}).msg_err(@"strtrim('$s1', $s2) ");
 		}
 
 		/* 1 */ result.append(check("hello salut", "salut", "hello "));
@@ -190,13 +196,20 @@ string run_strtrim() {
 		/* 16 */ result.append(check("lorem ipsum dolor sit amet", "tel", "orem ipsum dolor sit am"));
 		/* 17 */ result.append(check("          ", " ", ""));
 		/* 18 */ result.append(check("          ", "          ", ""));
+		/* 19 */ result.append(check(null, null, null)); 
+		/* 20 */ result.append(check("a", null, null));
+		/* 21 */ result.append(check("", null, null));
+		/* 22 */ result.append(check(null, "", null));
+		/* 23 */ result.append(check(null, "abc", null));
 		
-		/* 19 */ result.append(SupraTest.test(8, ()=>{
+		/* 24 */ result.append(SupraTest.test(3, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strtrim("ab", "ab");
-			if (s != null)
+			if (s != null) {
 				delete s;
-			return (s == null);
+				return false;
+			}
+			return (true);
 		}, "no protect ").msg_err());
 		
 		return result.str;

@@ -46,10 +46,10 @@ class LibftTester{
 
 
 	async void run_part(d_worker[] tab_func) {
-		const int max = 1;
+		uint max = get_num_processors();
 		int work = 0;
 
-		foreach(var i in tab_func)
+		foreach(unowned var i in tab_func)
 		{
 			work++;
 			worker.begin(i, (obj, res) => {
@@ -157,9 +157,10 @@ class LibftTester{
 	}
 
 	async string worker(d_worker func) {
+		var func_copy = func;
 		// run the func to test in a thread
-		var thread = new Thread<string>("work", ()=>{
-			string result = func();
+		var thread = new Thread<string>(null, ()=>{
+			string result = func_copy();
 			Idle.add(worker.callback);
 			return result;
 		});

@@ -174,7 +174,7 @@ string run_strtrim() {
 				stderr.printf("You:'%s' Me:'%s'", (string)s, cmp);
 				free(s);
 				return false;
-			}).msg_err(@"strtrim('$s1', $s2) ");
+			}).msg_err("strtrim('%s', %s) ".printf(s1 ?? "(null)", s2 ?? "(null)"));
 		}
 
 		/* 1 */ result.append(check("hello salut", "salut", "hello "));

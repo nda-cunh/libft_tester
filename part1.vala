@@ -604,10 +604,8 @@ extern int strncmp(char *s1, char* s2, size_t n);
 delegate int d_strncmp(char *s1, char *s2, size_t n);
 
 string run_strncmp() {
-	string result = "STRNCMP:  ";
+	var result = new StringBuilder("STRNCMP:  ");
 	try {
-		uint8 memory[8192];
-		memory[0] = 0;
 		var ft_strncmp = (d_strncmp)loader.symbol("ft_strncmp");
 
 		string check(char *s1, char *s2, size_t n, string? msg = null) {
@@ -621,26 +619,26 @@ string run_strncmp() {
 				return t.msg_ko(msg ?? t.message + t.stderr);
 			return t.msg();
 		}
-		/* 1 */ result += check("a", "b", 1);
-		/* 2 */ result += check("", "", 4);
-		/* 3 */ result += check("bjr\0kitty", "bjr\0hello", 7);
-		/* 4 */ result += check("abcd", "abce", 3);
-		/* 5 */ result += check("test\0", "", 6);
-		/* 6 */ result += check("", "test\0", 6);
+		/* 1 */ result.append(check("a", "b", 1));
+		/* 2 */ result.append(check("", "", 4));
+		/* 3 */ result.append(check("bjr\0kitty", "bjr\0hello", 7));
+		/* 4 */ result.append(check("abcd", "abce", 3));
+		/* 5 */ result.append(check("test\0", "", 6));
+		/* 6 */ result.append(check("", "test\0", 6));
 		uint8 []uc_test = {'t', 'e', 's', 't', 128};
-		/* 7 */ result += check(uc_test, "test\0", 6, "Unsigned-Char ?");
-		/* 8 */ result += check("Portal2", "TheCakeIsALie", 4);
-		/* 9 */ result += check("", "TheCakeIsALie", 4);
-		/* 10 */ result += check("Portal2", "", 4);
-		/* 11 */ result += check("fhfghfgdjhsffg", "dfghfdhsfd", 5);
-		/* 11 */ result += check("abcdefgh", "abcdwxyz", 4);
-		/* 11 */ result += check("zyxbcdefgh", "abcdwxyz", 0);
-		/* 11 */ result += check("abcdefgh", "", 0);
+		/* 7 */ result.append(check(uc_test, "test\0", 6, "Unsigned-Char ?"));
+		/* 8 */ result.append(check("Portal2", "TheCakeIsALie", 4));
+		/* 9 */ result.append(check("", "TheCakeIsALie", 4));
+		/* 10 */ result.append(check("Portal2", "", 4));
+		/* 11 */ result.append(check("fhfghfgdjhsffg", "dfghfdhsfd", 5));
+		/* 11 */ result.append(check("abcdefgh", "abcdwxyz", 4));
+		/* 11 */ result.append(check("zyxbcdefgh", "abcdwxyz", 0));
+		/* 11 */ result.append(check("abcdefgh", "", 0));
 	}
 	catch (Error e) {
-		return @"$result \033[31m$(e.message)\033[0m";
+		return @"$(result.str) \033[31m$(e.message)\033[0m";
 	}
-	return result;
+	return (owned)result.str;
 }
 
 [CCode (has_target = false)]
@@ -652,24 +650,24 @@ string run_memchr() {
 		char s[] = {0, 1, 2 ,3 ,4 ,5};
 		
 		result += SupraTest.test(null, ()=>{
-			return (ft_memchr(s, 0, 0) == null);
-		}, @"memchr(0, 0)").msg();
+			return (ft_memchr(s.copy(), 0, 0) == null);
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 0) == null").msg();
 		
 		result += SupraTest.test(null, ()=>{
-			return (ft_memchr(s, 0, 1) == s);
-		}, @"memchr(0, 1)").msg();
+			return (ft_memchr(s.copy(), 0, 1) == s);
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 1) == tab").msg();
 		
 		result += SupraTest.test(null, ()=>{
-			return (ft_memchr(s, 2, 3) == &s[2]);
-		}, @"memchr(2, 3)").msg();
+			return (ft_memchr(s.copy(), 2, 3) == &s[2]);
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 2, 3) == &tab[2]").msg();
 
 		result += SupraTest.test(null, ()=>{
-			return (ft_memchr(s, 6, 6) == null);
-		}, @"memchr(6, 6)").msg();
+			return (ft_memchr(s.copy(), 6, 6) == null);
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 6, 6) == null").msg();
 
 		result += SupraTest.test(null, ()=>{
-			return (ft_memchr(s, 2 + 256, 3) == &s[2]);
-		}, @"memchr(2 + 256, 3)").msg();
+			return (ft_memchr(s.copy(), (2 + 256), 3) == &s[2]);
+		}, @"memchr({0, 1, 2, 3, 4, 5}, (2 + 256), 3) == &tab[2]").msg();
 		return result;
 	}
 	catch (Error e) {
@@ -690,9 +688,6 @@ string run_memcmp() {
 			var t = SupraTest.test(null, ()=> {
 				var y = ft_memcmp(m1, m2, len);
 				var m = memcmp(m1, m2, len);
-				// 656584 -> 1
-				// -514984fgh  -> -1
-				// 0 =---> 0
 				if (clang_s(m) == clang_s(y))
 					return true;
 				stderr.printf("you: %d, Me: %d", y, m);
@@ -714,7 +709,7 @@ string run_memcmp() {
 			return t.msg_err(msg_dup);
 		}
 
-		uint8 []p = {'t', 128};
+		uint8 []p = {'t', 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		result += check("salut", "salut", 5);
 		result += check(p, "t\0", 2, "memcmp('t\\200', 't\\0', 2)");

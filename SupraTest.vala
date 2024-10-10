@@ -102,9 +102,13 @@ namespace SupraTest{
 	[CCode (cname = "WEXITSTATUS", cheader_filename="sys/wait.h")]
 	extern int exit_status(int status);
 
-	public Test test(uint timeout, testFunction func, string err_message = "") {
-		Test result = Test(err_message);
+	public Test test(uint? timeout, testFunction func, string err_message = "") {
+		uint8 memory[8192];
+		memory[0] = 0;
 
+		if (timeout == null)
+			timeout = 2;
+		Test result = Test(err_message);
 		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
 		if (fd_err < 0)

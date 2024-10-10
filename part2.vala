@@ -6,7 +6,7 @@ string run_itoa() {
 	try {
 		var ft_itoa = (d_itoa)loader.symbol("ft_itoa");
 		string check(int n, string? msg = null) {
-			return SupraTest.test(3, () => {
+			return SupraTest.test(null, () => {
 				return (ft_itoa(n) == @"$n");
 			}, msg ?? @"$n").msg();
 		}
@@ -31,7 +31,7 @@ string run_itoa() {
 			var i = Random.int_range(int.MIN, int.MAX);
 			result.append(check(i));
 		}
-		/* 18 */ result.append(SupraTest.test(4, ()=>{
+		/* 18 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_itoa(42);
 			if (s != null)
@@ -55,7 +55,7 @@ string run_substr() {
 
 		string check(string str, uint start, size_t len, string sp) {
 
-			var t = SupraTest.test(3, () => {
+			var t = SupraTest.test(null, () => {
 				char *sp1 = ft_substr(str, start, len);
 				if (sp1 != null) {
 					if (((string)sp1).ascii_casecmp(sp) == 0) {
@@ -88,14 +88,14 @@ string run_substr() {
 		/* 14 */ result.append(check("lorem ipsum dolor sit amet", 40000, 20, ""));
 		/* 15 */ result.append(check("lorem ipsum dolor sit amet", 400, 20, ""));
 
-		/* 16 */ result.append(SupraTest.test(8, ()=>{
+		/* 16 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_substr("abc", 1, 3);
 			if (s != null)
 				delete s;
 			return (s == null);
 		}, "no protect ").msg_err());
-		/* 17 */ result.append(SupraTest.test(8, ()=>{
+		/* 17 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_substr("abc", 5, 3);
 			if (s != null)
@@ -119,7 +119,7 @@ string run_strjoin() {
 		var ft_strjoin = (d_strjoin)loader.symbol("ft_strjoin");
 
 		string check(string s1, string s2, string cmp) {
-			return SupraTest.test(3, () => {
+			return SupraTest.test(null, () => {
 				var s = ft_strjoin(s1, s2);
 				if (s == cmp)
 					return true;
@@ -138,7 +138,7 @@ string run_strjoin() {
 		/* 8 */ result.append(check("luserbu le dartien", "", "luserbu le dartien"));
 		/* 9 */ result.append(check("a a a a a a a", "a a a a a a a  a a  a   a a  ", "a a a a a a aa a a a a a a  a a  a   a a  "));
 		
-		/* 10 */ result.append(SupraTest.test(8, ()=>{
+		/* 10 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strjoin("ab", "ab");
 			if (s != null)
@@ -162,7 +162,7 @@ string run_strtrim() {
 		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
 
 		string check(string? s1, string? s2, string? cmp) {
-			return SupraTest.test(3, () => {
+			return SupraTest.test(null, () => {
 				char *s = ft_strtrim(s1, s2);
 				if (s == null) {
 					return (cmp == null);
@@ -202,7 +202,7 @@ string run_strtrim() {
 		/* 22 */ result.append(check(null, "", null));
 		/* 23 */ result.append(check(null, "abc", null));
 		
-		/* 24 */ result.append(SupraTest.test(3, ()=>{
+		/* 24 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strtrim("ab", "ab");
 			if (s != null) {
@@ -228,7 +228,7 @@ string run_split() {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
 		string check(string str, char c, string []cmp) {
-			var t = SupraTest.test(3, () => {
+			var t = SupraTest.test(null, () => {
 				var sp1 = ft_split(str, c);
 				if (cmp[0] == null) {
 					if (sp1[0] == null) {
@@ -292,7 +292,7 @@ string run_split() {
 {"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
 		/* 16 */ result.append(check("", 'z', {null}));
 		
-		/* 17 */ result.append(SupraTest.test(8, ()=>{
+		/* 17 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char **s = ft_split("bababababhc", 'a');
 			if (s != null)
@@ -320,7 +320,7 @@ string run_strmapi() {
 		var ft_strmapi = (d_strmapi)loader.symbol("ft_strmapi");
 
 		string check(string s1, d_param_strmapi func, string cmp) {
-			return SupraTest.test(3, () => {
+			return SupraTest.test(null, () => {
 				var s = ft_strmapi(s1, func);
 				if (s == cmp)
 					return true;
@@ -345,7 +345,7 @@ string run_strmapi() {
 					return c - 32; 
 				return c;
 			}, "choCoLat"));
-		/* 5 */ result.append(SupraTest.test(3, ()=>{
+		/* 5 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strmapi("abc", ()=>{return 'e';});
 			return (s == null);
@@ -370,7 +370,7 @@ string run_striteri() {
 		var ft_striteri = (d_striteri)loader.symbol("ft_striteri");
 
 		string check(string s1, d_param_striteri func, string cmp) {
-			return SupraTest.test(3, () => {
+			return SupraTest.test(null, () => {
 				ft_striteri(s1, func);
 				if (s1 == cmp)
 					return true;

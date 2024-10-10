@@ -1,4 +1,4 @@
-project('libft_tester', ['c', 'vala'])
+project('libft_tester', ['c', 'vala'], default_options : ['optimization=2'])
 
 file = [  'part2.vala',
           'leak.c',
@@ -17,6 +17,9 @@ vala_lib = [
   meson.get_compiler('c').find_library('bsd')
 ]
 
-add_project_arguments(['--enable-experimental'], language: 'vala')
-
-executable('libft_tester_dev', file, dependencies: vala_lib, install : true)
+executable('libft_tester',
+  file,
+  c_args: '-w',
+  vala_args: '--enable-experimental',
+  dependencies: vala_lib,
+  install : true)

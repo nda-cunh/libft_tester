@@ -106,8 +106,11 @@ namespace SupraTest{
 		uint8 memory[8192];
 		memory[0] = 0;
 
+		uint time;
 		if (timeout == null)
-			timeout = 2;
+			time = 2;
+		else
+			time = timeout;
 		Test result = Test(err_message);
 		uint8 template_stderr[20] = "/tmp/vala_XXXXXXXXX".data;
 		int fd_err = mkstemp(template_stderr);
@@ -136,7 +139,7 @@ namespace SupraTest{
 				result.status = (Status)exit_status(status);
 				break;
 			}
-			if ((uint)timer.elapsed() >= timeout){
+			if ((uint)timer.elapsed() >= time){
 				Posix.kill(child_pid, Posix.Signal.INT);
 				break;
 			}

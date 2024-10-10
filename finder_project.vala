@@ -2,7 +2,7 @@
 public const string p_supra= "\033[33;1m[SupraTester]\033[0m\033[37m ";
 public const string p_none = "\033[0m";
 
-string? find_libft(string []args) {
+string? find_libft(string []args) throws Error {
 	var pwd = Environment.get_current_dir();
 	
 	// search in folder pwd/../libft/Makefile
@@ -22,22 +22,18 @@ string? find_libft(string []args) {
 	}
 
 	// search in folder pwd/**/Makefile
-	try {
-		var dir = Dir.open(pwd);
-		unowned string? name = null;
+	var dir = Dir.open(pwd);
+	unowned string? name = null;
 
-		while ((name = dir.read_name ()) != null) {
-			var folder = @"$pwd/$name";
-			if (FileUtils.test(folder, FileTest.IS_DIR)) {
-				if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
-					return generate_libft_so (folder);
-				}
+	while ((name = dir.read_name ()) != null) {
+		var folder = @"$pwd/$name";
+		if (FileUtils.test(folder, FileTest.IS_DIR)) {
+			if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
+				return generate_libft_so (folder);
 			}
 		}
-	} catch (Error e) {
-		printerr("%s\n", e.message);
 	}
-	return null;
+	throw new FileError.ACCES ("No Makefile found");
 }
 
 void run_command(string []av) {

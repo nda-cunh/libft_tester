@@ -4,45 +4,37 @@ Loader loader;
 
 class LibftTester{
 	
-	private MainLoop loop;
-
-	public  LibftTester(string []args) {
-		try {
-			loop = new MainLoop();
-			var libft = find_libft(args);
-			if (libft != null) {
-				loader = new Loader(libft);
-				this.run();
-			}
-			else {
-				printerr("libft.so introuvable !\n");
-			}
-		}
-		catch (Error e) {
-			printerr(e.message);
-		}
+	public  LibftTester(string []args) throws Error {
+		var libft = find_libft(args);
+		loader = new Loader(libft);
 	}
 
 	// SupraLoading
 	async void loading() {
 		var n = 0;
 		while (true) {
-			Timeout.add(300, loading.callback);
+			Timeout.add (300, loading.callback);
 			yield;
-			if (n == 0)
-				print("\033[35mSupraLoading    \033[0m\r");
-			if (n == 1)
-				print("\033[36mSupraLoading .  \033[0m\r");
-			if (n == 2)
-				print("\033[37mSupraLoading .. \033[0m\r");
-			if (n == 3)
-				print("\033[34mSupraLoading ...\033[0m\r");
+			switch (n) {
+				case 0:
+					print("\033[35mSupraLoading    \033[0m\r");
+					break;
+				case 1:
+					print("\033[36mSupraLoading .  \033[0m\r");
+					break;
+				case 2:
+					print("\033[37mSupraLoading .. \033[0m\r");
+					break;
+				case 3:
+					print("\033[34mSupraLoading ...\033[0m\r");
+					break;
+				case 4:
+					n = -1;
+					break;
+			}
 			++n;
-			if (n == 4)
-				n = 0;
 		}
 	}
-
 
 
 	async void run_part(d_worker[] tab_func) {
@@ -64,7 +56,7 @@ class LibftTester{
 			}
 		}
 		while (work != 0) {
-		Idle.add(run_part.callback);
+			Idle.add(run_part.callback);
 			yield;
 		}
 	}
@@ -136,24 +128,12 @@ class LibftTester{
 
 
 
-	void run(){
+	public async void run(){
 		// load function SupraLoading
-		Idle.add(()=> {
-			loading.begin();
-			return false;
-		});
+		loading.begin();
 
-		// load function Part 1 and Part 2 
-		Idle.add(()=> {
-			run_part1.begin(()=> {
-				run_part2.begin(()=>{
-					loop.quit();
-				});
-			});
-			return false;
-		});
-		// Run async mode
-		loop.run();
+		yield run_part1();
+		yield run_part2();
 	}
 
 	async string worker(d_worker func) {
@@ -170,11 +150,12 @@ class LibftTester{
 	}
 }
 
-void main(string []args) {
+async void main(string []args) {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
 	Log.set_default_handler(()=> {});
-	new LibftTester(args);
+	var tester = new LibftTester(args);
+	yield tester.run();
 	print("====================================================\n");
 }

@@ -17,7 +17,7 @@ le SupraTester pour la libft de l'école 42 (Linux ~~Mac Os~~)
 # INSTALLATION
 
     cloner le repo dans votre libft ou à sa racine.
-    executer `make run`
+	executer './install.sh'
 
 # SupraTester
 

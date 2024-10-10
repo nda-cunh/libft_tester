@@ -272,10 +272,8 @@ string run_memcpy() {
 	return result;
 }
 
-// [CCode (cname = "memmove", cheader_filename="ctype.h")]
-// extern size_t memmove(void *dest, void *src, size_t size);
 [CCode (has_target = false)]
-delegate int d_memmove(void *dest, void *src, size_t size);
+delegate size_t d_memmove(void *dest, void *src, size_t size);
 string run_memmove() {
 	string result = "MEMMOVE:  ";
 	try {
@@ -316,7 +314,7 @@ string run_memmove() {
 [CCode (cname = "strlcpy", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcpy(char *dest, char *src, size_t size);
 [CCode (has_target = false)]
-delegate int d_strlcpy(char *dest, char *src, size_t size);
+delegate size_t d_strlcpy(char *dest, char *src, size_t size);
 
 string run_strlcpy() {
 	var result = new StringBuilder.sized(300);
@@ -393,7 +391,8 @@ string run_strlcpy() {
 [CCode (cname = "strlcat", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcat(char *dest, char *src, size_t size);
 [CCode (has_target = false)]
-delegate int d_strlcat(char *dest, char *src, size_t size);
+delegate size_t d_strlcat(char *dest, char *src, size_t size);
+
 string run_strlcat() {
 	var result = new StringBuilder.sized(300);
 	result.append("STRLCAT:  ");
@@ -682,7 +681,6 @@ string run_memchr() {
 	}
 }
 
-//TODO upgrade test memcmp
 [CCode (cname = "memcmp", cheader_filename="string.h")]
 extern int memcmp(void *s1, void* s2, size_t n);
 [CCode (has_target = false)]
@@ -724,6 +722,7 @@ string run_memcmp() {
 		result += check("test", "tEst", 4);
 		result += check("", "test", 4);
 		result += check("test", "", 4);
+		result += check("supra\0vim", "supra\0pack", 8, "memcmp('supra\\0vim', 'supra\\0pack', 8)");
 		result += check("abcdefghij", "abcdefgxyz", 7);
 		result += check("abcdefgh", "abcdwxyz", 6);
 		result += check("zyxbcdefgh", "abcdefgxyz", 0);

@@ -317,6 +317,7 @@ string run_memmove() {
 extern size_t strlcpy(char *dest, char *src, size_t size);
 [CCode (has_target = false)]
 delegate int d_strlcpy(char *dest, char *src, size_t size);
+
 string run_strlcpy() {
 	var result = new StringBuilder.sized(300);
 	result.append("STRLCPY:  ");
@@ -336,14 +337,17 @@ string run_strlcpy() {
 				size_t len1 = 0;
 				size_t len2 = 0;
 
-				if ((len1 = ft_strlcpy(d1, s1, n)) != (len2 = strlcpy(d2, s2, n))) {
-					printerr(">> you: ('%s' %zu) Me: ('%s' %zu)", (string)d1, len1, (string)s2, len2);
+				len1 = ft_strlcpy(d1, s1, n);
+				len2 = strlcpy(d2, s2, n);
+				if (len1 != len2) {
+					printerr("return > you: %zu, me: %zu", len1, len2);
 					return false;
 				}
-				if (Memory.cmp(d1, d2, 20) == 0)
-					return true;
-				printerr("you: '%s' Me: '%s'", (string)d1, (string)d2);
-				return false;
+				if (Memory.cmp(d1, d2, 20) != 0) {
+					printerr("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
+					return false;
+				}
+				return true;
 			}).msg_err(@"strlcpy('$dest', '$src', $n)");
 		}
 		/* 1 */ result.append(check("", "valac", 12));

@@ -1,7 +1,7 @@
 
-int clang_s(int n) {
+int clang_s (int n) {
 	if (n == 0)
-		return 0;
+		return n;
 	else if (n > 0)
 		return 1;
 	return -1;
@@ -152,7 +152,7 @@ string run_strlen() {
 		}, "No segfault with strlen(null)");
 		if (t.status != SIGSEGV)
 			result.append(t.msg());
-		
+
 		return result.str;
 	}
 	catch (Error e) {
@@ -211,11 +211,11 @@ string run_bzero() {
 				uint8 buf2[40];
 				Memory.set(buf1, 'X', 40);
 				Memory.set(buf2, 'X', 40);
-				
+
 				ft_bzero(buf1, i);
 				Memory.set(buf2, '\0', i);
 				if (Memory.cmp(buf1, buf2, i) == 0)
-					return true; 
+					return true;
 				return false;
 			}, @"bzero(mem, E, $i)").msg();
 		}
@@ -235,7 +235,7 @@ string run_memcpy() {
 	string result = "MEMCPY:   ";
 	try {
 		var ft_memcpy = (d_memcpy)loader.symbol("ft_memcpy");
-		
+
 		result += SupraTest.test(null, () => {
 			uint8 dest[100];
 			Memory.set(dest, 'A', 100);
@@ -245,14 +245,14 @@ string run_memcpy() {
 					return false;
 			return (true);
 		}, "memset(dest, 'A', 0) ").msg();
-		
+
 		result += SupraTest.test(null, () => {
 			uint8 dest[5];
 			Memory.set(dest, 'A', 5);
 			var r = memcpy(dest, null, 0);
 			return (r == dest);
 		}, "Return is not 'dest' ").msg();
-		
+
 		result += SupraTest.test(null, () => {
 			uint8 dest[100];
 			Memory.set(dest, 'A', 100);
@@ -263,7 +263,7 @@ string run_memcpy() {
 				;
 			return (i == 2 && dest[2] == 'A');
 		}, "Complexe test").msg();
-	
+
 
 	}
 	catch (Error e) {
@@ -287,7 +287,7 @@ string run_memmove() {
 			ft_memmove(str + 7, str, n);
 			return (str == "Hello, Hello, World!");
 		}, "test same_memory").msg();
-		
+
 
 		result += SupraTest.test(null, () => {
 			string mstr = "Hello, World!";
@@ -296,7 +296,7 @@ string run_memmove() {
 			ft_memmove(str + 2, str, n);
 			return (str == "HeHello, World!");
 		}, "test overlap").msg();
-		
+
 		result += SupraTest.test(null, () => {
 			string msrc = "Source";
 			char *src = msrc;
@@ -372,7 +372,7 @@ string run_strlcpy() {
 			ft_strlcpy(null, "", 0);
 			return true;
 		}, "strlcpy(NULL, '', 0)").msg());
-	
+
 		/* 19 */ var t = SupraTest.test(null, () => {
 			ft_strlcpy(null, "", 1);
 			return false;
@@ -413,14 +413,17 @@ string run_strlcat() {
 				size_t len1 = 0;
 				size_t len2 = 0;
 
-				if ((len1 = ft_strlcat(d1, s1, n)) != (len2 = strlcat(d2, s2, n))) {
-					printerr(">> you: ('%s' %zu) Me: ('%s' %zu)", (string)d1, len1, (string)d2, len2);
+				len1 = ft_strlcat(d1, s1, n);
+				len2 = strlcat(d2, s2, n);
+				if (len1 != len2) {
+					printerr("return > you: %zu, me: %zu", len1, len2);
 					return false;
 				}
-				if (Memory.cmp(d1, d2, 20) == 0)
-					return true;
-				printerr("you: '%s' Me: '%s'", (string)d1, (string)d2);
-				return false;
+				if (Memory.cmp(d1, d2, 20) != 0) {
+					printerr("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
+					return false;
+				}
+				return true;
 			}).msg_err(@"strlcat('$dest', '$src', $n)");
 		}
 		/* 1 */ result.append(check("", "valac", 12));
@@ -446,7 +449,7 @@ string run_strlcat() {
 			ft_strlcat(null, "", 0);
 			return true;
 		}, "strlcat(NULL, '', 0)").msg());
-	
+
 		/* 20 */ var t = SupraTest.test(null, () => {
 			ft_strlcat(null, "", 1);
 			return false;
@@ -518,7 +521,7 @@ string run_strchr() {
 	string result = "STRCHR:   ";
 	try {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
-		
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
@@ -564,7 +567,7 @@ string run_strrchr() {
 	string result = "STRRCHR:  ";
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
-		
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 's';
@@ -652,15 +655,15 @@ string run_memchr() {
 	try {
 		var ft_memchr= (d_memchr)loader.symbol("ft_memchr");
 		char s[] = {0, 1, 2 ,3 ,4 ,5};
-		
+
 		result += SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 0, 0) == null);
 		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 0) == null").msg();
-		
+
 		result += SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 0, 1) == s);
 		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 1) == tab").msg();
-		
+
 		result += SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 2, 3) == &s[2]);
 		}, @"memchr({0, 1, 2, 3, 4, 5}, 2, 3) == &tab[2]").msg();
@@ -778,7 +781,7 @@ string run_strnstr() {
 
 // atoi
 [CCode (cname = "atoi", cheader_filename="stdlib.h")]
-extern int atoi(string s1); 
+extern int atoi(string s1);
 [CCode (has_target = false)]
 delegate int d_atoi(string s);
 string run_atoi() {
@@ -803,7 +806,7 @@ string run_atoi() {
 		/* 7 */ result.append(check("10"));
 		/* 8 */ result.append(check("11"));
 		/* 9 */ result.append(check("42"));
-		/* 10 */ result.append(check("-1")); 
+		/* 10 */ result.append(check("-1"));
 		/* 11 */ result.append(check("-2"));
 		/* 12 */ result.append(check("-9"));
 		/* 13 */ result.append(check("-10"));
@@ -826,7 +829,7 @@ string run_atoi() {
 			var i = Random.int_range(int.MIN, int.MAX);
 			result.append(check(@"$i"));
 		}
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -841,7 +844,7 @@ string run_calloc() {
 		var ft_calloc = (d_calloc)loader.symbol("ft_calloc");
 
 		SupraTest.Test t;
-		
+
 		/* 1 */ t = SupraTest.test(null, () => {
 			char *m = ft_calloc(52, sizeof(char));
 
@@ -860,7 +863,7 @@ string run_calloc() {
 		else
 			result += t.msg_ok();
 		/* 2 */ result += t.msg();
-		
+
 		/* 3 */ result += SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_calloc(42, 1);
@@ -868,7 +871,7 @@ string run_calloc() {
 				delete s;
 			return (s == null);
 		}).msg_err("no protect ");
-	
+
 
 		/* 4 */ t = SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
@@ -929,16 +932,16 @@ string run_strdup() {
 				return t.msg_ko(@"Bad alloc size $(t.bytes)");
 			return t.msg_ok();
 		}
-		
-		/* 1 */ result += check("abc");	
-		/* 2 */ result += check("Abc");	
-		/* 3 */ result += check("abc\0yop");	
-		/* 4 */ result += check("abc 12345\0yop");	
-		/* 5 */ result += check("abc 12345\0yop");	
-		/* 6 */ result += check("lorem ipsum dolor sit amet");	
-		/* 7 */ result += check("lorem ipsum dolor sit amet lorem ipsum dolor sit amet");	
+
+		/* 1 */ result += check("abc");
+		/* 2 */ result += check("Abc");
+		/* 3 */ result += check("abc\0yop");
+		/* 4 */ result += check("abc 12345\0yop");
+		/* 5 */ result += check("abc 12345\0yop");
+		/* 6 */ result += check("lorem ipsum dolor sit amet");
+		/* 7 */ result += check("lorem ipsum dolor sit amet lorem ipsum dolor sit amet");
 		/* 8 */ result += check("");
-		
+
 		// Test if strdup segfault
 		/* 9 */ var	t = SupraTest.test(null, () => {
 			ft_strdup(null);
@@ -950,7 +953,7 @@ string run_strdup() {
 			result += t.msg_ok();
 
 
-		// Test if strdup protect (malloc) 
+		// Test if strdup protect (malloc)
 		/* 5 */ result += SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strdup("bababababhc");

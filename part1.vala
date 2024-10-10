@@ -1,3 +1,28 @@
+// delegate int d_isalpha(int c);
+
+delegate int	d_atoi(char *nptr);
+delegate void	d_bzero(void *s, size_t n);
+delegate void*	d_calloc(size_t nmemb, size_t size);
+delegate int	d_isalnum(int c);
+delegate int	d_isalpha(int c);
+delegate int	d_isascii(int c);
+delegate int	d_isdigit(int c);
+delegate int	d_isprint(int c);
+delegate void*	d_memchr(void *s, int c, size_t n);
+delegate int	d_memcmp(void *s1, void *s2, size_t n);
+delegate void*	d_memcpy(void *dest, void *src, size_t n);
+delegate void*	d_memmove(void *dest, void *src, size_t n);
+delegate void*	d_memset(void *s, int c, size_t n);
+delegate char*	d_strchr(char *s, int c);
+delegate char*	d_strdup(char *src);
+delegate size_t	d_strlcat(char *dst, char *src, size_t size);
+delegate int	d_strncmp(char *s1, char *s2, size_t n);
+delegate char*	d_strnstr(char *big, char *little, size_t len);
+delegate char*	d_strrchr(char *s, int c);
+delegate int	d_tolower(int c);
+delegate int	d_toupper(int c);
+delegate size_t	d_strlcpy(char *dst, char *src, size_t size);
+delegate size_t	d_strlen(char *s);
 
 int clang_s (int n) {
 	if (n == 0)
@@ -9,8 +34,7 @@ int clang_s (int n) {
 
 [CCode (cname = "isalpha", cheader_filename="ctype.h")]
 extern int clang_isalpha(int c);
-[CCode (has_target = false)]
-delegate int d_isalpha(int c);
+
 string run_isalpha() {
 	string result = "IS_ALPHA: ";
 	try {
@@ -34,8 +58,7 @@ string run_isalpha() {
 
 [CCode (cname = "isdigit", cheader_filename="ctype.h")]
 extern int clang_isdigit(int c);
-[CCode (has_target = false)]
-delegate int d_isdigit(int c);
+
 string run_isdigit() {
 	string result = "ISDIGIT:  ";
 	try {
@@ -59,8 +82,7 @@ string run_isdigit() {
 
 [CCode (cname = "isalnum", cheader_filename="ctype.h")]
 extern int clang_isalnum(int c);
-[CCode (has_target = false)]
-delegate int d_isalnum(int c);
+
 string run_isalnum() {
 	string result = "ISALNUM:  ";
 	try {
@@ -84,8 +106,7 @@ string run_isalnum() {
 
 [CCode (cname = "isascii", cheader_filename="ctype.h")]
 extern int clang_isascii(int c);
-[CCode (has_target = false)]
-delegate int d_isascii(int c);
+
 string run_isascii() {
 	string result = "ISASCII:  ";
 	try {
@@ -109,8 +130,7 @@ string run_isascii() {
 
 [CCode (cname = "isprint", cheader_filename="ctype.h")]
 extern int clang_isprint(int c);
-[CCode (has_target = false)]
-delegate int d_isprint(int c);
+
 string run_isprint() {
 	string result = "ISPRINT:  ";
 	try {
@@ -132,8 +152,7 @@ string run_isprint() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate int d_strlen(string? s);
+
 string run_strlen() {
 	var result = new StringBuilder.sized(250);
 	result.append("STRLEN:   ");
@@ -160,8 +179,7 @@ string run_strlen() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate int d_memset(void* mem, char c, int nb);
+
 string run_memset() {
 	string result = "MEMSET:   ";
 	try {
@@ -198,8 +216,7 @@ string run_memset() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate int d_bzero(void* mem, int nb);
+
 string run_bzero() {
 	string result = "BZERO:    ";
 	try {
@@ -229,8 +246,7 @@ string run_bzero() {
 // MEMCPY
 [CCode (cname = "memcpy", cheader_filename="string.h")]
 extern void *memcpy(void* dest, void* src, size_t n);
-[CCode (has_target = false)]
-delegate char *d_memcpy(void* dest, void* src, size_t n);
+
 string run_memcpy() {
 	string result = "MEMCPY:   ";
 	try {
@@ -272,8 +288,7 @@ string run_memcpy() {
 	return result;
 }
 
-[CCode (has_target = false)]
-delegate size_t d_memmove(void *dest, void *src, size_t size);
+
 string run_memmove() {
 	string result = "MEMMOVE:  ";
 	try {
@@ -313,8 +328,7 @@ string run_memmove() {
 
 [CCode (cname = "strlcpy", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcpy(char *dest, char *src, size_t size);
-[CCode (has_target = false)]
-delegate size_t d_strlcpy(char *dest, char *src, size_t size);
+
 
 string run_strlcpy() {
 	var result = new StringBuilder.sized(300);
@@ -390,8 +404,7 @@ string run_strlcpy() {
 
 [CCode (cname = "strlcat", cheader_filename="ctype.h,bsd/string.h")]
 extern size_t strlcat(char *dest, char *src, size_t size);
-[CCode (has_target = false)]
-delegate size_t d_strlcat(char *dest, char *src, size_t size);
+
 
 string run_strlcat() {
 	var result = new StringBuilder.sized(300);
@@ -468,8 +481,7 @@ string run_strlcat() {
 
 [CCode (cname = "toupper", cheader_filename="ctype.h")]
 extern int clang_toupper(int c);
-[CCode (has_target = false)]
-delegate int d_toupper(int c);
+
 string run_toupper() {
 	string result = "TOUPPER:  ";
 	try {
@@ -491,8 +503,7 @@ string run_toupper() {
 
 [CCode (cname = "tolower", cheader_filename="ctype.h")]
 extern int clang_tolower(int c);
-[CCode (has_target = false)]
-delegate int d_tolower(int c);
+
 string run_tolower() {
 	string result = "TOLOWER:  ";
 	try {
@@ -514,8 +525,7 @@ string run_tolower() {
 
 [CCode (cname = "strchr", cheader_filename="string.h")]
 extern char *strchr(char *s, int c);
-[CCode (has_target = false)]
-delegate char *d_strchr(char *s, int c);
+
 string run_strchr() {
 	string result = "STRCHR:   ";
 	try {
@@ -560,8 +570,7 @@ string run_strchr() {
 
 [CCode (cname = "strrchr", cheader_filename="string.h")]
 extern char *strrchr(char *s, int c);
-[CCode (has_target = false)]
-delegate char *d_strrchr(char *s, int c);
+
 string run_strrchr() {
 	string result = "STRRCHR:  ";
 	try {
@@ -606,8 +615,7 @@ string run_strrchr() {
 
 [CCode (cname = "strncmp", cheader_filename="string.h")]
 extern int strncmp(char *s1, char* s2, size_t n);
-[CCode (has_target = false)]
-delegate int d_strncmp(char *s1, char *s2, size_t n);
+
 
 string run_strncmp() {
 	var result = new StringBuilder("STRNCMP:  ");
@@ -647,8 +655,7 @@ string run_strncmp() {
 	return (owned)result.str;
 }
 
-[CCode (has_target = false)]
-delegate void* d_memchr(void* s1, int c, size_t n);
+
 string run_memchr() {
 	string result = "MEMCHR:   ";
 	try {
@@ -683,8 +690,7 @@ string run_memchr() {
 
 [CCode (cname = "memcmp", cheader_filename="string.h")]
 extern int memcmp(void *s1, void* s2, size_t n);
-[CCode (has_target = false)]
-delegate int d_memcmp(void* s1, void* s2, size_t n);
+
 string run_memcmp() {
 	string result = "MEMCMP:   ";
 	try {
@@ -735,18 +741,17 @@ string run_memcmp() {
 
 [CCode (cname = "strnstr", cheader_filename="bsd/string.h")]
 extern unowned string? strnstr(char *s1, char* s2, size_t n);
-[CCode (has_target = false)]
-delegate unowned string? d_strnstr(char* s1, char* s2, size_t n);
+
 string run_strnstr() {
 	string result = "STRNSTR:  ";
 	try {
 		var ft_strnstr= (d_strnstr)loader.symbol("ft_strnstr");
 		string check(char* s1, char* s2, size_t n) {
 			return SupraTest.test(null, ()=>{
-				unowned string? a = ft_strnstr(s1, s2, n);
-				unowned string? b = strnstr(s1, s2, n);
+				char* a = ft_strnstr(s1, s2, n);
+				char* b = strnstr(s1, s2, n);
 				if (a != b) {
-					stderr.printf("strnstr('%s', '%s', %ld) you: %s, me: %s ", (string)s1, (string)s2, (long)n, a, b);
+					stderr.printf("strnstr('%s', '%s', %ld) you: %s, me: %s ", (string)s1, (string)s2, (long)n, (string)a ?? "(null)", (string)b ?? "(null)");
 					return false;
 				}
 				return true;
@@ -781,8 +786,7 @@ string run_strnstr() {
 // atoi
 [CCode (cname = "atoi", cheader_filename="stdlib.h")]
 extern int atoi(string s1);
-[CCode (has_target = false)]
-delegate int d_atoi(string s);
+
 string run_atoi() {
 	var result = new StringBuilder.sized(200);
 	result.append("ATOI:     ");
@@ -835,8 +839,7 @@ string run_atoi() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate void *d_calloc(size_t nmemb, size_t size);
+
 string run_calloc() {
 	string result = "CALLOC:   ";
 	try {
@@ -910,8 +913,7 @@ string run_calloc() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate string d_strdup(char *str);
+
 string run_strdup() {
 	string result = "STRDUP:   ";
 	try {

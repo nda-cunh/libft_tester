@@ -1,5 +1,21 @@
-[CCode (has_target = false)]
-delegate string d_itoa(int n);
+delegate char*	d_substr(char *s, uint start, size_t len);
+delegate string	d_strjoin(char *s1, char *s2);
+delegate char*	d_strtrim(char *s1, char *set);
+delegate string	d_itoa(int n);
+
+delegate char	d_param_strmapi(uint n, char c);
+delegate string	d_strmapi(char *s, d_param_strmapi f);
+delegate void	d_param_striteri(uint n, char *s);
+delegate void	d_striteri(char *s, d_param_striteri f);
+
+delegate void	d_putchar_fd(char c, int fd);
+delegate void	d_putendl_fd(char *s, int fd);
+delegate void	d_putnbr_fd(int n, int fd);
+delegate void	d_putstr_fd(char *s, int fd);
+delegate char**	d_split(char *s, char c);
+
+
+
 string run_itoa() {
 	var result = new StringBuilder.sized(250);
 	result.append("ITOA:     ");
@@ -45,8 +61,7 @@ string run_itoa() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate string d_substr(char *s, uint start, size_t len);
+
 string run_substr() {
 	var result = new StringBuilder.sized(250);
 	result.append("SUBSTR:   ");
@@ -110,8 +125,7 @@ string run_substr() {
 	}
 }
 // ft_strjoin
-[CCode (has_target = false)]
-delegate string d_strjoin(char *s1, char *s2);
+
 string run_strjoin() {
 	var result = new StringBuilder.sized(250);
 	result.append("STRJOIN:  ");
@@ -123,7 +137,7 @@ string run_strjoin() {
 				var s = ft_strjoin(s1, s2);
 				if (s == cmp)
 					return true;
-				stderr.printf("You:'%s' Me:'%s'", s, cmp);
+				stderr.printf("You:'%s' Me:'%s'", (string)s ?? "(null)", cmp);
 				return false;
 			}).msg_err(@"test: ('$s1', $s2) ");
 		}
@@ -153,8 +167,7 @@ string run_strjoin() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate string d_strtrim(char *s1, char *set);
+
 string run_strtrim() {
 	var result = new StringBuilder.sized(250);
 	result.append("STRTRIM:  ");
@@ -219,8 +232,7 @@ string run_strtrim() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate char** d_split(char *s, char c);
+
 string run_split() {
 	var result = new StringBuilder.sized(250);
 	result.append("SPLIT:    ");
@@ -229,10 +241,11 @@ string run_split() {
 
 		string check(string str, char c, string []cmp) {
 			var t = SupraTest.test(null, () => {
-				var sp1 = ft_split(str, c);
+				var __sp1 = ft_split(str, c);
+				unowned string []sp1 = (string[])__sp1;
 				if (cmp[0] == null) {
 					if (sp1[0] == null) {
-						delete sp1[0];
+						delete __sp1[0];
 						return true;
 					}
 				}
@@ -240,6 +253,7 @@ string run_split() {
 				for (int i = 0; i != cmp.length; ++i)
 				{
 					
+
 					if (sp1[i] == null || (string)sp1[i] != cmp[i]) {
 						stderr.printf("You: [");
 						for (int e = 0; sp1[e] != null; ++e) {
@@ -309,10 +323,8 @@ string run_split() {
 
 // ft_strmapi
 
-[CCode (has_target = false)]
-delegate char d_param_strmapi(uint n, char c);
-[CCode (has_target = false)]
-delegate string d_strmapi(char *s, d_param_strmapi func);
+
+
 string run_strmapi() {
 	var result = new StringBuilder.sized(250);
 	result.append("STRMAPI:  ");
@@ -359,10 +371,8 @@ string run_strmapi() {
 }
 // ft_striteri
 
-[CCode (has_target = false)]
-delegate void d_param_striteri(uint n, char *s);
-[CCode (has_target = false)]
-delegate void d_striteri(char *s, d_param_striteri func);
+
+
 string run_striteri() {
 	var result = new StringBuilder.sized(250);
 	result.append("STRITERI: ");
@@ -410,8 +420,7 @@ string run_striteri() {
 }
 
 
-[CCode (has_target = false)]
-delegate void d_putchar_fd(char c, int fd);
+
 string run_putchar_fd() {
 	var result = new StringBuilder.sized(250);
 	result.append("PUTCHARFD:");
@@ -454,8 +463,7 @@ string run_putchar_fd() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate void d_putstr_fd(char *s, int fd);
+
 string run_putstr_fd() {
 	var result = new StringBuilder.sized(250);
 	result.append("PUTSTRFD: ");
@@ -499,8 +507,7 @@ string run_putstr_fd() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate void d_putendl_fd(char *s, int fd);
+
 string run_putendl_fd() {
 	var result = new StringBuilder.sized(250);
 	result.append("PUTENDLFD:");
@@ -544,8 +551,7 @@ string run_putendl_fd() {
 	}
 }
 
-[CCode (has_target = false)]
-delegate void d_putnbr_fd(int n, int fd);
+
 string run_putnbr_fd() {
 	var result = new StringBuilder.sized(250);
 	result.append("PUTNBRFD: ");

@@ -155,7 +155,12 @@ async void main(string []args) {
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
 	Log.set_default_handler(()=> {});
-	var tester = new LibftTester(args);
-	yield tester.run();
+	try {
+		var tester = new LibftTester(args);
+		yield tester.run();
+	}
+	catch (Error e) {
+		printerr (e.message);
+	}
 	print("====================================================\n");
 }

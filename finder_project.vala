@@ -5,6 +5,14 @@ public const string p_none = "\033[0m";
 string? find_libft(string []args) throws Error {
 	var pwd = Environment.get_current_dir();
 	
+	// search in folder pwd/Makefile
+	if (FileUtils.test(@"$pwd/Makefile", FileTest.EXISTS)) {
+		var folder = @"$pwd/";
+		if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
+			return generate_libft_so (folder);
+		}
+	}
+
 	// search in folder pwd/../libft/Makefile
 	if (FileUtils.test(@"$pwd/../libft/Makefile", FileTest.EXISTS)) {
 		var folder = @"$pwd/../libft/";

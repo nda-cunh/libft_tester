@@ -190,25 +190,44 @@ string run_memset() {
 			buf[6] = '\0';
 			return((string)buf == "EEEEEE");
 		}, "memset(mem, E, 6)").msg();
+
 		result += SupraTest.test(null, () => {
 			uint8 buf[20];
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[7] != 'E');
-		}, "trop loin...").msg();
+		}, "trop loin... ft_memset(buf, 'E', 6)").msg();
+
 		result += SupraTest.test(null, () => {
 			uint8 buf[20];
 			buf[5] = '\0';
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[5] == 'E');
-		}, "pas asser loin...").msg();
+		}, "pas assez loin... ft_memset(buf, 'E', 6").msg();
+
 		result += SupraTest.test(null, () => {
 			uint8 buf[5];
 			buf[0] = 'J';
 			ft_memset(buf, 'E', 0);
 			return(buf[0] == 'J');
-		}, "bug avec memset 0").msg();
+		}, "ft_memset(buf, 'E', 0)").msg();
+		
+		result += SupraTest.test(null, () => {
+			ft_memset(null, 0, 0);
+			return true;
+		}, """ft_memset(NULL, 0, 0)""").msg();
+
+		var test = SupraTest.test(null, () => {
+			ft_memset(null, 0, 1);
+			return false;
+		}, "No segfault with memset(null, 0, 1)");
+		if (test.status != SIGSEGV)
+			result += test.msg();
+		else
+			result += test.msg_ok();
+
+
 		return result;
 	}
 	catch (Error e) {
@@ -538,31 +557,52 @@ string run_strchr() {
 				int c = 's';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 's')""").msg();
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'v')""").msg();
+
 		result += SupraTest.test(null, () => {
 				string s = "suprapatata\0vttiX";
-				int c = 'X';
+				int c = 'E';
 				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'X')""").msg();
+		}, """strchr("suprapatata\0vttiX", 'E')""").msg();
+
 		result += SupraTest.test(null, () => {
 				string s = "\0";
 				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'X')""").msg();
+		}, """strchr("\0", '\0')""").msg();
+
+		result += SupraTest.test(null, () => {
+				string s = "Hey Supra";
+				int c = '\0';
+				return (strchr(s, c) == ft_strchr(s, c));
+		}, """strchr("Hey Supra", '\0')""").msg();
+
+		var t = SupraTest.test(null, () => {
+			ft_strchr(null, 0);
+			return false;
+		}, "No segfault with strchr(null)");
+		if (t.status != SIGSEGV)
+			result += t.msg();
+		else
+			result += t.msg_ok();
+
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

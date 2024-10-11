@@ -103,9 +103,6 @@ namespace SupraTest{
 	extern int exit_status(int status);
 
 	public Test test(uint? timeout, testFunction func, string err_message = "") {
-		uint8 memory[8192];
-		memory[0] = 0;
-
 		uint time;
 		if (timeout == null)
 			time = 2;
@@ -121,6 +118,14 @@ namespace SupraTest{
 		// FORK
 		var child_pid = Posix.fork();
 		if (child_pid == 0) {
+
+			// Write in STACK memory EEEEE
+			{
+				uint8 memory[8192];
+				Memory.set(memory, 'E', 4046);
+				Memory.set(&memory[4046], '\0', 4046);
+			}
+
 			result.init_sig();
 			SupraLeak.reset();
 			Posix.dup2(fd_err, 2);
@@ -182,6 +187,13 @@ namespace SupraTest{
 
 		var child_pid = Posix.fork();
 		if (child_pid == 0) {
+
+			// Write in STACK memory EEEEE
+			{
+				uint8 memory[8192];
+				Memory.set(memory, 'E', 4046);
+				Memory.set(&memory[4046], '\0', 4046);
+			}
 			result.init_sig();
 			SupraLeak.reset();
 			Posix.dup2(fd_out, 1);

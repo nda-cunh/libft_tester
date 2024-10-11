@@ -87,12 +87,32 @@ string? generate_libft_so (string dir_makefile) throws Error {
 		return @"$dir_makefile/libft.so";
 
 	// Test with libft.a
-	run_command({"make", "-C", dir_makefile});
+	string errput;
+	int wait_status;
+	SpawnFlags flags = SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL;
+	Process.spawn_sync(null, {"make", "-C", dir_makefile}, null, flags, null, null, out errput, out wait_status); 
+
+
 	if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
+		if (wait_status != 0) {
+			printerr("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
+			printerr("%s\033[0m%s%s\n", p_supra, errput, p_none);
+			print("%sDo you want running your last libft.a ? [y/N] %s", p_supra, p_none);
+			if (stdin.read_line().strip().ascii_down() != "y")
+				throw new FileError.ACCES ("Error while running make");
+		}
 		print(@"$p_supra[Generate] libft.so from libft.a\n$p_none");
 		string libft_so = extract_libft_dll(@"$dir_makefile/libft.a");
 		if (FileUtils.test(libft_so, FileTest.EXISTS))
 			return libft_so;
+	}
+	else {
+		if (wait_status != 0) {
+			printerr("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
+			printerr("%s\033[0m%s%s\n", p_supra, errput, p_none);
+			throw new FileError.ACCES ("Error while running make");
+		}
+
 	}
 	printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
 	printerr("%s", p_supra);

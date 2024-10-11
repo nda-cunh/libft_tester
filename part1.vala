@@ -224,14 +224,14 @@ string run_bzero() {
 		for (int i = 0; i < 25; ++i)
 		{
 			result += SupraTest.test(null, () => {
-				uint8 buf1[40];
-				uint8 buf2[40];
+				uint8 buf1[128];
+				uint8 buf2[128];
 				Memory.set(buf1, 'X', 40);
 				Memory.set(buf2, 'X', 40);
 
 				ft_bzero(buf1, i);
 				Memory.set(buf2, '\0', i);
-				if (Memory.cmp(buf1, buf2, i) == 0)
+				if (Memory.cmp(buf1, buf2, 38) == 0)
 					return true;
 				return false;
 			}, @"bzero(mem, E, $i)").msg();
@@ -253,14 +253,16 @@ string run_memcpy() {
 		var ft_memcpy = (d_memcpy)loader.symbol("ft_memcpy");
 
 		result += SupraTest.test(null, () => {
-			uint8 dest[100];
-			Memory.set(dest, 'A', 100);
-			ft_memcpy(dest, "coucou", 0);
-			for (int i = 0; i < 100; ++i)
-				if (dest[i] != 'A')
-					return false;
-			return (true);
-		}, "memset(dest, 'A', 0) ").msg();
+			uint8 dest1[32];
+			uint8 dest2[32];
+			Memory.set(dest1, 'A', 32);
+			Memory.set(dest2, 'A', 32);
+			ft_memcpy(dest1, "coucou", 0);
+			Memory.copy(dest2, "coucou", 0);
+			if (Memory.cmp(dest1, dest2, 32) == 0)
+				return (true);
+			return false;
+		}, "memcpy(dest, 'coucou', 0) ").msg();
 
 		result += SupraTest.test(null, () => {
 			uint8 dest[5];

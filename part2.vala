@@ -78,7 +78,7 @@ string run_substr() {
 						return true;
 					}
 				}
-				stderr.printf("[You:'%s' != Me:'%s'] ", (string)sp1, sp); 
+				stderr.printf("[You:'%s' != Me:'%s'] ", ((string)sp1).compress(), sp); 
 				free(sp1);
 				return false;
 			});

@@ -161,7 +161,7 @@ async void main(string []args) {
 		yield tester.run();
 	}
 	catch (Error e) {
-		printerr (e.message);
+		printerr ("\033[31m[SupraTest]\033[0m %s", e.message);
 	}
-	print("====================================================\n");
+	print("\n====================================================\n");
 }

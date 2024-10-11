@@ -77,7 +77,7 @@ string extract_libft_dll(string libft_a) {
 	}
 }
 
-string? generate_libft_so (string dir_makefile) {
+string? generate_libft_so (string dir_makefile) throws Error {
 	print(@"$(p_supra)Makefile found here: %s/Makefile\n$p_none", dir_makefile);
 	// Test run so
 	run_command({"make", "so", "-C", dir_makefile});
@@ -108,5 +108,5 @@ Vous pouvez aussi juste creer le libft.so avec
 	gcc *.c --shared -o libft.so
 ```""");
 	printerr("\n\n");
-	return null;
+	throw new FileError.ACCES ("Can't generate libft.so from libft.a\n");
 }

@@ -13,7 +13,7 @@ delegate int	d_memcmp(void *s1, void *s2, size_t n);
 delegate void*	d_memcpy(void *dest, void *src, size_t n);
 delegate void*	d_memmove(void *dest, void *src, size_t n);
 delegate void*	d_memset(void *s, int c, size_t n);
-delegate char*	d_strchr(char *s, int c);
+delegate size_t d_strchr(char *s, int c);
 delegate char*	d_strdup(char *src);
 delegate size_t	d_strlcat(char *dst, char *src, size_t size);
 delegate int	d_strncmp(char *s1, char *s2, size_t n);
@@ -545,7 +545,7 @@ string run_tolower() {
 }
 
 [CCode (cname = "strchr", cheader_filename="string.h")]
-extern char *strchr(char *s, int c);
+extern size_t strchr(char *s, int c);
 
 string run_strchr() {
 	string result = "STRCHR:   ";
@@ -600,15 +600,24 @@ string run_strchr() {
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("1024", '\0')""").msg();
 
+		// segfault test
 		var t = SupraTest.test(null, () => {
 			ft_strchr(null, 0);
 			return false;
-		}, "No segfault with strchr(null)");
+		}, "No segfault with strchr(null, 0)");
 		if (t.status != SIGSEGV)
 			result += t.msg();
 		else
 			result += t.msg_ok();
-
+		
+		t = SupraTest.test(null, () => {
+			ft_strchr(null, 'c');
+			return false;
+		}, "No segfault with strchr(null, 'c')");
+		if (t.status != SIGSEGV)
+			result += t.msg();
+		else
+			result += t.msg_ok();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -625,35 +634,54 @@ string run_strrchr() {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 's')""").msg();
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'v')""").msg();
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'X';
 				return (strrchr(s, c) == ft_strrchr(s, c));
 		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
 		result += SupraTest.test(null, () => {
-				string s = "bonjour";
+				const string s = "bonjour";
 				int c = 'b';
 				return (strrchr(s.offset(2), c) == ft_strrchr(s.offset(2), c));
 		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
+		
+		// segfault test
+		var t = SupraTest.test(null, () => {
+			ft_strrchr(null, 0);
+			return false;
+		}, "No segfault with strchr(null, 0)");
+		if (t.status != SIGSEGV)
+			result += t.msg();
+		else
+			result += t.msg_ok();
+		
+		t = SupraTest.test(null, () => {
+			ft_strrchr(null, 'c');
+			return false;
+		}, "No segfault with strchr(null, 'c')");
+		if (t.status != SIGSEGV)
+			result += t.msg();
+		else
+			result += t.msg_ok();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

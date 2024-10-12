@@ -40,7 +40,8 @@ public void* vala_malloc(void *ptr, size_t len) {
 	}
 	g_alloc_count++;
 	g_alloc_bytes += len;
-	Memory.set(ptr, 'E', len);
+	Memory.set(ptr, 'E', len + 8);
+	Memory.set(&ptr[len + 8], '\0', 8);
 	return ptr;
 }
 

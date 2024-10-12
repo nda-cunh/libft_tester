@@ -26,7 +26,7 @@ void* malloc(size_t size)
 {
 	if (libc_malloc == NULL)
 		init_malloc();
-	void* p = libc_malloc(size);
+	void* p = libc_malloc(size + 16);
 	if (vala_malloc(p, size) == NULL) {
 		libc_free(p);
 		return NULL;

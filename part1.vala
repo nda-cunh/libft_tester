@@ -674,7 +674,7 @@ string run_strchr() {
 	try {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
 
-		string check (char* s, uchar c, string? msg = null) {
+		string check (char* s, int c, string? msg = null) {
 			string cp;
 			if (c == '\0')
 				cp = "'\\0'";

@@ -784,36 +784,35 @@ string run_strrchr() {
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 's';
-				return (strrchr(s, c) == ft_strrchr(s, c));
-		}, """strrchr("suprapatata\0vttiX", 's')""").msg();
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'a';
-				return (strrchr(s, c) == ft_strrchr(s, c));
-		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'p';
-				return (strrchr(s, c) == ft_strrchr(s, c));
-		}, """strrchr("suprapatata\0vttiX", 'a')""").msg();
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'v';
-				return (strrchr(s, c) == ft_strrchr(s, c));
-		}, """strrchr("suprapatata\0vttiX", 'v')""").msg();
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'X';
-				return (strrchr(s, c) == ft_strrchr(s, c));
-		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
+		string check (char* s, int c, string? msg = null) {
+			var p = SupraTest.test(null, () => {
+				var a = strrchr(s, c);
+				var b = ft_strrchr(s, c);
+				if (a != b) {
+					stderr.printf("libc: %s you: %s ", (string)a?? "null", (string)b ?? "(null)");
+					return false;
+				}
+				return true;
+			}, msg.printf(c)).msg_err();
+			return p ; 
+		}
+
+		result += check("suprapatata\0vttiX", 's', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'a', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'v', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'p', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'r', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 't', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'X', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'b', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", 'i', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX", '\0', """strrchr("suprapatata\0vttiX", '%c')""");
+
 		result += SupraTest.test(null, () => {
 				const string s = "bonjour";
 				int c = 'b';
 				return (strrchr(s.offset(2), c) == ft_strrchr(s.offset(2), c));
-		}, """strrchr("suprapatata\0vttiX", 'X')""").msg();
+		}, """buf = "bonjour" strrchr(buf + 2, 'b') """).msg();
 		
 		// segfault test
 		var t = SupraTest.test(null, () => {

@@ -164,6 +164,7 @@ string run_strlen() {
 		/* 4 */ result.append(SupraTest.test(null, () => { return (ft_strlen("1234") == 4); }, "4").msg());
 		/* 5 */ result.append(SupraTest.test(null, () => { return (ft_strlen("12345") == 5); }, "5").msg());
 		/* 6 */ result.append(SupraTest.test(null, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "8 spaces").msg());
+		/* 6 */ result.append(SupraTest.test(null, () => { return (ft_strlen("abcdefghijklmnopqrdtuvwxyz") == 26); }, "abcdefghijklmnopqrdtuvwxyz").msg());
 		/* 7 */
 		var t = SupraTest.test(null, ()=>{
 			ft_strlen(null);
@@ -171,6 +172,8 @@ string run_strlen() {
 		}, "No segfault with strlen(null)");
 		if (t.status != SIGSEGV)
 			result.append(t.msg());
+		else
+			result.append(t.msg_ok());
 
 		return result.str;
 	}

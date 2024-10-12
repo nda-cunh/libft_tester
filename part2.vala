@@ -41,26 +41,28 @@ string run_itoa() {
 		/* 13 */ result.append(check(-10));
 		/* 14 */ result.append(check(-11));
 		/* 15 */ result.append(check(-42));
-		/* 16 */ result.append(check(165468465));
-		/* 17 */ for (var N = 0; N < 5; ++N)
-		{
-			var i = Random.int_range(int.MIN, int.MAX);
-			result.append(check(i));
-		}
-		/* 18 */ result.append(SupraTest.test(null, ()=>{
+		/* 16 */ result.append(check(1654665));
+		/* 17 */ result.append(check(14698465));
+		/* 18 */ result.append(check(-16465));
+		/* 19 */ result.append(check(546465));
+		/* 20 */ result.append(check(-164465));
+		/* 21 */ result.append(check(684));
+		/* 22 */ result.append(check(-68465));
+		/* 23 */ result.append(check(6851465));
+		/* 24 */
+		result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_itoa(42);
 			if (s != null)
 				delete s;
 			return (s == null);
 		}, "no protect ").msg_err());
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
 	}
 }
-
 
 string run_substr() {
 	var result = new StringBuilder.sized(250);
@@ -118,7 +120,7 @@ string run_substr() {
 			return (s == null);
 		}, "no protect ").msg_err());
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -160,7 +162,7 @@ string run_strjoin() {
 			return (s == null);
 		}, "no protect ").msg_err());
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -225,7 +227,7 @@ string run_strtrim() {
 			return (true);
 		}, "no protect ").msg_err());
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -314,7 +316,7 @@ string run_split() {
 			return (s == null);
 		}, "no protect ").msg_err());
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -363,7 +365,7 @@ string run_strmapi() {
 			return (s == null);
 		}, "no protect ").msg_err());
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -412,7 +414,7 @@ string run_striteri() {
 					s[-1] = 'h';
 				}
 			}, "cVoVhlat"));
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -456,7 +458,7 @@ string run_putchar_fd() {
 			t.status = OK;
 		result.append(t.msg(@"putchar('e', -1) you '$(t.stderr)' "));
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -500,7 +502,7 @@ string run_putstr_fd() {
 		result.append(check("", -1));
 		result.append(check("", 1));
 		result.append(check("", 2));
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -544,7 +546,7 @@ string run_putendl_fd() {
 		result.append(check("", -1));
 		result.append(check("", 1));
 		result.append(check("", 2));
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -592,7 +594,7 @@ string run_putnbr_fd() {
 		}
 		result.append(check(0, -1));
 		result.append(check(42, -1));
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";

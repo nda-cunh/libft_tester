@@ -11,7 +11,7 @@
 void *(*libc_malloc)(size_t) = NULL;
 void (*libc_free)(void*) = NULL;
 
-// Prototype 
+// Prototype
 void* malloc(size_t size);
 void free(void * p);
 extern void* vala_malloc(void* ptr, size_t len);

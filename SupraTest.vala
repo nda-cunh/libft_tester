@@ -11,7 +11,7 @@ public string read_all(string file) {
 	return str.str;
 }
 
-//   SUPRATEST 
+//   SUPRATEST
 public enum Status{
 	OK = 0,
 	KO = 1,
@@ -46,21 +46,29 @@ namespace SupraTest{
 			this.free = 0;
 		}
 
-		public string msg_ok() {
+		public unowned string msg_ok() {
 			return "\033[32m[OK]\033[0m";
 		}
 
+		public string msg_need_segfault() {
+			if (this.status == SIGSEGV)
+				return (this.msg_ok());
+			else
+				return (this.msg_ko());
+		}
+
 		public string msg_ko(string? msg = null) {
-			return @"\033[31m[KO] \033[91m$(msg ?? "")\033[0m";
+			var s = msg ?? this.message;
+			return @"\033[31m[KO] \033[91m$(s)\033[0m";
 		}
 
 		public string msg_err(string? message = null) {
-			var s = message ?? this.message; 
+			var s = message ?? this.message;
 			return msg(@"$s $(this.stderr)");
 		}
-		
+
 		public string msg(string? message = null) {
-			var msg = message ?? this.message; 
+			var msg = message ?? this.message;
 			if (status == LEAK)
 				return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
 			else if (status == SIGILL)
@@ -113,7 +121,7 @@ namespace SupraTest{
 		int fd_err = mkstemp(template_stderr);
 		if (fd_err < 0)
 			Posix.perror("Erreur lors de la création du fichier temporaire");
-		
+
 
 		// FORK
 		var child_pid = Posix.fork();
@@ -134,7 +142,7 @@ namespace SupraTest{
 			stderr.printf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
 			Posix.exit((b == true) ? 0 : 1);
 		}
-	
+
 
 		// Async waitpid
 		var timer = new Timer();
@@ -207,7 +215,7 @@ namespace SupraTest{
 				Posix.exit(0);
 			Posix.exit(1);
 		}
-		
+
 
 		// Async waitpid
 		var timer = new Timer();
@@ -227,14 +235,14 @@ namespace SupraTest{
 		Posix.close(fd_err);
 		result.stdout = read_all((string)template_stdout);
 		result.stderr = read_all((string)template_stderr);
-		
+
 		// get SupraLeak alloc/free and remove it
 		if (result.stderr != null) {
 			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
 			begin.scanf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", ref result.free, ref result.alloc, ref result.bytes);
 			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}
-		
+
 		// remove stderr pipe
 		FileUtils.unlink((string)template_stderr);
 		FileUtils.unlink((string)template_stdout);

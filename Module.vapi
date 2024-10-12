@@ -24,7 +24,7 @@ public enum RTLD_DI {
 
 [CCode (cname="void", free_function = "dlclose", cheader_filename = "dlfcn.h")]
 [Compact]
-public class Module{
+public class Module {
 	[CCode (cname = "dlopen")]
 	public Module(string filename, RTLD flags);
 	[CCode (cname = "dlsym")]

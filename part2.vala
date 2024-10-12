@@ -78,12 +78,12 @@ string run_substr() {
 						return true;
 					}
 				}
-				stderr.printf("[You:'%s' != Me:'%s'] ", ((string)sp1).compress(), sp); 
+				stderr.printf("[You:'%s' != Me:'%s'] ", ((string)sp1).compress(), sp);
 				free(sp1);
 				return false;
 			});
 
-			
+
 			return t.msg(@"test: ('$str', $start, $len) $(t.stderr)");
 		}
 
@@ -151,7 +151,7 @@ string run_strjoin() {
 		/* 7 */ result.append(check("", "suprluserbu le dartien test", "suprluserbu le dartien test"));
 		/* 8 */ result.append(check("luserbu le dartien", "", "luserbu le dartien"));
 		/* 9 */ result.append(check("a a a a a a a", "a a a a a a a  a a  a   a a  ", "a a a a a a aa a a a a a a  a a  a   a a  "));
-		
+
 		/* 10 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strjoin("ab", "ab");
@@ -159,7 +159,7 @@ string run_strjoin() {
 				delete s;
 			return (s == null);
 		}, "no protect ").msg_err());
-		
+
 		return result.str;
 	}
 	catch (Error e) {
@@ -209,12 +209,12 @@ string run_strtrim() {
 		/* 16 */ result.append(check("lorem ipsum dolor sit amet", "tel", "orem ipsum dolor sit am"));
 		/* 17 */ result.append(check("          ", " ", ""));
 		/* 18 */ result.append(check("          ", "          ", ""));
-		/* 19 */ result.append(check(null, null, null)); 
+		/* 19 */ result.append(check(null, null, null));
 		/* 20 */ result.append(check("a", null, null));
 		/* 21 */ result.append(check("", null, null));
 		/* 22 */ result.append(check(null, "", null));
 		/* 23 */ result.append(check(null, "abc", null));
-		
+
 		/* 24 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strtrim("ab", "ab");
@@ -224,7 +224,7 @@ string run_strtrim() {
 			}
 			return (true);
 		}, "no protect ").msg_err());
-		
+
 		return result.str;
 	}
 	catch (Error e) {
@@ -249,10 +249,10 @@ string run_split() {
 						return true;
 					}
 				}
-			
+
 				for (int i = 0; i != cmp.length; ++i)
 				{
-					
+
 
 					if (sp1[i] == null || (string)sp1[i] != cmp[i]) {
 						stderr.printf("You: [");
@@ -295,7 +295,7 @@ string run_split() {
 		/* 15 */ result.append(check(",,,", '\0', {",,,"}));
 		/* 16 */ result.append(check(" ", ',', {" "}));
 		/* 16 */ result.append(check("          ", ' ', {null}));
-		
+
 		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse", ' ',
 		{"lorem","ipsum","dolor","sit","amet,","consectetur","adipiscing","elit.","Sed","non","risus.","Suspendisse"}));
 		/* 16 */ result.append(check("   lorem   ipsum dolor     sit amet, consectetur   adipiscing elit. Sed non risus. Suspendisse  ", ' ',
@@ -305,7 +305,7 @@ string run_split() {
 		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'z',
 {"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
 		/* 16 */ result.append(check("", 'z', {null}));
-		
+
 		/* 17 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char **s = ft_split("bababababhc", 'a');
@@ -342,19 +342,19 @@ string run_strmapi() {
 		}
 
 		/* 1 */ result.append(check("salut", (n, c)=>{
-				return 'e'; 
+				return 'e';
 			}, "eeeee"));
 		/* 2 */ result.append(check("abcde", (n, c)=>{
-				return c + 1; 
+				return c + 1;
 			}, "bcdef"));
 		/* 3 */ result.append(check("chocolat", (n, c)=>{
 				if (n % 2 == 0)
 					return c;
-				return c - 32; 
+				return c - 32;
 			}, "cHoCoLaT"));
 		/* 4 */ result.append(check("chocolat", (n, c)=>{
 				if (n == 3 || n == 5)
-					return c - 32; 
+					return c - 32;
 				return c;
 			}, "choCoLat"));
 		/* 5 */ result.append(SupraTest.test(null, ()=>{
@@ -362,7 +362,7 @@ string run_strmapi() {
 			char *s = ft_strmapi("abc", ()=>{return 'e';});
 			return (s == null);
 		}, "no protect ").msg_err());
-			
+
 		return result.str;
 	}
 	catch (Error e) {
@@ -435,9 +435,9 @@ string run_putchar_fd() {
 		if (t.status == OK && t.stdout == "e" && t.stderr == "")
 			t.status = OK;
 		result.append(t.msg(@"putchar('e', 1) you '$(t.stdout)' "));
-		
+
 		//test 2
-		
+
 		t = SupraTest.complex(3, () => {
 			ft_putchar_fd('v', 2);
 			return true;
@@ -445,9 +445,9 @@ string run_putchar_fd() {
 		if (t.status == OK && t.stdout == "" && t.stderr == "v")
 			t.status = OK;
 		result.append(t.msg(@"putchar('e', 2) you '$(t.stderr)' "));
-		
+
 		//test 3
-		
+
 		t = SupraTest.complex(3, () => {
 			ft_putchar_fd('e', -1);
 			return true;

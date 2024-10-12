@@ -2,8 +2,8 @@
 delegate string d_worker();
 Loader loader;
 
-class LibftTester{
-	
+class LibftTester : Object{
+
 	public  LibftTester(string []args) throws Error {
 		var libft = find_libft(args);
 		loader = new Loader(libft);
@@ -62,7 +62,7 @@ class LibftTester{
 	}
 
 
-                                      
+
 	// ,------.                  ,--.    ,--.
 	// |  .--. ' ,--,--.,--.--.,-'  '-. /   |
 	// |  '--' |' ,-.  ||  .--''-.  .-' `|  |
@@ -98,15 +98,15 @@ class LibftTester{
 		print("\033[33m     <------------- [ PART 1 ] ------------->\n\033[0m");
 		yield run_part(tab_func_p1);
 	}
-	
-	
-	
+
+
+
 	// ,------.                  ,--.    ,---.
 	// |  .--. ' ,--,--.,--.--.,-'  '-. '.-.  \
 	// |  '--' |' ,-.  ||  .--''-.  .-'  .-' .'
 	// |  | --' \ '-'  ||  |     |  |   /   '-.
 	// `--'      `--`--'`--'     `--'   '-----'
-	
+
 	async void run_part2() {
 		d_worker []tab_func_p2 = {
 			run_itoa,

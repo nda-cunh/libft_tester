@@ -13,7 +13,7 @@ delegate int	d_memcmp(void *s1, void *s2, size_t n);
 delegate void*	d_memcpy(void *dest, void *src, size_t n);
 delegate void*	d_memmove(void *dest, void *src, size_t n);
 delegate void*	d_memset(void *s, int c, size_t n);
-delegate size_t d_strchr(char *s, int c);
+delegate char*	d_strchr(char *s, int c);
 delegate char*	d_strdup(char *src);
 delegate size_t	d_strlcat(char *dst, char *src, size_t size);
 delegate int	d_strncmp(char *s1, char *s2, size_t n);
@@ -145,7 +145,7 @@ string run_isprint() {
 				}
 				return true;
 			});
-		return result + t.msg_err("Input:");
+		return result + t.msg_err("Input: ");
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -154,31 +154,25 @@ string run_isprint() {
 
 
 string run_strlen() {
-	var result = new StringBuilder.sized(250);
-	result.append("STRLEN:   ");
+	var result = "STRLEN:   ";
 	try {
 		var ft_strlen = (d_strlen)loader.symbol("ft_strlen");
-		/* 1 */ result.append(SupraTest.test(null, () => { return (ft_strlen("1") == 1); }, "1").msg());
-		/* 2 */ result.append(SupraTest.test(null, () => { return (ft_strlen("12") == 2); }, "2").msg());
-		/* 3 */ result.append(SupraTest.test(null, () => { return (ft_strlen("123") == 3); }, "3").msg());
-		/* 4 */ result.append(SupraTest.test(null, () => { return (ft_strlen("1234") == 4); }, "4").msg());
-		/* 5 */ result.append(SupraTest.test(null, () => { return (ft_strlen("12345") == 5); }, "5").msg());
-		/* 6 */ result.append(SupraTest.test(null, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "8 spaces").msg());
-		/* 6 */ result.append(SupraTest.test(null, () => { return (ft_strlen("abcdefghijklmnopqrdtuvwxyz") == 26); }, "abcdefghijklmnopqrdtuvwxyz").msg());
+		/* 1 */ result += (SupraTest.test(null, () => { return (ft_strlen("1") == 1); }, "1").msg());
+		/* 2 */ result += (SupraTest.test(null, () => { return (ft_strlen("12") == 2); }, "2").msg());
+		/* 3 */ result += (SupraTest.test(null, () => { return (ft_strlen("123") == 3); }, "3").msg());
+		/* 4 */ result += (SupraTest.test(null, () => { return (ft_strlen("1234") == 4); }, "4").msg());
+		/* 5 */ result += (SupraTest.test(null, () => { return (ft_strlen("12345") == 5); }, "5").msg());
+		/* 6 */ result += (SupraTest.test(null, () => { return (ft_strlen("   \t\t\t\r\n") == 8); }, "8 spaces").msg());
+		/* 6 */ result += (SupraTest.test(null, () => { return (ft_strlen("abcdefghijklmnopqrdtuvwxyz") == 26); }, "abcdefghijklmnopqrdtuvwxyz").msg());
 		/* 7 */
-		var t = SupraTest.test(null, ()=>{
+		result += (SupraTest.test(null, () => {
 			ft_strlen(null);
 			return false;
-		}, "No segfault with strlen(null)");
-		if (t.status != SIGSEGV)
-			result.append(t.msg());
-		else
-			result.append(t.msg_ok());
-
-		return result.str;
+		}, "No segfault with strlen(null)").msg_need_segfault());
+		return result;
 	}
 	catch (Error e) {
-		return @"$(result.str) \033[31m$(e.message)\033[0m";
+		return @"$(result) \033[31m$(e.message)\033[0m";
 	}
 }
 
@@ -215,20 +209,16 @@ string run_memset() {
 			ft_memset(buf, 'E', 0);
 			return(buf[0] == 'J');
 		}, "ft_memset(buf, 'E', 0)").msg();
-		
+
 		result += SupraTest.test(null, () => {
 			ft_memset(null, 0, 0);
 			return true;
 		}, """ft_memset(NULL, 0, 0)""").msg();
 
-		var test = SupraTest.test(null, () => {
+		result += SupraTest.test(null, () => {
 			ft_memset(null, 0, 1);
-			return false;
-		}, "No segfault with memset(null, 0, 1)");
-		if (test.status != SIGSEGV)
-			result += test.msg();
-		else
-			result += test.msg_ok();
+			return true;
+		}, "No segfault with memset(null, 0, 1)").msg_need_segfault();
 
 
 		return result;
@@ -240,12 +230,13 @@ string run_memset() {
 
 
 string run_bzero() {
-	string result = "BZERO:    ";
+	var result = new StringBuilder.sized(300);
+	result.append("BZERO:    ");
 	try {
 		var ft_bzero = (d_bzero)loader.symbol("ft_bzero");
 		for (int i = 0; i < 25; ++i)
 		{
-			result += SupraTest.test(null, () => {
+			result.append(SupraTest.test(null, () => {
 				uint8 buf1[128];
 				uint8 buf2[128];
 				Memory.set(buf1, 'X', 40);
@@ -256,12 +247,12 @@ string run_bzero() {
 				if (Memory.cmp(buf1, buf2, 38) == 0)
 					return true;
 				return false;
-			}, @"bzero(mem, E, $i)").msg();
+			}, @"bzero(mem, E, $i)").msg());
 		}
-		return result;
+		return (owned)result.str;
 	}
 	catch (Error e) {
-		return @"$result \033[31m$(e.message)\033[0m";
+		return @"$(result.str) \033[31m$(e.message)\033[0m";
 	}
 }
 
@@ -305,7 +296,7 @@ string run_memcpy() {
 			return true;
 		}, "memcpy(dest, NULL, 0) ").msg_err();
 
-		
+
 		result += SupraTest.test(null, () => {
 			const int size = 100;
 			const string src = "\0\0abc";
@@ -327,7 +318,7 @@ string run_memcpy() {
 			}
 			return true;
 		}, """ft_memcpy("AAAAAAAAAAAAAA...(100)", "\0\0abc", 2)""").msg_err();
-		
+
 
 		result += SupraTest.test(null, () => {
 			const int size = 100;
@@ -350,7 +341,7 @@ string run_memcpy() {
 			}
 			return true;
 		}, """ft_memcpy("AAAAAAAAAAAAAA...(100)", "Hello, World!", 12)""").msg_err();
-		
+
 		result += SupraTest.test(null, () => {
 			const int size = 100;
 			const string src = "abcdefghijklmnopqrstuvwxyz0123456789zyxwvutsrqponmlkjihgfedcba";
@@ -373,7 +364,7 @@ string run_memcpy() {
 			return true;
 		}, """ft_memcpy("AAAAAAAAAAAAAA...(100)", "abcdefghijklmnopqrstuvwxyz0123456789zyxwvutsrqponmlkjihgfedcba, World!", 61)""").msg_err();
 
-		
+
 		result += SupraTest.test(null, () => {
 			const int size = 42;
 			const string src = "abcdefghijklmnopqrstuvwxyz0123456789zyxwvutsr\0";
@@ -505,17 +496,12 @@ string run_strlcpy() {
 			return true;
 		}, "strlcpy(NULL, '', 0)").msg());
 
-		/* 19 */ var t = SupraTest.test(null, () => {
+		/* 19 */ result.append(SupraTest.test(null, () => {
 			ft_strlcpy(null, "", 1);
 			return false;
-		}, "strlcpy(null, '', 1) No Crash");
+		}, "strlcpy(null, '', 1) No Crash").msg_need_segfault());
 
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
-
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -582,69 +568,44 @@ string run_strlcat() {
 			return true;
 		}, "strlcat(NULL, '', 0)").msg());
 
-
-		/* 20 */ var t = SupraTest.test(null, () => {
+		/* 20 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 0);
 			return false;
-		}, "strlcat(null, null, 0) No Crash");
+		}, "strlcat(null, null, 0) No Crash").msg_need_segfault());
 
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
-		
-		/* 21 */ t = SupraTest.test(null, () => {
+		/* 21 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 1);
 			return false;
-		}, "strlcat(null, null, 1) No Crash");
+		}, "strlcat(null, null, 1) No Crash").msg_need_segfault());
 
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
-		
-		/* 22 */ t = SupraTest.test(null, () => {
+		/* 22 */ result.append(SupraTest.test(null, () => {
 			string str = "hello";
 			ft_strlcat(str, null, 0);
 			return false;
-		}, "strlcat(\"hello\", null, 0) No Crash");
+		}, "strlcat(\"hello\", null, 0) No Crash").msg_need_segfault());
 
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
-		
-		/* 23 */ t = SupraTest.test(null, () => {
+
+		/* 23 */ result.append(SupraTest.test(null, () => {
 			string str = "hello";
 			ft_strlcat(str, null, 1);
 			return false;
-		}, "strlcat(\"hello\", null, 1) No Crash");
+		}, "strlcat(\"hello\", null, 1) No Crash").msg_need_segfault());
 
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
-		
-		/* 24 */ t = SupraTest.test(null, () => {
+		/* 24 */ result.append(SupraTest.test(null, () => {
 			return (ft_strlcat(null, "source", 1) == 6);
-		}, "strlcat(\"hello\", null, 1) No Crash");
-
-		if (t.status == SIGSEGV)
-			result.append(t.msg_ok());
-		else
-			result.append(t.msg());
+		}, "strlcat(\"hello\", null, 1) No Crash").msg_need_segfault());
 
 		/* 25 */ result.append(SupraTest.test(null, () => {
 			return (ft_strlcat(null, "source", 0) == 6);
 		}).msg("ft_strlcat(NULL, \"source\", 0) != 6"));
-		
-		
+
+
 		/* 26 */ result.append(SupraTest.test(null, () => {
 			string s = "abcdef";
 			return (ft_strlcat(s, "source", 0) == 6);
 		}).msg("ft_strlcat(\"abcdef\", \"source\", 0) != 6"));
 
-		return result.str;
+		return (owned)result.str;
 	}
 	catch (Error e) {
 		return @"$(result.str) \033[31m$(e.message)\033[0m";
@@ -661,7 +622,7 @@ string run_toupper() {
 		var t = SupraTest.test(null, () => {
 			for (int i = 0; i < 255; ++i)
 			{
-				if (clang_s(ft_toupper(i)) != clang_s(clang_toupper(i)))
+				if (ft_toupper(i) != clang_toupper(i))
 					return false;
 			}
 			return true;
@@ -683,7 +644,7 @@ string run_tolower() {
 		var t = SupraTest.test(null, () => {
 				for (int i = 0; i < 255; ++i)
 				{
-					if (clang_s(ft_tolower(i)) != clang_s(clang_tolower(i)))
+					if (ft_tolower(i) != clang_tolower(i))
 						return false;
 				}
 				return true;
@@ -696,42 +657,44 @@ string run_tolower() {
 }
 
 [CCode (cname = "strchr", cheader_filename="string.h")]
-extern size_t strchr(char *s, int c);
+extern char* strchr(char *s, int c);
 
 string run_strchr() {
 	string result = "STRCHR:   ";
 	try {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
 
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 's';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 's')""").msg();
+		string check (char* s, uchar c, string? msg = null) {
+			string cp;
+			if (c == '\0')
+				cp = "'\\0'";
+			else
+				cp = ((char)c).to_string();
+			var p = SupraTest.test(null, () => {
+				var a = strchr(s, c);
+				var b = ft_strchr(s, c);
+				if (a != b) {
+					stderr.printf("libc: %s you: %s ", ((string)a) ?? "null", ((string)b) ?? "(null)");
+					return false;
+				}
+				return true;
+			}, msg.printf(cp)).msg_err();
+			return (owned)p;
+		}
 
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'a';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
-
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'p';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
-
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'v';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'v')""").msg();
-
-		result += SupraTest.test(null, () => {
-				const string s = "suprapatata\0vttiX";
-				int c = 'E';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("suprapatata\0vttiX", 'E')""").msg();
+		result += check("suprapatata\0vttiX",	's', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'a', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'v', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'p', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'r', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	't', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'X', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'b', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'i', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'E', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'\0', """strchr("suprapatata\0vttiX", '%s')""");
+		result += check("Hey Supra",			'\0', """strchr("Hey Supra", '%s')""");
+		result += check("\0",					'\0', """strchr("\0", '%s')""");
 
 		result += SupraTest.test(null, () => {
 				const string s = "\0";
@@ -740,35 +703,20 @@ string run_strchr() {
 		}, """strchr("\0", '\0')""").msg();
 
 		result += SupraTest.test(null, () => {
-				const string s = "Hey Supra";
-				int c = '\0';
-				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("Hey Supra", '\0')""").msg();
-		
-		result += SupraTest.test(null, () => {
 				const string s = "1024";
 				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("1024", '\0')""").msg();
 
-		// segfault test
-		var t = SupraTest.test(null, () => {
-			ft_strchr(null, 0);
-			return false;
-		}, "No segfault with strchr(null, 0)");
-		if (t.status != SIGSEGV)
-			result += t.msg();
-		else
-			result += t.msg_ok();
-		
-		t = SupraTest.test(null, () => {
-			ft_strchr(null, 'c');
-			return false;
-		}, "No segfault with strchr(null, 'c')");
-		if (t.status != SIGSEGV)
-			result += t.msg();
-		else
-			result += t.msg_ok();
+		result += SupraTest.test(null, () => {
+				ft_strchr(null, '\0');
+				return false;
+		}, """strchr(NULL, '\0')""").msg_need_segfault();
+
+		result += SupraTest.test(null, () => {
+				ft_strchr(null, 'c');
+				return false;
+		}, """strchr(NULL, 'c')""").msg_need_segfault();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -784,54 +732,53 @@ string run_strrchr() {
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 
-		string check (char* s, int c, string? msg = null) {
+		string check (char* s, uchar c, string? msg = null) {
+			string cp;
+			if (c == '\0')
+				cp = "'\\0'";
+			else
+				cp = ((char)c).to_string();
 			var p = SupraTest.test(null, () => {
 				var a = strrchr(s, c);
 				var b = ft_strrchr(s, c);
 				if (a != b) {
-					stderr.printf("libc: %s you: %s ", (string)a?? "null", (string)b ?? "(null)");
+					stderr.printf("libc: %s you: %s ", ((string)a) ?? "null", ((string)b) ?? "(null)");
 					return false;
 				}
 				return true;
-			}, msg.printf(c)).msg_err();
-			return p ; 
+			}, msg.printf(cp)).msg_err();
+			return (owned)p;
 		}
 
-		result += check("suprapatata\0vttiX", 's', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'a', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'v', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'p', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'r', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 't', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'X', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'b', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", 'i', """strrchr("suprapatata\0vttiX", '%c')""");
-		result += check("suprapatata\0vttiX", '\0', """strrchr("suprapatata\0vttiX", '%c')""");
+		result += check("suprapatata\0vttiX",	's', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'a', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'v', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'p', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'r', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	't', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'X', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'b', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'i', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'E', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("suprapatata\0vttiX",	'\0', """strrchr("suprapatata\0vttiX", '%s')""");
+		result += check("Hey Supra",			'\0', """strrchr("Hey Supra", '%s')""");
+		result += check("\0",					'\0', """strrchr("\0", '%s')""");
 
 		result += SupraTest.test(null, () => {
 				const string s = "bonjour";
 				int c = 'b';
 				return (strrchr(s.offset(2), c) == ft_strrchr(s.offset(2), c));
 		}, """buf = "bonjour" strrchr(buf + 2, 'b') """).msg();
-		
-		// segfault test
-		var t = SupraTest.test(null, () => {
-			ft_strrchr(null, 0);
-			return false;
-		}, "No segfault with strchr(null, 0)");
-		if (t.status != SIGSEGV)
-			result += t.msg();
-		else
-			result += t.msg_ok();
-		
-		t = SupraTest.test(null, () => {
-			ft_strrchr(null, 'c');
-			return false;
-		}, "No segfault with strchr(null, 'c')");
-		if (t.status != SIGSEGV)
-			result += t.msg();
-		else
-			result += t.msg_ok();
+
+		result += SupraTest.test(null, () => {
+				ft_strrchr(null, '\0');
+				return false;
+		}, """strrchr(NULL, '\0')""").msg_need_segfault();
+
+		result += SupraTest.test(null, () => {
+				ft_strrchr(null, 'c');
+				return false;
+		}, """strrchr(NULL, 'c')""").msg_need_segfault();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";
@@ -883,49 +830,52 @@ string run_strncmp() {
 
 
 string run_memchr() {
-	string result = "MEMCHR:   ";
+	var result = new StringBuilder("MEMCHR:   ");
 	try {
 		var ft_memchr= (d_memchr)loader.symbol("ft_memchr");
 		char s[] = {0, 1, 2 ,3 ,4 ,5};
 
-		result += SupraTest.test(null, ()=>{
+		// 1
+		result.append(SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 0, 0) == null);
-		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 0) == null").msg();
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 0) == null").msg());
 
-		result += SupraTest.test(null, ()=>{
+		// 2
+		result.append(SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 0, 1) == s);
-		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 1) == tab").msg();
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 0, 1) == tab").msg());
 
-		result += SupraTest.test(null, ()=>{
+		// 3
+		result.append(SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 2, 3) == &s[2]);
-		}, @"memchr({0, 1, 2, 3, 4, 5}, 2, 3) == &tab[2]").msg();
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 2, 3) == &tab[2]").msg());
 
-		result += SupraTest.test(null, ()=>{
+		// 4
+		result.append(SupraTest.test(null, ()=>{
 			return (ft_memchr(s, 6, 6) == null);
-		}, @"memchr({0, 1, 2, 3, 4, 5}, 6, 6) == null").msg();
+		}, @"memchr({0, 1, 2, 3, 4, 5}, 6, 6) == null").msg());
 
-		result += SupraTest.test(null, ()=>{
+		// 5
+		result.append(SupraTest.test(null, ()=>{
 			return (ft_memchr(s, (2 + 256), 3) == &s[2]);
-		}, @"memchr({0, 1, 2, 3, 4, 5}, (2 + 256), 3) == &tab[2]").msg();
+		}, @"memchr({0, 1, 2, 3, 4, 5}, (2 + 256), 3) == &tab[2]").msg());
 
-		var t = SupraTest.test(null, () => {
+		// 6
+		result.append(SupraTest.test(null, () => {
 			ft_memchr(null, 'e', 0);
-			return false;
-		}, "No segfault with memchr(null, 'e', 0)");
+			return true;
+		}, "memchr(null, 'e', 0)").msg());
 
-		t = SupraTest.test(null, () => {
+		// 7
+		result.append(SupraTest.test(null, () => {
 			ft_memchr(null, 'e', 1);
 			return false;
-		}, "No segfault with memchr(null, 'e', 1)");
-		if (t.status != SIGSEGV)
-			result += t.msg();
-		else
-			result += t.msg_ok();
+		}, "No segfault with memchr(null, 'e', 1)").msg_need_segfault());
 
-		return result;
+		return (owned)result.str;
 	}
 	catch (Error e) {
-		return @"$result \033[31m$(e.message)\033[0m";
+		return @"$(result.str) \033[31m$(e.message)\033[0m";
 	}
 }
 
@@ -1156,7 +1106,7 @@ string run_calloc() {
 
 
 string run_strdup() {
-	string result = "STRDUP:   ";
+	var result = new StringBuilder("STRDUP:   ");
 	try {
 		var ft_strdup = (d_strdup)loader.symbol("ft_strdup");
 
@@ -1175,38 +1125,33 @@ string run_strdup() {
 			return t.msg_ok();
 		}
 
-		/* 1 */ result += check("abc");
-		/* 2 */ result += check("Abc");
-		/* 3 */ result += check("abc\0yop");
-		/* 4 */ result += check("abc 12345\0yop");
-		/* 5 */ result += check("abc 12345\0yop");
-		/* 6 */ result += check("lorem ipsum dolor sit amet");
-		/* 7 */ result += check("lorem ipsum dolor sit amet lorem ipsum dolor sit amet");
-		/* 8 */ result += check("");
+		/* 1 */ result.append(check("abc"));
+		/* 2 */ result.append(check("Abc"));
+		/* 3 */ result.append(check("abc\0yop"));
+		/* 4 */ result.append(check("abc 12345\0yop"));
+		/* 5 */ result.append(check("abc 12345\0yop"));
+		/* 6 */ result.append(check("lorem ipsum dolor sit amet"));
+		/* 7 */ result.append(check("lorem ipsum dolor sit amet lorem ipsum dolor sit amet"));
+		/* 8 */ result.append(check(""));
 
 		// Test if strdup segfault
-		/* 9 */ var	t = SupraTest.test(null, () => {
+		/* 9 */ result.append(SupraTest.test(null, () => {
 			ft_strdup(null);
 			return false;
-		}, "strdup(NULL) NOCRASH");
-		if (t.status != SIGSEGV)
-			result += t.msg_ko(@"No alloc ??? $(t.alloc)");
-		else
-			result += t.msg_ok();
-
+		}, "strdup(NULL) NOCRASH").msg_need_segfault());
 
 		// Test if strdup protect (malloc)
-		/* 5 */ result += SupraTest.test(null, ()=>{
+		/* 5 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_strdup("bababababhc");
 			if (s != null)
 				delete s;
 			return (s == null);
-		}).msg_err("no protect ");
+		}).msg_err("no protect "));
 
-		return result;
+		return (owned)result.str;
 	}
 	catch (Error e) {
-		return @"$result \033[31m$(e.message)\033[0m";
+		return @"$(result.str) \033[31m$(e.message)\033[0m";
 	}
 }

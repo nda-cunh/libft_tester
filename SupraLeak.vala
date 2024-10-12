@@ -4,7 +4,7 @@ private int g_alloc_count = 0;
 private int g_free_count = 0;
 private bool g_is_null = false;
 
-public class SupraLeak {
+public class SupraLeak : Object {
 	public static size_t bytes{
 		get {
 			return g_alloc_bytes;

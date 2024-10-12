@@ -79,12 +79,6 @@ string extract_libft_dll(string libft_a) {
 
 string? generate_libft_so (string dir_makefile) throws Error {
 	print(@"$(p_supra)Makefile found here: %s/Makefile\n$p_none", dir_makefile);
-	// Test run so
-	run_command({"make", "so", "-C", dir_makefile});
-
-	// Test if libft.so exist
-	if (FileUtils.test(@"$dir_makefile/libft.so", FileTest.EXISTS))
-		return @"$dir_makefile/libft.so";
 
 	// Test with libft.a
 	string errput;
@@ -114,19 +108,6 @@ string? generate_libft_so (string dir_makefile) throws Error {
 		}
 
 	}
-	printerr("%sLa regle 'so' n'existe pas dans le Makefile%s\n", p_supra, p_none);
-	printerr("%s", p_supra);
-	printerr("""
-exemple d'une regle `so`
-```makefile
-so:
-  gcc $(OBJS) --shared -o libft.so
-```
-	(Ca revient a la regle avec ar -rc mais avec gcc et --shared)
-Vous pouvez aussi juste creer le libft.so avec
-```bash
-	gcc *.c --shared -o libft.so
-```""");
 	printerr("\n\n");
 	throw new FileError.ACCES ("Can't generate libft.so from libft.a\n");
 }

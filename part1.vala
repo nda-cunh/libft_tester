@@ -499,7 +499,17 @@ string run_strlcpy() {
 		/* 19 */ result.append(SupraTest.test(null, () => {
 			ft_strlcpy(null, "", 1);
 			return false;
-		}, "strlcpy(null, '', 1) No Crash").msg_need_segfault());
+		}, "strlcpy(NULL, '', 1) No Crash").msg_need_segfault());
+		
+		/* 20 */ result.append(SupraTest.test(null, () => {
+			ft_strlcpy(null, null, 0);
+			return false;
+		}, "strlcpy(NULL, NULL, 0) No Crash").msg_need_segfault());
+
+		/* 21 */ result.append(SupraTest.test(null, () => {
+			ft_strlcpy(null, null, 1);
+			return false;
+		}, "strlcpy(NULL, NULL, 1) No Crash").msg_need_segfault());
 
 		return (owned)result.str;
 	}
@@ -589,11 +599,11 @@ string run_strlcat() {
 			string str = "hello";
 			ft_strlcat(str, null, 1);
 			return false;
-		}, "strlcat(\"hello\", null, 1) No Crash").msg_need_segfault());
+		}, "strlcat(\"hello\", NULL, 1) No Crash").msg_need_segfault());
 
 		/* 24 */ result.append(SupraTest.test(null, () => {
 			return (ft_strlcat(null, "source", 1) == 6);
-		}, "strlcat(\"hello\", null, 1) No Crash").msg_need_segfault());
+		}, """strlcat(NULL, "source", 1) No Crash""").msg_need_segfault());
 
 		/* 25 */ result.append(SupraTest.test(null, () => {
 			return (ft_strlcat(null, "source", 0) == 6);
@@ -707,6 +717,12 @@ string run_strchr() {
 				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("1024", '\0')""").msg();
+		
+		result += SupraTest.test(null, () => {
+				const string s = "1024";
+				int c = 't' + 256;
+				return (strchr(s, c) == ft_strchr(s, c));
+		}, """strchr("1024", ('t' + 256))""").msg();
 
 		result += SupraTest.test(null, () => {
 				ft_strchr(null, '\0');
@@ -732,7 +748,7 @@ string run_strrchr() {
 	try {
 		var ft_strrchr = (d_strrchr)loader.symbol("ft_strrchr");
 
-		string check (char* s, uchar c, string? msg = null) {
+		string check (char* s, int c, string? msg = null) {
 			string cp;
 			if (c == '\0')
 				cp = "'\\0'";
@@ -769,6 +785,12 @@ string run_strrchr() {
 				int c = 'b';
 				return (strrchr(s.offset(2), c) == ft_strrchr(s.offset(2), c));
 		}, """buf = "bonjour" strrchr(buf + 2, 'b') """).msg();
+		
+		result += SupraTest.test(null, () => {
+				const string s = "1024";
+				int c = 't' + 256;
+				return (strrchr(s, c) == ft_strrchr(s.offset(2), c));
+		}, """buf = "1024" strrchr(buf, ('t' + 256) (unsigned char) """).msg();
 
 		result += SupraTest.test(null, () => {
 				ft_strrchr(null, '\0');
@@ -871,6 +893,7 @@ string run_memchr() {
 			ft_memchr(null, 'e', 1);
 			return false;
 		}, "No segfault with memchr(null, 'e', 1)").msg_need_segfault());
+		
 
 		return (owned)result.str;
 	}

@@ -553,46 +553,52 @@ string run_strchr() {
 		var ft_strchr = (d_strchr)loader.symbol("ft_strchr");
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 's';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 's')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'a';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'p';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'a')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'v';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'v')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "suprapatata\0vttiX";
+				const string s = "suprapatata\0vttiX";
 				int c = 'E';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("suprapatata\0vttiX", 'E')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "\0";
+				const string s = "\0";
 				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("\0", '\0')""").msg();
 
 		result += SupraTest.test(null, () => {
-				string s = "Hey Supra";
+				const string s = "Hey Supra";
 				int c = '\0';
 				return (strchr(s, c) == ft_strchr(s, c));
 		}, """strchr("Hey Supra", '\0')""").msg();
+		
+		result += SupraTest.test(null, () => {
+				const string s = "1024";
+				int c = '\0';
+				return (strchr(s, c) == ft_strchr(s, c));
+		}, """strchr("1024", '\0')""").msg();
 
 		var t = SupraTest.test(null, () => {
 			ft_strchr(null, 0);

@@ -280,7 +280,6 @@ string run_split() {
 				int j = 0;
 				foreach (unowned var i in cmp) {
 					if ((string)sp[j] != i){
-						printerr("[%s] and [%s]", i, (string)sp[j]);
 						free_print(sp, cmp, true);
 						return false;
 					}

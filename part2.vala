@@ -12,7 +12,7 @@ delegate void	d_putchar_fd(char c, int fd);
 delegate void	d_putendl_fd(char *s, int fd);
 delegate void	d_putnbr_fd(int n, int fd);
 delegate void	d_putstr_fd(char *s, int fd);
-delegate char**	d_split(char *s, char c);
+delegate char** d_split(char *s, char c);
 
 
 
@@ -241,40 +241,53 @@ string run_split() {
 	try {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
-		string check(string str, char c, string []cmp) {
-			var t = SupraTest.test(null, () => {
-				var __sp1 = ft_split(str, c);
-				unowned string []sp1 = (string[])__sp1;
-				if (cmp[0] == null) {
-					if (sp1[0] == null) {
-						delete __sp1[0];
-						return true;
+		string check(string str, char c, string? []cmp) {
+
+			void free_print(char **sp, string []cmp, bool printing) {
+				if (printing) {
+					stderr.printf("Me: [ ");
+					foreach (unowned var i in cmp) {
+						stderr.printf("\"%s\" ", i);
 					}
+					stderr.printf("] ");
+					stderr.printf("You: [ ");
+					int j = 0;
+					foreach (unowned var i in cmp) {
+						if (sp[j] == null) {
+							stderr.printf("\"(null)\"");
+							break;
+						}
+						stderr.printf("\"%s\" ", (string)sp[j]);
+						j++;
+					}
+
+					stderr.printf("]");
+					stderr.printf("\n");
 				}
-
-				for (int i = 0; i != cmp.length; ++i)
-				{
-
-
-					if (sp1[i] == null || (string)sp1[i] != cmp[i]) {
-						stderr.printf("You: [");
-						for (int e = 0; sp1[e] != null; ++e) {
-							stderr.printf("'%s',", (string)sp1[e]);
-						}
-						stderr.printf("(null)] Me: [");
-						foreach (var e in cmp) {
-							stderr.printf("'%s',", e);
-						}
-						stderr.printf("(null)]");
-						for (int j = 0; sp1[j] != null; ++j)
-							free(sp1[j]);
-						free(sp1);
+				if (sp != null) {
+					strfreev((string[])sp);
+				}
+			}
+			var t = SupraTest.test(null, () => {
+				var sp = ft_split(str, c);
+				// test if cmp is null
+				if (cmp == null) {
+					if (sp != null)
+						free_print(sp, cmp, false);
+					else
+						return true;
+				}
+				int j = 0;
+				foreach (unowned var i in cmp) {
+					if ((string)sp[j] != i){
+						printerr("[%s] and [%s]", i, (string)sp[j]);
+						free_print(sp, cmp, true);
 						return false;
 					}
+					j++;
 				}
-				for (int j = 0; sp1[j] != null; ++j)
-					free(sp1[j]);
-				free(sp1);
+
+				free_print(sp, cmp, false);
 				return true;
 			});
 			return t.msg_err(@"split(\"$str\", '$c')");

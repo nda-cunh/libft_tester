@@ -1086,13 +1086,15 @@ string run_calloc() {
 			if (s != null)
 				delete s;
 			return (s == null);
-		}).msg_err("no protect ");
+		}).msg_err("no protect malloc (send null) ");
 
 
 		/* 4 */ t = SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
-			(string)ft_calloc(0, 1);
-			return true;
+			bool stats;
+			void* mem = ft_calloc(0, 1);
+			stats = (mem != null);
+			free(mem);
+			return (stats);
 		});
 		if (t.bytes == 0)
 			result += t.msg_ok();
@@ -1100,9 +1102,11 @@ string run_calloc() {
 			result += t.msg_ko("dont alloc with calloc(0, 1)");
 
 		/* 5 */ t = SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
-			(string)ft_calloc(1, 0);
-			return true;
+			bool stats;
+			void* mem = ft_calloc(1, 0);
+			stats = (mem != null);
+			free(mem);
+			return (stats);
 		});
 		if (t.bytes == 0)
 			result += t.msg_ok();
@@ -1110,9 +1114,11 @@ string run_calloc() {
 			result += t.msg_ko("dont alloc with calloc(1, 0)");
 
 		/* 6 */ t = SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
-			(string)ft_calloc(0, 0);
-			return true;
+			bool stats;
+			void* mem = ft_calloc(0, 0);
+			stats = (mem != null);
+			free(mem);
+			return (stats);
 		});
 		if (t.bytes == 0)
 			result += t.msg_ok();

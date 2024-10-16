@@ -64,7 +64,7 @@ namespace SupraTest{
 
 		public string msg_err(string? message = null) {
 			var s = message ?? this.message;
-			return msg(@"$s $(this.stderr)");
+			return msg(@"\033[91m$s $(this.stderr)\033[0m");
 		}
 
 		public string msg(string? message = null) {

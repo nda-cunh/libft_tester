@@ -289,7 +289,10 @@ string run_split() {
 				free_print(sp, cmp, false);
 				return true;
 			});
-			return t.msg_err(@"split(\"$str\", '$c')");
+			var msg = t.msg_err(@"split(\"$str\", '$c')");
+			if (t.status == SIGSEGV)
+				msg += "\033[91mme: [" + string.joinv(" ", cmp) + "]\n";
+			return msg;
 		}
 
 		/* 1 */ result.append(check("a,a,a,a", ',', {"a", "a", "a", "a"}));
@@ -336,7 +339,6 @@ string run_split() {
 }
 
 // ft_strmapi
-
 
 
 string run_strmapi() {

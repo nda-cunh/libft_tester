@@ -60,7 +60,7 @@ string extract_libft_dll(string libft_a) {
 		tmp_dir = DirUtils.make_tmp("vala_libsoXXXXXX");
 		run_command({"ar", "-xv", libft_a, @"--output=$tmp_dir"});
 		Dir dir = Dir.open (tmp_dir);
-		string []result = {"gcc"};
+		string []result = {"cc"};
 		string name;
 		while ((name = dir.read_name ()) != null) {
 			if (name.has_suffix(".o"))

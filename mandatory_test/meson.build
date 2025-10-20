@@ -1,6 +1,4 @@
 files_vala += files(
-  'part1.vala',
-  'part2.vala',
   'atoi_test.vala',
   'bzero_test.vala',
   'calloc_test.vala',

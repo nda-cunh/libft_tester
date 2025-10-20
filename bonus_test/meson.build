@@ -1,5 +1,4 @@
 files_vala += files(
-  'part_bonus.vala',
   'lstadd_back_test.vala',
   'lstadd_front_test.vala',
   'lstclear_test.vala',

@@ -3,9 +3,7 @@ project('libft_tester', ['c', 'vala'], default_options : ['optimization=2'])
 files_vala = files(
   'finder_project.vala',
   'Loader.vala',
-  'part1.vala',
-  'part2.vala',
-  'part_bonus.vala',
+  'delegate.vala',
   'main.vala',
   'SupraLeak.vala',
   'SupraTest.vala',

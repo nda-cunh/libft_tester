@@ -71,6 +71,8 @@ namespace SupraTest{
 			var msg = message ?? this.message;
 			if (status == LEAK)
 				return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
+			else if (status == TIMEOUT)
+				return @"\033[31m[TIMEOUT] $(msg)\033[0m";
 			else if (status == SIGILL)
 				return @"\033[31m[SIGILL] $(msg)\033[0m";
 			else if (status == SIGFPE)
@@ -83,8 +85,6 @@ namespace SupraTest{
 				return @"\033[32m[OK]\033[0m";
 			else if (status == KO)
 				return msg_ko(msg);
-			else if (status == TIMEOUT)
-				return @"\033[31m[TIMEOUT] $(msg)\033[0m";
 			else
 				return @"\033[31m[???] \033[0m";
 		}
@@ -154,6 +154,7 @@ namespace SupraTest{
 			}
 			if ((uint)timer.elapsed() >= time){
 				Posix.kill(child_pid, Posix.Signal.INT);
+				result.status = TIMEOUT;
 				break;
 			}
 		}
@@ -227,6 +228,7 @@ namespace SupraTest{
 			}
 			if ((uint)timer.elapsed() >= timeout){
 				Posix.kill(child_pid, Posix.Signal.INT);
+				result.status = TIMEOUT;
 				break;
 			}
 		}

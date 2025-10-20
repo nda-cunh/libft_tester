@@ -1,15 +1,16 @@
 project('libft_tester', ['c', 'vala'], default_options : ['optimization=2'])
 
-file = [  'part2.vala',
-          'leak.c',
-          'part_bonus.vala',
-          'main.vala',
-          'SupraTest.vala',
-          'Loader.vala',
-          'SupraLeak.vala',
-          'part1.vala',
-          'finder_project.vala',
-          'Module.vapi', 'leak.c']
+files_vala = files(
+  'finder_project.vala',
+  'Loader.vala',
+  'main.vala',
+  'SupraLeak.vala',
+  'SupraTest.vala',
+  'Module.vapi'
+)
+
+subdir('mandatory_test')
+subdir('bonus_test')
 
 vala_lib = [
   dependency('glib-2.0'),
@@ -19,7 +20,7 @@ vala_lib = [
 ]
 
 executable('libft_tester',
-  files(file),
+  files_vala,
   c_args: '-w',
   vala_args: '--enable-experimental',
   dependencies: vala_lib,

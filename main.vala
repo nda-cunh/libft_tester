@@ -126,6 +126,31 @@ class LibftTester : Object{
 	}
 
 
+	// ,------.                  ,--.  3 // TODO : BONUS ascii art 
+	// |  .--. ' ,--,--.,--.--.,-'  '-. 
+	// |  '--' |' ,-.  ||  .--''-.  .-' 
+	// |  | --' \ '-'  ||  |     |  |   
+	// `--'      `--`--'`--'     `--'   
+
+	async void run_part_bonus() {
+		d_worker []tab_func_p2 = {
+			run_lstnew,
+			run_lstsize,
+			run_lstadd_front,
+			run_lstadd_back,
+			run_lstlast,
+			run_lstdelone,
+			run_lstclear,
+			run_lstiter,
+			run_lstmap
+
+		};
+		print("\033[33m     <------------- [ Bonus ] ------------->\n\033[0m");
+		yield run_part(tab_func_p2);
+	}
+
+
+
 
 
 	public async void run(){
@@ -134,6 +159,7 @@ class LibftTester : Object{
 
 		yield run_part1();
 		yield run_part2();
+		yield run_part_bonus();
 	}
 
 	async string worker(d_worker func) {

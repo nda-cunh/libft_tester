@@ -84,7 +84,8 @@ string? generate_libft_so (string dir_makefile) throws Error {
 	string errput;
 	int wait_status;
 	SpawnFlags flags = SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL;
-	Process.spawn_sync(null, {"make", "-C", dir_makefile}, null, flags, null, null, out errput, out wait_status); 
+	Process.spawn_sync(null, {"make", "all", "-C", dir_makefile}, null, flags, null, null, out errput, out wait_status); 
+	Process.spawn_sync(null, {"make", "bonus", "-C", dir_makefile}, null, flags, null, null); 
 
 
 	if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {

@@ -168,6 +168,7 @@ class LibftTester {
 		yield run_part1();
 		yield run_part2();
 		yield run_part_bonus();
+		check_forbidden_functions();
 	}
 
 
@@ -184,6 +185,38 @@ class LibftTester {
 		yield;
 		return thread.join();
 	}
+}
+
+void check_forbidden_functions () throws Error {
+	print ("\033[33m     <------------- [ Forbidden functions ] ------------->\n\033[0m");
+	string output;
+	string errput;
+	int status;
+	Process.spawn_command_line_sync (@"nm $(loader.library_path)", out output, out errput, out status);
+	if (status != 0) {
+		stderr.printf ("\033[31m[SupraTest] Error while checking forbidden functions\033[0m\n");
+		stderr.printf("%s\n", errput);
+		return;
+	}
+	var sp = output.split ("\n");
+	const string []forbidden = {
+		"write",
+		"malloc",
+		"free",
+	};
+	bool is_good = true;
+	foreach (unowned var line in sp) {
+		if (" U " in line) {
+			unowned string func_name = line.offset(line.index_of (" U ") + 3);
+			func_name._delimit ("@", '\0');
+			if (!(func_name in forbidden)) {
+				print ("\033[91m[Forbidden Function]: \033[31m%s !\033[0m\n", func_name);
+				is_good = false;
+			}
+		}
+	}
+	if (is_good)
+		print ("\033[32mNo forbidden function found !\033[0m\n");
 }
 
 async void main(string []args) {

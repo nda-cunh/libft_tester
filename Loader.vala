@@ -9,6 +9,7 @@ class Loader {
 		handle = new Module(library, RTLD.LAZY);
 		if (handle == null && handle.error() != null)
 			throw new ErrLoader.NOT_FOUND(@"Can't found $library");
+		library_path = library;
 	}
 
 	public void* symbol(string name) throws ErrLoader {
@@ -21,6 +22,7 @@ class Loader {
 		mutex.unlock();
 		throw new ErrLoader.SYMBOL_NOTFOUND(@"$name not found");
 	}
+	public string library_path;
 	private Mutex mutex;
 	private Module handle;
 }

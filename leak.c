@@ -36,6 +36,8 @@ void* malloc(size_t size)
 
 void free(void * p)
 {
+	if (p == NULL)
+		return;
 	if (libc_free == NULL)
 		init_malloc();
 	libc_free(p);

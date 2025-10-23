@@ -72,7 +72,7 @@ string extract_libft_dll(string libft_a) {
 		run_command(result);
 		return @"$tmp_dir/libft.so";
 	} catch(Error e) {
-		printerr(@"$(e.message)\n");
+		stderr.printf(@"$(e.message)\n");
 		return "";
 	}
 }
@@ -89,8 +89,8 @@ string? generate_libft_so (string dir_makefile) throws Error {
 
 	if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
 		if (wait_status != 0) {
-			printerr("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
-			printerr("%s\033[0m%s%s\n", p_supra, errput, p_none);
+			stderr.printf("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
+			stderr.printf("%s\033[0m%s%s\n", p_supra, errput, p_none);
 			print("%sDo you want running your last libft.a ? [y/N] %s", p_supra, p_none);
 			if (stdin.read_line().strip().ascii_down() != "y")
 				throw new FileError.ACCES ("Error while running make");
@@ -102,12 +102,12 @@ string? generate_libft_so (string dir_makefile) throws Error {
 	}
 	else {
 		if (wait_status != 0) {
-			printerr("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
-			printerr("%s\033[0m%s%s\n", p_supra, errput, p_none);
+			stderr.printf("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
+			stderr.printf("%s\033[0m%s%s\n", p_supra, errput, p_none);
 			throw new FileError.ACCES ("Error while running make");
 		}
 
 	}
-	printerr("\n\n");
+	stderr.printf("\n\n");
 	throw new FileError.ACCES ("Can't generate libft.so from libft.a\n");
 }

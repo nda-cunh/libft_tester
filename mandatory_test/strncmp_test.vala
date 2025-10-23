@@ -7,7 +7,7 @@ string run_strncmp() {
 			var t = SupraTest.test(null, () => {
 				var a = strncmp(s1, s2, n);
 				var b = ft_strncmp(s1, s2, n);
-				printerr("libc: %d you: %d ", a, b);
+				stderr.printf("libc: %d you: %d ", a, b);
 				return (clang_s(strncmp(s1, s2, n)) == clang_s(ft_strncmp(s1, s2, n)));
 			}, @"strncmp('$((string)s1)', '$((string)s2)', $n) ");
 			if (t.status == KO)

@@ -90,7 +90,7 @@ namespace SupraTest{
 		}
 
 		public void print_result() {
-			print(this.msg());
+			stdout.printf(this.msg());
 		}
 
 		public void init_sig(){
@@ -210,7 +210,7 @@ namespace SupraTest{
 			Posix.close(fd_out);
 			Posix.close(fd_err);
 			bool res = func();
-			printerr("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
+			stderr.printf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
 			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);

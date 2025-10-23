@@ -20,11 +20,11 @@ string run_strlcpy() {
 				len1 = ft_strlcpy(d1, s1, n);
 				len2 = strlcpy(d2, s2, n);
 				if (len1 != len2) {
-					printerr("return > you: %zu, me: %zu", len1, len2);
+					stderr.printf("return > you: %zu, me: %zu", len1, len2);
 					return false;
 				}
 				if (Memory.cmp(d1, d2, 20) != 0) {
-					printerr("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
+					stderr.printf("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
 					return false;
 				}
 				return true;

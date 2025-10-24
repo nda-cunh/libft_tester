@@ -203,6 +203,24 @@ void check_forbidden_functions () throws Error {
 		"write",
 		"malloc",
 		"free",
+		"__stack_chk_fail",
+		"__stack_chk_fail",
+		"__assert_fail",
+		"__divdi3",
+		"__moddi3",
+		"__udivdi3",
+		"__umoddi3",
+		"__overflow",
+		"__addv",
+		"__subv",
+		"__mulv",
+		"__builtin_trap",
+		"__fortify_fail",
+		"__cxa_throw",
+		"__cxa_rethrow",
+		"__cxa_atexit",
+		"__cxa_finalize",
+		"__gcc_personality_v0"
 	};
 	bool is_good = true;
 	foreach (unowned var line in sp) {

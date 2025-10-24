@@ -8,19 +8,24 @@ string run_split() {
 
 			void free_print(char **sp, string []cmp, bool printing) {
 				if (printing) {
-					stderr.printf("Me: [ ");
-					foreach (unowned var i in cmp) {
-						stderr.printf("\"%s\" ", i);
+					stderr.printf("Me: [");
+					int j = 0;
+					for (j = 0; j < cmp.length; j++) {
+						if (j != 0)
+							stderr.printf(", ");
+						stderr.printf("\"%s\"", cmp[j]);
 					}
 					stderr.printf("] ");
-					stderr.printf("You: [ ");
-					int j = 0;
+					stderr.printf("You: [");
+					j = 0;
 					foreach (unowned var i in cmp) {
+						if (j != 0)
+							stderr.printf(", ");
 						if (sp[j] == null) {
 							stderr.printf("\"(null)\"");
 							break;
 						}
-						stderr.printf("\"%s\" ", (string)sp[j]);
+						stderr.printf("\"%s\"", (string)sp[j]);
 						j++;
 					}
 
@@ -52,7 +57,11 @@ string run_split() {
 				free_print(sp, cmp, false);
 				return true;
 			});
-			var msg = t.msg_err(@"split(\"$str\", '$c')");
+			string msg;
+			if (c == '\0')
+				msg = t.msg_err(@"split(\"$str\", '\\0')-> ");
+			else
+				msg = t.msg_err(@"split(\"$str\", '$c')-> ");
 			if (t.status == SIGSEGV)
 				msg += "\033[91mme: [" + string.joinv(" ", cmp) + "]\n";
 			return msg;
@@ -74,19 +83,20 @@ string run_split() {
 		/* 14 */ result.append(check(",,,", ',', {null}));
 		/* 15 */ result.append(check(",,,", '\0', {",,,"}));
 		/* 16 */ result.append(check(" ", ',', {" "}));
-		/* 16 */ result.append(check("          ", ' ', {null}));
+		/* 17 */ result.append(check("          ", ' ', {null}));
+		/* 18 */ result.append(check("", '\0', {null}));
 
-		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse", ' ',
+		/* 19 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse", ' ',
 		{"lorem","ipsum","dolor","sit","amet,","consectetur","adipiscing","elit.","Sed","non","risus.","Suspendisse"}));
-		/* 16 */ result.append(check("   lorem   ipsum dolor     sit amet, consectetur   adipiscing elit. Sed non risus. Suspendisse  ", ' ',
+		/* 20 */ result.append(check("   lorem   ipsum dolor     sit amet, consectetur   adipiscing elit. Sed non risus. Suspendisse  ", ' ',
 {"lorem","ipsum","dolor","sit","amet,","consectetur","adipiscing","elit.","Sed","non","risus.","Suspendisse"}));
-		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'i',
+		/* 21 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'i',
 {"lorem ","psum dolor s","t amet, consectetur ad","p","sc","ng el","t. Sed non r","sus. Suspend","sse lectus tortor, d","gn","ss","m s","t amet, ad","p","sc","ng nec, ultr","c","es sed, dolor. Cras elementum ultr","c","es d","am. Maecenas l","gula massa, var","us a, semper congue, eu","smod non, m","."}));
-		/* 16 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'z',
+		/* 22 */ result.append(check("lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.", 'z',
 {"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
-		/* 16 */ result.append(check("", 'z', {null}));
+		/* 23 */ result.append(check("", 'z', {null}));
 
-		/* 17 */ result.append(SupraTest.test(null, ()=>{
+		/* 24 */ result.append(SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char **s = ft_split("bababababhc", 'a');
 			if (s != null)

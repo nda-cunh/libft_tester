@@ -4,8 +4,8 @@ Loader loader;
 
 class LibftTester {
 
-	public LibftTester (string []args) throws Error {
-		var libft = find_libft(args);
+	public LibftTester () throws Error {
+		var libft = find_libft();
 		loader = new Loader(libft);
 	}
 
@@ -168,7 +168,13 @@ class LibftTester {
 		yield run_part1();
 		yield run_part2();
 		yield run_part_bonus();
-		check_forbidden_functions();
+
+		try {
+			check_forbidden_functions();
+		}
+		catch (Error e) {
+			stderr.printf ("\033[31m[SupraTest]\033[0m %s", e.message);
+		}
 	}
 
 
@@ -192,12 +198,14 @@ void check_forbidden_functions () throws Error {
 	string output;
 	string errput;
 	int status;
+
 	Process.spawn_command_line_sync (@"nm $(loader.library_path)", out output, out errput, out status);
 	if (status != 0) {
 		stderr.printf ("\033[31m[SupraTest] Error while checking forbidden functions\033[0m\n");
 		stderr.printf("%s\n", errput);
 		return;
 	}
+
 	var sp = output.split ("\n");
 	const string []forbidden = {
 		"write",
@@ -222,6 +230,7 @@ void check_forbidden_functions () throws Error {
 		"__cxa_finalize",
 		"__gcc_personality_v0"
 	};
+
 	bool is_good = true;
 	foreach (unowned var line in sp) {
 		if (" U " in line) {
@@ -237,7 +246,7 @@ void check_forbidden_functions () throws Error {
 		print ("\033[32mNo forbidden function found !\033[0m\n");
 }
 
-async void main(string []args) {
+async void main() {
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
@@ -245,7 +254,7 @@ async void main(string []args) {
 	Intl.setlocale();
 
 	try {
-		var tester = new LibftTester(args);
+		var tester = new LibftTester();
 		yield tester.run();
 	}
 	catch (Error e) {

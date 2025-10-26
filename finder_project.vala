@@ -2,7 +2,12 @@
 public const string p_supra= "\033[33;1m[SupraTester]\033[0m\033[37m ";
 public const string p_none = "\033[0m";
 
-string? find_libft(string []args) throws Error {
+/**
+ * Search for Makefile in common libft locations and generate libft.so
+ * @return Path to generated libft.so
+ * @throws Error if no Makefile is found or generation fails
+ */
+string? find_libft() throws Error {
 	var pwd = Environment.get_current_dir();
 	
 	// search in folder pwd/Makefile
@@ -31,7 +36,7 @@ string? find_libft(string []args) throws Error {
 
 	// search in folder pwd/**/Makefile
 	var dir = Dir.open(pwd);
-	unowned string? name = null;
+	unowned string? name;
 
 	while ((name = dir.read_name ()) != null) {
 		var folder = @"$pwd/$name";
@@ -44,43 +49,62 @@ string? find_libft(string []args) throws Error {
 	throw new FileError.ACCES ("No Makefile found");
 }
 
-void run_command(string []av) {
-	try {
-		SubprocessFlags flags = STDERR_SILENCE | STDOUT_SILENCE;
-		var pid = new Subprocess.newv(av, flags); 
-		pid.wait();
-	} catch (Error e) {
-		error(e.message);
+/**
+ * Extract libft.a into a temporary folder and generate libft.so from object files
+ * @param libft_a Path to libft.a
+ * @return Path to generated libft.so
+ * @throws Error if extraction or generation fails
+ */
+string extract_libft_dll (string libft_a) throws Error {
+	string tmp_dir = DirUtils.make_tmp("vala_libsoXXXXXX");
+	string error_str;
+	int wait_status;
+
+	Process.spawn_sync(null,
+		{"ar", "-xv", libft_a, "--output", tmp_dir},
+		null,
+		SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL,
+		null,
+		null,
+		out error_str,
+		out wait_status);
+
+	if (wait_status != 0)
+		throw new FileError.ACCES ("Can't extract object file from libft.a %s\n", error_str);
+
+	Dir dir = Dir.open (tmp_dir);
+	string result_so = @"$tmp_dir/libft.so";
+	string []command = {"cc", "--shared", "-o", result_so};
+	unowned string name;
+	while ((name = dir.read_name ()) != null) {
+		if (name.has_suffix(".o"))
+			command += @"$tmp_dir/$name";
 	}
+
+	Process.spawn_sync(null,
+		command,
+		null,
+		SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL,
+		null,
+		null,
+		out error_str,
+		out wait_status);
+
+	if (wait_status != 0)
+		throw new FileError.ACCES ("Can't generate libft.so from object files %s\n", error_str);
+
+	return result_so;
 }
 
-string extract_libft_dll(string libft_a) {
-	string tmp_dir;
-	try {
-		tmp_dir = DirUtils.make_tmp("vala_libsoXXXXXX");
-		run_command({"ar", "-xv", libft_a, @"--output=$tmp_dir"});
-		Dir dir = Dir.open (tmp_dir);
-		string []result = {"cc"};
-		string name;
-		while ((name = dir.read_name ()) != null) {
-			if (name.has_suffix(".o"))
-				result += @"$tmp_dir/$name";
-		}
-		result += "--shared";
-		result += "-o";
-		result += @"$tmp_dir/libft.so";
-		run_command(result);
-		return @"$tmp_dir/libft.so";
-	} catch(Error e) {
-		stderr.printf(@"$(e.message)\n");
-		return "";
-	}
-}
+/**
+  * Run make in the given directory to generate libft.a and libft.so
+  * @param dir_makefile Directory containing the Makefile
+  * @return Path to generated libft.so
+  * @throws Error if make fails or libft.so cannot be generated
+  */
+public string? generate_libft_so (string dir_makefile) throws Error {
+	stdout.printf(p_supra + "Makefile found here: %sMakefile" + p_none + "\n", dir_makefile);
 
-string? generate_libft_so (string dir_makefile) throws Error {
-	print(@"$(p_supra)Makefile found here: %s/Makefile\n$p_none", dir_makefile);
-
-	// Test with libft.a
 	string errput;
 	int wait_status;
 	SpawnFlags flags = SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL;
@@ -88,27 +112,21 @@ string? generate_libft_so (string dir_makefile) throws Error {
 	Process.spawn_sync(null, {"make", "bonus", "-C", dir_makefile}, null, flags, null, null); 
 
 
-	if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
-		if (wait_status != 0) {
-			stderr.printf("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
-			stderr.printf("%s\033[0m%s%s\n", p_supra, errput, p_none);
-			print("%sDo you want running your last libft.a ? [y/N] %s", p_supra, p_none);
+	if (wait_status != 0) {
+		stderr.printf(p_supra + "Error while running make in %s\n" + p_none, dir_makefile);
+		stderr.printf(p_supra + "\033[0m%s%s\n", errput, p_none);
+		stderr.printf(p_supra + "Do you want running your last libft.a ? [y/N]");
+
+		if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
 			if (stdin.read_line().strip().ascii_down() != "y")
 				throw new FileError.ACCES ("Error while running make");
-		}
-		print(@"$p_supra[Generate] libft.so from libft.a\n$p_none");
-		string libft_so = extract_libft_dll(@"$dir_makefile/libft.a");
-		if (FileUtils.test(libft_so, FileTest.EXISTS))
-			return libft_so;
+		}	
 	}
-	else {
-		if (wait_status != 0) {
-			stderr.printf("%sError while running make in %s\n%s", p_supra, dir_makefile, p_none);
-			stderr.printf("%s\033[0m%s%s\n", p_supra, errput, p_none);
-			throw new FileError.ACCES ("Error while running make");
-		}
 
-	}
-	stderr.printf("\n\n");
-	throw new FileError.ACCES ("Can't generate libft.so from libft.a\n");
+	// Generate libft.so from libft.a
+	stderr.printf(p_supra + "[Generate] libft.so from libft.a\n" + p_none);
+	string libft_so = extract_libft_dll(@"$dir_makefile/libft.a");
+	if (FileUtils.test(libft_so, FileTest.EXISTS))
+		return libft_so;
+	throw new FileError.ACCES ("Can't generate libft.so from libft.a ???\n");
 }

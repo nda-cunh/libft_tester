@@ -5,11 +5,13 @@ string run_itoa() {
 		var ft_itoa = (d_itoa)loader.symbol("ft_itoa");
 		string check(int n, string? msg = null) {
 			return SupraTest.test(null, () => {
-				return (ft_itoa(n) == @"$n");
-			}, msg ?? @"$n").msg();
+				string s = ft_itoa(n);
+				stderr.printf("You:'%s' Me:'%d'", s, n);
+				return (s == @"$n");
+			}).msg_err();
 		}
-		/* 1 */ result.append(check(2147483647, "INT MAX "));
-		/* 2 */ result.append(check(-2147483648, "INT MIN "));
+		/* 1 */ result.append(check(2147483647));
+		/* 2 */ result.append(check(-2147483648));
 		/* 3 */ result.append(check(0));
 		/* 4 */ result.append(check(1));
 		/* 5 */ result.append(check(2));
@@ -38,7 +40,7 @@ string run_itoa() {
 			if (s != null)
 				delete s;
 			return (s == null);
-		}, "no protect ").msg_err());
+		}, "no protect malloc ").msg_err());
 		return (owned)result.str;
 	}
 	catch (Error e) {

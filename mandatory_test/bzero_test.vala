@@ -16,7 +16,7 @@ string run_bzero() {
 				if (Memory.cmp(buf1, buf2, 38) == 0)
 					return true;
 				return false;
-			}, @"bzero(mem, E, $i)").msg());
+			}).msg("bzero(mem, E, %d)", i));
 		}
 		return (owned)result.str;
 	}

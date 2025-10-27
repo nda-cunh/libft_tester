@@ -1,18 +1,18 @@
 string run_atoi() {
-	var result = new StringBuilder.sized(200);
+	var result = new StringBuilder.sized(256);
 	result.append("ATOI:     ");
 	try {
 		var ft_atoi = (d_atoi)loader.symbol("ft_atoi");
-		string check(string s_nb){
+		string check(string s_nb, string? msg = null) {
 			return SupraTest.test(null, () => {
 				var a = ft_atoi(s_nb);
 				var b = atoi(s_nb);
-				stderr.printf("You:%d Me:%d", a, b);
+				stderr.printf("You:'%d' Me:'%d'", a, b);
 				return (a == b);
-			}).msg_err(@"Atoi('$s_nb')");
+			}).msg_err(msg);
 		}
-		/* 1 */ result.append(check("2147483647"));
-		/* 2 */ result.append(check("-2147483648"));
+		/* 1 */ result.append(check("2147483647", "(INT_MIN)"));
+		/* 2 */ result.append(check("-2147483648", "(INT_MAX)"));
 		/* 3 */ result.append(check("0"));
 		/* 4 */ result.append(check("1"));
 		/* 5 */ result.append(check("2"));

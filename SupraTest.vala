@@ -17,6 +17,7 @@ public enum Status{
 	KO = 1,
 	SIGINT = 2,
 	TIMEOUT = 3,
+	ABORTED = 6,
 	SIGILL = 4,
 	SIGFPE = 8,
 	SIGBUS = 10,
@@ -50,50 +51,92 @@ namespace SupraTest{
 			return "\033[32m[OK]\033[0m";
 		}
 
-		public string msg_need_segfault() {
+		public string msg_need_segfault () {
 			if (this.status == SIGSEGV)
 				return (this.msg_ok());
-			else
-				return (this.msg_ko());
+			return (this.msg_ko());
 		}
 
-		public string msg_ko(string? msg = null) {
-			var s = msg ?? this.message;
+		public string msg_ko (string? format = null) {
+			var s = format ?? this.message;
 			return @"\033[31m[KO] \033[91m$(s)\033[0m";
 		}
 
-		public string msg_err(string? message = null) {
-			var s = message ?? this.message;
-			return msg(@"\033[91m$s $(this.stderr)\033[0m");
-		}
+		public string msg_err (string? format = null, ...) {
+			string msg;
 
-		public string msg(string? message = null) {
-			var msg = message ?? this.message;
-			if (status == LEAK)
-				return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
-			else if (status == TIMEOUT)
-				return @"\033[31m[TIMEOUT] $(msg)\033[0m";
-			else if (status == SIGILL)
-				return @"\033[31m[SIGILL] $(msg)\033[0m";
-			else if (status == SIGFPE)
-				return @"\033[31m[SIGFPE] $(msg)\033[0m";
-			else if (status == SIGBUS)
-				return @"\033[31m[SIGBUS] $(msg)\033[0m";
-			else if (status == SIGSEGV)
-				return @"\033[31m[SIGSEGV] $(msg)\033[0m";
-			else if (status == OK)
-				return @"\033[32m[OK]\033[0m";
-			else if (status == KO)
-				return msg_ko(msg);
+			if (format == null)
+				msg = this.message;
 			else
-				return @"\033[31m[???] \033[0m";
+				msg = format.vprintf(va_list());
+
+			if (this.stderr != "\0") {
+				if (msg == "")
+					msg = this.stderr;
+				else
+					msg += " " + this.stderr;
+			}
+			switch (status) {
+				case LEAK:
+					return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg) \033[0m";
+				case TIMEOUT:
+					return @"\033[31m[TIMEOUT] $(msg)\033[0m";
+				case SIGILL:
+					return @"\033[31m[SIGILL] $(msg)\033[0m";
+				case SIGFPE:
+					return @"\033[31m[SIGFPE] $(msg)\033[0m";
+				case SIGBUS:
+					return @"\033[31m[SIGBUS] $(msg)\033[0m";
+				case SIGSEGV:
+					return @"\033[31m[SIGSEGV] $(msg)\033[0m";
+				case ABORTED:
+					return @"\033[31m[ABORTED] $(msg)\033[0m";
+				case OK:
+					return "\033[32m[OK]\033[0m";
+				case KO:
+					return msg_ko(msg);
+				default:
+					return "\033[31m[???]\033[0m";
+			}
 		}
 
-		public void print_result() {
+		public string msg (string? format = null, ...) {
+			string msg;
+
+			if (format == null)
+				msg = this.message;
+			else
+				msg = format.vprintf(va_list());
+
+			switch (status) {
+				case LEAK:
+					return @"\033[31m[LEAK] $(this.alloc) Alloc $(this.free) Free $(msg)\033[0m";
+				case TIMEOUT:
+					return @"\033[31m[TIMEOUT] $(msg)\033[0m";
+				case SIGILL:
+					return @"\033[31m[SIGILL] $(msg)\033[0m";
+				case SIGFPE:
+					return @"\033[31m[SIGFPE] $(msg)\033[0m";
+				case SIGBUS:
+					return @"\033[31m[SIGBUS] $(msg)\033[0m";
+				case SIGSEGV:
+					return @"\033[31m[SIGSEGV] $(msg)\033[0m";
+				case ABORTED:
+					return @"\033[31m[ABORTED] $(msg)\033[0m";
+				case OK:
+					return @"\033[32m[OK]\033[0m";
+				case KO:
+					return msg_ko(msg);
+				default:
+					return @"\033[31m[???] \033[0m";
+			}
+		}
+
+		public void print_result () {
 			stdout.printf(this.msg());
 		}
 
-		public void init_sig(){
+		public void init_sig () {
 			int tab[] = {4, 8, 10, 11};
 			foreach (var i in tab) {
 				Posix.signal(i, (sg) => {
@@ -149,7 +192,10 @@ namespace SupraTest{
 		while (true) {
 			int status;
 			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
-				result.status = (Status)exit_status(status);
+				if (Process.if_exited(status))
+					result.status = (Status)exit_status(status);
+				else if (Process.if_signaled(status))
+					result.status = (Status)Process.term_sig(status);
 				break;
 			}
 			if ((uint)timer.elapsed() >= time){
@@ -223,7 +269,10 @@ namespace SupraTest{
 		while (true) {
 			int status;
 			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
-				result.status = (Status)exit_status(status);
+				if (Process.if_exited(status))
+					result.status = (Status)exit_status(status);
+				else if (Process.if_signaled(status))
+					result.status = (Status)Process.term_sig(status);
 				break;
 			}
 			if ((uint)timer.elapsed() >= timeout){

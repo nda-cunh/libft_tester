@@ -39,7 +39,7 @@ string? find_libft() throws Error {
 	unowned string? name;
 
 	while ((name = dir.read_name ()) != null) {
-		var folder = @"$pwd/$name";
+		var folder = Path.build_filename (pwd, name);
 		if (FileUtils.test(folder, FileTest.IS_DIR)) {
 			if (FileUtils.test(@"$folder/Makefile", FileTest.EXISTS)) {
 				return generate_libft_so (folder);
@@ -60,8 +60,8 @@ string extract_libft_dll (string libft_a) throws Error {
 	string error_str;
 	int wait_status;
 
-	Process.spawn_sync(null,
-		{"ar", "-xv", libft_a, "--output", tmp_dir},
+	Process.spawn_sync(tmp_dir,
+		{"ar", "-xv", libft_a},
 		null,
 		SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL,
 		null,
@@ -73,12 +73,12 @@ string extract_libft_dll (string libft_a) throws Error {
 		throw new FileError.ACCES ("Can't extract object file from libft.a %s\n", error_str);
 
 	Dir dir = Dir.open (tmp_dir);
-	string result_so = @"$tmp_dir/libft.so";
+	string result_so = Path.build_filename (tmp_dir, "libft.so");
 	string []command = {"cc", "--shared", "-o", result_so};
 	unowned string name;
 	while ((name = dir.read_name ()) != null) {
 		if (name.has_suffix(".o"))
-			command += @"$tmp_dir/$name";
+			command += Path.build_filename (tmp_dir, name);
 	}
 
 	Process.spawn_sync(null,

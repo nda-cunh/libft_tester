@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# cd to the script directory
+cd "$(dirname "$0")"
 
 echo ''
 echo '███████╗██╗  ██╗██████╗ ██████╗  █████╗'
@@ -32,7 +34,7 @@ fi
 
 if [ ! -f build/build.ninja ]; then
 	echo "building..."
-	meson build --prefix="$PWD" --bindir='' --buildtype=release
+	meson setup build --prefix="$PWD" --bindir='' --buildtype=release
 fi
 ninja install -C build
 

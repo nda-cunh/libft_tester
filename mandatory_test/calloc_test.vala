@@ -75,6 +75,21 @@ string run_calloc() {
 		else
 			result += t.msg_ko("dont alloc with calloc(0, 0)");
 
+		// nmemb * size overflows: must return NULL, not a tiny block
+		string check_overflow(size_t nmemb, size_t size, string msg) {
+			return SupraTest.test(null, () => {
+				void *mem = ft_calloc(nmemb, size);
+				if (mem != null) {
+					free(mem);
+					return false;
+				}
+				return true;
+			}, msg).msg_err();
+		}
+		/* 7 */ result += check_overflow(size_t.MAX / 2 + 2, 2, "calloc(SIZE_MAX / 2 + 2, 2) overflow != NULL ");
+		/* 8 */ result += check_overflow(size_t.MAX / 4 + 1, 8, "calloc(SIZE_MAX / 4 + 1, 8) overflow != NULL ");
+		/* 9 */ result += check_overflow(size_t.MAX, size_t.MAX, "calloc(SIZE_MAX, SIZE_MAX) overflow != NULL ");
+
 
 		return result;
 	}

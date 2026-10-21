@@ -42,6 +42,24 @@ string run_memset() {
 			return true;
 		}, "No segfault with memset(null, 0, 1)").msg_need_segfault();
 
+		result += SupraTest.test(null, () => {
+			uint8 buf[20];
+			return (ft_memset(buf, 'E', 6) == buf);
+		}, "return value != buf ft_memset(buf, 'E', 6)").msg();
+
+		result += SupraTest.test(null, () => {
+			uint8 buf[20];
+			return (ft_memset(buf, 'E', 0) == buf);
+		}, "return value != buf ft_memset(buf, 'E', 0)").msg();
+
+		// c is converted to unsigned char
+		result += SupraTest.test(null, () => {
+			uint8 buf[20];
+			Memory.set(buf, '\0', buf.length);
+			ft_memset(buf, 'A' + 256, 4);
+			return ((string)buf == "AAAA");
+		}, "ft_memset(buf, 'A' + 256, 4) != 'AAAA'").msg();
+
 
 		return result;
 	}

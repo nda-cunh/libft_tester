@@ -19,15 +19,16 @@ string run_strlcat() {
 
 				len1 = ft_strlcat(d1, s1, n);
 				len2 = strlcat(d2, s2, n);
+				bool b = true;
 				if (len1 != len2) {
 					stderr.printf("return > you: %zu, me: %zu", len1, len2);
-					return false;
+					b = false;
 				}
 				if (Memory.cmp(d1, d2, 20) != 0) {
 					stderr.printf("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
-					return false;
+					b = false;
 				}
-				return true;
+				return b;
 			}).msg_err(@"strlcat('$dest', '$src', $n)");
 		}
 		/* 1 */ result.append(check("", "valac", 12));

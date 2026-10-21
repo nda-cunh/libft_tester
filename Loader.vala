@@ -7,8 +7,8 @@ class Loader {
 	public Loader(string library) throws ErrLoader{
 		mutex = Mutex();
 		handle = new Module(library, RTLD.LAZY);
-		if (handle == null && handle.error() != null)
-			throw new ErrLoader.NOT_FOUND(@"Can't found $library");
+		if (handle == null)
+			throw new ErrLoader.NOT_FOUND(@"Can't load $library: $(Module.error())");
 		library_path = library;
 	}
 

@@ -30,10 +30,10 @@ public class Module {
 	[CCode (cname = "dlsym")]
 	public void *dlsym(string symbol);
 	[CCode (cname = "dlerror")]
-	private static string _error();
+	private static unowned string? _error();
 	[CCode (cname = "dlinfo")]
 	int info(RTLD_DI request, void *p);
-	public string error(){
-		return _error();
+	public static string error(){
+		return _error() ?? "unknown error";
 	}
 }

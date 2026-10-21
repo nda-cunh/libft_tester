@@ -9,12 +9,12 @@ string run_substr() {
 			var t = SupraTest.test(null, () => {
 				char *sp1 = ft_substr(str, start, len);
 				if (sp1 != null) {
-					if (((string)sp1).ascii_casecmp(sp) == 0) {
+					if ((string)sp1 == sp) {
 						free(sp1);
 						return true;
 					}
 				}
-				stderr.printf("[You:'%s' != Me:'%s'] ", ((string)sp1).compress(), sp);
+				stderr.printf("[You:'%s' != Me:'%s'] ", sp1 == null ? "(null)" : ((string)sp1).compress(), sp);
 				free(sp1);
 				return false;
 			});

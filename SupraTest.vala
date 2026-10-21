@@ -133,14 +133,15 @@ namespace SupraTest{
 		}
 
 		public void print_result () {
-			stdout.printf(this.msg());
+			stdout.printf("%s", this.msg());
 		}
 
 		public void init_sig () {
 			int tab[] = {4, 8, 10, 11};
 			foreach (var i in tab) {
 				Posix.signal(i, (sg) => {
-						Posix.exit(sg);
+						// only async-signal-safe functions in a signal handler
+						Posix._exit(sg);
 					});
 			}
 		}
@@ -199,18 +200,22 @@ namespace SupraTest{
 				break;
 			}
 			if ((uint)timer.elapsed() >= time){
-				Posix.kill(child_pid, Posix.Signal.INT);
+				Posix.kill(child_pid, Posix.Signal.KILL);
+				Posix.waitpid(child_pid, out status, 0);
 				result.status = TIMEOUT;
 				break;
 			}
+			Thread.usleep(500);
 		}
 
 		Posix.close(fd_err);
 		result.stderr = read_all((string)template_stderr);
 
 		// get SupraLeak alloc/free and remove it
-		if (result.stderr != null) {
-			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
+		int index_leak = result.stderr.index_of("[SupraLeak]");
+		// not found if the child crashed before printing it
+		if (index_leak != -1) {
+			unowned string begin = result.stderr.offset(index_leak);
 			begin.scanf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", ref result.free, ref result.alloc, ref result.bytes);
 			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}
@@ -257,7 +262,6 @@ namespace SupraTest{
 			Posix.close(fd_err);
 			bool res = func();
 			stderr.printf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
-			Posix.close(fd_out);
 			if(res == true)
 				Posix.exit(0);
 			Posix.exit(1);
@@ -276,10 +280,12 @@ namespace SupraTest{
 				break;
 			}
 			if ((uint)timer.elapsed() >= timeout){
-				Posix.kill(child_pid, Posix.Signal.INT);
+				Posix.kill(child_pid, Posix.Signal.KILL);
+				Posix.waitpid(child_pid, out status, 0);
 				result.status = TIMEOUT;
 				break;
 			}
+			Thread.usleep(500);
 		}
 
 		Posix.close(fd_out);
@@ -288,8 +294,10 @@ namespace SupraTest{
 		result.stderr = read_all((string)template_stderr);
 
 		// get SupraLeak alloc/free and remove it
-		if (result.stderr != null) {
-			unowned string begin = result.stderr.offset(result.stderr.index_of("[SupraLeak]"));
+		int index_leak = result.stderr.index_of("[SupraLeak]");
+		// not found if the child crashed before printing it
+		if (index_leak != -1) {
+			unowned string begin = result.stderr.offset(index_leak);
 			begin.scanf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", ref result.free, ref result.alloc, ref result.bytes);
 			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}

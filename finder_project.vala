@@ -103,7 +103,7 @@ string extract_libft_dll (string libft_a) throws Error {
   * @throws Error if make fails or libft.so cannot be generated
   */
 public string? generate_libft_so (string dir_makefile) throws Error {
-	stdout.printf(p_supra + "Makefile found here: %sMakefile" + p_none + "\n", dir_makefile);
+	stdout.printf(p_supra + "Makefile found here: %s" + p_none + "\n", Path.build_filename (dir_makefile, "Makefile"));
 
 	string errput;
 	int wait_status;
@@ -115,12 +115,13 @@ public string? generate_libft_so (string dir_makefile) throws Error {
 	if (wait_status != 0) {
 		stderr.printf(p_supra + "Error while running make in %s\n" + p_none, dir_makefile);
 		stderr.printf(p_supra + "\033[0m%s%s\n", errput, p_none);
-		stderr.printf(p_supra + "Do you want running your last libft.a ? [y/N]");
+		if (!FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS))
+			throw new FileError.ACCES ("Error while running make (no libft.a)");
 
-		if (FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS)) {
-			if (stdin.read_line().strip().ascii_down() != "y")
-				throw new FileError.ACCES ("Error while running make");
-		}	
+		stderr.printf(p_supra + "Do you want running your last libft.a ? [y/N]");
+		string? answer = stdin.read_line();
+		if (answer == null || answer.strip().ascii_down() != "y")
+			throw new FileError.ACCES ("Error while running make");
 	}
 
 	// Generate libft.so from libft.a

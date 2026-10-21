@@ -7,7 +7,7 @@ string run_lstsize() {
 			node1->append((void*)4);
 			node1->append((void*)5);
 			node1->append((void*)8);
-			int size = ft_lstsize((void*)node1);
+			int size = ft_lstsize(node1);
 			stderr.printf("size: %d != 4\n", size);
 			t_list.free_list(node1);
 			if (size != 4)
@@ -19,7 +19,7 @@ string run_lstsize() {
 			t_list *node1 = t_list.create((void*)"Node 1");
 			node1->append((void*)4);
 			node1->append((void*)3);
-			int size = ft_lstsize((void*)node1);
+			int size = ft_lstsize(node1);
 			stderr.printf("size: %d != 3\n", size);
 			t_list.free_list(node1);
 			if (size != 3)
@@ -30,7 +30,7 @@ string run_lstsize() {
 		result += SupraTest.test(null, () => {
 			t_list *node1 = t_list.create((void*)"Node 1");
 			node1->append((void*)4);
-			int size = ft_lstsize((void*)node1);
+			int size = ft_lstsize(node1);
 			stderr.printf("size: %d != 2\n", size);
 			t_list.free_list(node1);
 			if (size != 2)
@@ -40,7 +40,7 @@ string run_lstsize() {
 
 		result += SupraTest.test(null, () => {
 			t_list *node1 = t_list.create((void*)"Node 1");
-			int size = ft_lstsize((void*)node1);
+			int size = ft_lstsize(node1);
 			stderr.printf("size: %d != 1\n", size);
 			t_list.free_list(node1);
 			if (size != 1)

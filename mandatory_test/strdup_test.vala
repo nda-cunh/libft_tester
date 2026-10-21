@@ -9,8 +9,14 @@ string run_strdup() {
 
 				if (s == null)
 					return false;
-				return ((string)s == (string)cmp);
-			}, "strdup('$cmp')");
+				bool is_same = ((string)s == (string)cmp);
+				if (!is_same)
+					stderr.printf("You:'%s' Me:'%s'", (string)s, (string)cmp);
+				free(s);
+				return is_same;
+			}, @"strdup('$((string)cmp)')");
+			if (t.status != OK)
+				return t.msg_err();
 			if (t.alloc != 1)
 				return t.msg_ko(@"No alloc ??? $(t.alloc) alloc");
 			if (t.bytes != ((string)cmp).length + 1)

@@ -40,7 +40,9 @@ string run_calloc() {
 			free(mem);
 			return (stats);
 		});
-		if (t.bytes == 0)
+		if (t.status != OK && t.status != KO)
+			result += t.msg_err("calloc(0, 1)");
+		else if (t.bytes == 0)
 			result += t.msg_ok();
 		else
 			result += t.msg_ko("dont alloc with calloc(0, 1)");
@@ -52,7 +54,9 @@ string run_calloc() {
 			free(mem);
 			return (stats);
 		});
-		if (t.bytes == 0)
+		if (t.status != OK && t.status != KO)
+			result += t.msg_err("calloc(1, 0)");
+		else if (t.bytes == 0)
 			result += t.msg_ok();
 		else
 			result += t.msg_ko("dont alloc with calloc(1, 0)");
@@ -64,7 +68,9 @@ string run_calloc() {
 			free(mem);
 			return (stats);
 		});
-		if (t.bytes == 0)
+		if (t.status != OK && t.status != KO)
+			result += t.msg_err("calloc(0, 0)");
+		else if (t.bytes == 0)
 			result += t.msg_ok();
 		else
 			result += t.msg_ko("dont alloc with calloc(0, 0)");

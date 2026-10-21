@@ -11,8 +11,8 @@ string run_atoi() {
 				return (a == b);
 			}).msg_err(msg);
 		}
-		/* 1 */ result.append(check("2147483647", "(INT_MIN)"));
-		/* 2 */ result.append(check("-2147483648", "(INT_MAX)"));
+		/* 1 */ result.append(check("2147483647", "(INT_MAX)"));
+		/* 2 */ result.append(check("-2147483648", "(INT_MIN)"));
 		/* 3 */ result.append(check("0"));
 		/* 4 */ result.append(check("1"));
 		/* 5 */ result.append(check("2"));

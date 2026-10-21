@@ -204,7 +204,7 @@ public delegate void	DelFunction (void *content);
 [CCode(has_target = false)]
 public delegate t_list *d_lstnew(void *content);
 [CCode(has_target = false)]
-public delegate int d_lstsize(void *content);
+public delegate int d_lstsize(t_list *lst);
 [CCode(has_target = false)]
 public delegate void d_lstadd_front(t_list **lst, t_list *new);
 [CCode(has_target = false)]

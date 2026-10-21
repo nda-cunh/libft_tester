@@ -175,6 +175,7 @@ class LibftTester {
 		catch (Error e) {
 			stderr.printf ("\033[31m[SupraTest]\033[0m %s", e.message);
 		}
+		remove_tmp_dir (Path.get_dirname (loader.library_path));
 	}
 
 
@@ -207,11 +208,10 @@ void check_forbidden_functions () throws Error {
 	}
 
 	var sp = output.split ("\n");
-	const string []forbidden = {
+	const string []allowed = {
 		"write",
 		"malloc",
 		"free",
-		"__stack_chk_fail",
 		"__stack_chk_fail",
 		"__assert_fail",
 		"__divdi3",
@@ -236,7 +236,7 @@ void check_forbidden_functions () throws Error {
 		if (" U " in line) {
 			unowned string func_name = line.offset(line.index_of (" U ") + 3);
 			func_name._delimit ("@", '\0');
-			if (!(func_name in forbidden)) {
+			if (!(func_name in allowed)) {
 				print ("\033[91m[Forbidden Function]: \033[31m%s !\033[0m\n", func_name);
 				is_good = false;
 			}

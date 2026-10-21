@@ -17,16 +17,14 @@ string run_split() {
 					}
 					stderr.printf("] ");
 					stderr.printf("You: [");
-					j = 0;
-					foreach (unowned var i in cmp) {
-						if (j != 0)
-							stderr.printf(", ");
-						if (sp[j] == null) {
-							stderr.printf("\"(null)\"");
-							break;
+					if (sp == null) {
+						stderr.printf("(null)");
+					}
+					else {
+						for (j = 0; sp[j] != null; j++) {
+							stderr.printf("\"%s\", ", (string)sp[j]);
 						}
-						stderr.printf("\"%s\"", (string)sp[j]);
-						j++;
+						stderr.printf("\"(null)\"");
 					}
 
 					stderr.printf("]");
@@ -38,20 +36,22 @@ string run_split() {
 			}
 			var t = SupraTest.test(null, () => {
 				var sp = ft_split(str, c);
-				// test if cmp is null
-				if (cmp == null) {
-					if (sp != null)
-						free_print(sp, cmp, false);
-					else
-						return true;
+				if (sp == null) {
+					free_print(sp, cmp, true);
+					return false;
 				}
-				int j = 0;
-				foreach (unowned var i in cmp) {
-					if ((string)sp[j] != i){
+				int len = 0;
+				while (len < cmp.length && cmp[len] != null)
+					len++;
+				for (int j = 0; j < len; j++) {
+					if (sp[j] == null || (string)sp[j] != cmp[j]) {
 						free_print(sp, cmp, true);
 						return false;
 					}
-					j++;
+				}
+				if (sp[len] != null) {
+					free_print(sp, cmp, true);
+					return false;
 				}
 
 				free_print(sp, cmp, false);

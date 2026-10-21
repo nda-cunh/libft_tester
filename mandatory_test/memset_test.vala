@@ -11,6 +11,7 @@ string run_memset() {
 
 		result += SupraTest.test(null, () => {
 			uint8 buf[20];
+			Memory.set(buf, '\0', buf.length);
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[7] != 'E');

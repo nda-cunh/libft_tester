@@ -10,10 +10,10 @@ string run_strlcat() {
 				char d2[61];
 				char s1[61];
 				char s2[61];
-				Memory.set(d1, '\0', 20); Memory.copy(d1, dest, dest.length);
-				Memory.set(d2, '\0', 20); Memory.copy(d2, dest, dest.length);
-				Memory.set(s1, '\0', 20); Memory.copy(s1, src, src.length);
-				Memory.set(s2, '\0', 20); Memory.copy(s2, src, src.length);
+				Memory.set(d1, '\0', 61); Memory.copy(d1, dest, dest.length);
+				Memory.set(d2, '\0', 61); Memory.copy(d2, dest, dest.length);
+				Memory.set(s1, '\0', 61); Memory.copy(s1, src, src.length);
+				Memory.set(s2, '\0', 61); Memory.copy(s2, src, src.length);
 				size_t len1 = 0;
 				size_t len2 = 0;
 

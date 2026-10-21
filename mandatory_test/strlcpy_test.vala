@@ -10,10 +10,10 @@ string run_strlcpy() {
 				char d2[21];
 				char s1[21];
 				char s2[21];
-				Memory.set(d1, '\0', 20); Memory.copy(d1, dest, dest.length);
-				Memory.set(d2, '\0', 20); Memory.copy(d2, dest, dest.length);
-				Memory.set(s1, '\0', 20); Memory.copy(s1, src, src.length);
-				Memory.set(s2, '\0', 20); Memory.copy(s2, src, src.length);
+				Memory.set(d1, '\0', 21); Memory.copy(d1, dest, dest.length);
+				Memory.set(d2, '\0', 21); Memory.copy(d2, dest, dest.length);
+				Memory.set(s1, '\0', 21); Memory.copy(s1, src, src.length);
+				Memory.set(s2, '\0', 21); Memory.copy(s2, src, src.length);
 				size_t len1 = 0;
 				size_t len2 = 0;
 

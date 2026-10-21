@@ -252,8 +252,8 @@ void check_update () {
 		string path = Path.get_dirname (FileUtils.read_link ("/proc/self/exe"));
 
 		if (FileUtils.test (Path.build_filename (path, ".git"), GLib.FileTest.EXISTS) == true) {
-			Process.spawn_sync (path, {"git", "pull"}, null, 0, null, null, out errput);
-			Process.spawn_sync (path, {"sh", "install.sh"}, null, 0, null, null, out errput);
+			Process.spawn_sync (path, {"git", "pull"}, null, SpawnFlags.SEARCH_PATH, null, null, out errput);
+			Process.spawn_sync (path, {"sh", "install.sh"}, null, SpawnFlags.SEARCH_PATH, null, null, out errput);
 		}
 	}
 	catch (Error e) {

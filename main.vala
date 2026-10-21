@@ -246,7 +246,23 @@ void check_forbidden_functions () throws Error {
 		print ("\033[32mNo forbidden function found !\033[0m\n");
 }
 
+void check_update () {
+	string errput = "";
+	try {
+		string path = Path.get_dirname (FileUtils.read_link ("/proc/self/exe"));
+
+		if (FileUtils.test (Path.build_filename (path, ".git"), GLib.FileTest.EXISTS) == true) {
+			Process.spawn_sync (path, {"git", "pull"}, null, 0, null, null, out errput);
+			Process.spawn_sync (path, {"sh", "install.sh"}, null, 0, null, null, out errput);
+		}
+	}
+	catch (Error e) {
+		printerr ("\033[31m[Update]\033[0m %s\n%s", e.message, errput);
+	}
+}
+
 async void main() {
+	check_update();
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");

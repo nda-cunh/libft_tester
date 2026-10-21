@@ -50,6 +50,26 @@ string? find_libft() throws Error {
 }
 
 /**
+ * Remove the temporary folder created by extract_libft_dll
+ * @param tmp_dir Path to the vala_libsoXXXXXX folder
+ */
+void remove_tmp_dir (string tmp_dir) {
+	// never remove something that is not our temporary folder
+	if (!Path.get_basename (tmp_dir).has_prefix ("vala_libso"))
+		return;
+	try {
+		var dir = Dir.open (tmp_dir);
+		unowned string? name;
+		while ((name = dir.read_name ()) != null)
+			FileUtils.unlink (Path.build_filename (tmp_dir, name));
+	}
+	catch (Error e) {
+		return;
+	}
+	DirUtils.remove (tmp_dir);
+}
+
+/**
  * Extract libft.a into a temporary folder and generate libft.so from object files
  * @param libft_a Path to libft.a
  * @return Path to generated libft.so
@@ -69,8 +89,10 @@ string extract_libft_dll (string libft_a) throws Error {
 		out error_str,
 		out wait_status);
 
-	if (wait_status != 0)
+	if (wait_status != 0) {
+		remove_tmp_dir (tmp_dir);
 		throw new FileError.ACCES ("Can't extract object file from libft.a %s\n", error_str);
+	}
 
 	Dir dir = Dir.open (tmp_dir);
 	string result_so = Path.build_filename (tmp_dir, "libft.so");
@@ -90,8 +112,10 @@ string extract_libft_dll (string libft_a) throws Error {
 		out error_str,
 		out wait_status);
 
-	if (wait_status != 0)
+	if (wait_status != 0) {
+		remove_tmp_dir (tmp_dir);
 		throw new FileError.ACCES ("Can't generate libft.so from object files %s\n", error_str);
+	}
 
 	return result_so;
 }

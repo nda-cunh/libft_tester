@@ -51,10 +51,21 @@ namespace SupraTest{
 			return "\033[32m[OK]\033[0m";
 		}
 
+		/**
+		 * For tests that expect a crash (NULL arguments like the libc):
+		 * a protected version is not wrong, so it is only a warning
+		 */
 		public string msg_need_segfault () {
-			if (this.status == SIGSEGV)
+			if (this.status == SIGSEGV || this.status == SIGBUS)
 				return (this.msg_ok());
-			return (this.msg_ko());
+			if (this.status == OK || this.status == KO || this.status == LEAK)
+				return (this.msg_warn());
+			return (this.msg_err());
+		}
+
+		public string msg_warn (string? format = null) {
+			var s = format ?? this.message;
+			return @"\033[33m[WARN] \033[93m$(s)\033[0m";
 		}
 
 		public string msg_ko (string? format = null) {

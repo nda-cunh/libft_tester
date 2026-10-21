@@ -21,7 +21,7 @@ string run_memcpy() {
 
 		result += SupraTest.test(null, () => {
 			const string dest = "AAAAAAAAAA";
-			var r = memcpy(dest.data, null, 0);
+			var r = ft_memcpy(dest.data, null, 0);
 			if (r != dest) {
 				stderr.printf("Return is not 'dest' ");
 				return false;

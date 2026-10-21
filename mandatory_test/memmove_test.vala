@@ -3,18 +3,24 @@ string run_memmove() {
 	try {
 		var ft_memmove = (d_memmove)loader.symbol("ft_memmove");
 		result += SupraTest.test(null, () => {
-			string mstr = "Hello, World!";
-			char *str = (char*)mstr;
-			size_t n = mstr.length + 1;
+			// buffer big enough for the overlapping copy
+			char buf[32];
+			Memory.set(buf, '\0', buf.length);
+			Memory.copy(buf, "Hello, World!", 14);
+			char *str = buf;
+			size_t n = 14;
 			ft_memmove(str + 7, str, n);
 			return (str == "Hello, Hello, World!");
 		}, "test same_memory").msg();
 
 
 		result += SupraTest.test(null, () => {
-			string mstr = "Hello, World!";
-			char *str = (char*)mstr;
-			size_t n = mstr.length + 1;
+			// buffer big enough for the overlapping copy
+			char buf[32];
+			Memory.set(buf, '\0', buf.length);
+			Memory.copy(buf, "Hello, World!", 14);
+			char *str = buf;
+			size_t n = 14;
 			ft_memmove(str + 2, str, n);
 			return (str == "HeHello, World!");
 		}, "test overlap").msg();

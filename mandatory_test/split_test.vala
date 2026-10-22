@@ -96,12 +96,17 @@ string run_split() {
 {"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
 		/* 23 */ result.append(check("", 'z', {null}));
 
-		/* 24 */ result.append(SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
-			char **s = ft_split("bababababhc", 'a');
+		/* 24 */ result.append(SupraTest.test_each_malloc((n)=>{
+			SupraLeak.fail_at(n);
+			char **s = ft_split("  bab abab   abhc ", ' ');
+			SupraLeak.fail_at(0);
+			if (SupraLeak.has_failed && s != null)
+				stderr.printf("ft_split(\"  bab abab   abhc \", ' ') must return NULL when its malloc n°%d fails, but returned a result", n);
+			else if (!SupraLeak.has_failed && s == null)
+				stderr.printf("ft_split(\"  bab abab   abhc \", ' ') returned NULL but no malloc failed (expected [\"bab\", \"abab\", \"abhc\", NULL]): your function returns NULL outside of a malloc failure");
 			if (s != null)
-				delete s;
-			return (s == null);
+				strfreev((string[])s);
+			return (SupraLeak.has_failed == (s == null));
 		}, "no protect ").msg_err());
 
 		return (owned)result.str;

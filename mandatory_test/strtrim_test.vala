@@ -45,14 +45,17 @@ string run_strtrim() {
 		/* 22 */ result.append(check(null, "", null));
 		/* 23 */ result.append(check(null, "abc", null));
 
-		/* 24 */ result.append(SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
+		/* 24 */ result.append(SupraTest.test_each_malloc((n)=>{
+			SupraLeak.fail_at(n);
 			char *s = ft_strtrim("ab", "ab");
-			if (s != null) {
+			SupraLeak.fail_at(0);
+			if (SupraLeak.has_failed && s != null)
+				stderr.printf("ft_strtrim(\"ab\", \"ab\") must return NULL when its malloc n°%d fails, but returned a result", n);
+			else if (!SupraLeak.has_failed && s == null)
+				stderr.printf("ft_strtrim(\"ab\", \"ab\") returned NULL but no malloc failed (expected \"\"): your function returns NULL outside of a malloc failure");
+			if (s != null)
 				delete s;
-				return false;
-			}
-			return (true);
+			return (SupraLeak.has_failed == (s == null));
 		}, "no protect ").msg_err());
 
 		return (owned)result.str;

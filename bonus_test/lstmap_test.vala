@@ -78,39 +78,50 @@ string run_lstmap() {
 			return true;
 		}).msg_err();
 		
-		result += SupraTest.test(null, () => {
+		// Fail each malloc of lstmap: the contents already made by f must be freed with del
+		result += SupraTest.test_each_malloc((n) => {
 			// Create the initial list
 			t_list *node = t_list.create(strdup("1"));
 			node->append(strdup("2"));
 			node->append(strdup("3"));
-			SupraLeak.send_null(); // Force malloc to fail
 
+			SupraLeak.fail_at(n);
 			// Map the list
 			t_list *new_list = ft_lstmap(node,
-				// Map Function
+				// Map Function (its own malloc never fails)
 				(content) => {
-					unowned string str = (string)content;
-					void* new_content = (void*)int.parse(str);
-					return (void*)new_content;
-				}, // Delete Function
-
+					SupraLeak.pause();
+					void *new_content = strdup((string)content);
+					SupraLeak.resume();
+					return new_content;
+				},
+				// Delete Function
 				(content) => {
+					free(content);
 				}
 			);
-
+			SupraLeak.fail_at(0);
 
 			t_list.free_list(node, (content) => {
 				free(content);
 			});
 
-			if (new_list != null) {
-				stderr.printf("Your LSTMAP should return NULL on malloc failure and Free\n");
-				t_list.free_list(new_list);
+			if (SupraLeak.has_failed && new_list != null) {
+				stderr.printf("ft_lstmap must return NULL when its malloc n°%d fails, but returned a list", n);
+				t_list.free_list(new_list, (content) => {
+					free(content);
+				});
 				return false;
 			}
-
+			if (!SupraLeak.has_failed && new_list == null) {
+				stderr.printf("ft_lstmap returned NULL but no malloc failed (expected a list of 3 nodes): your function returns NULL outside of a malloc failure");
+				return false;
+			}
+			t_list.free_list(new_list, (content) => {
+				free(content);
+			});
 			return true;
-		}).msg_err();
+		}, "no protect ").msg_err();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

@@ -34,12 +34,17 @@ string run_itoa() {
 		/* 22 */ result.append(check(-68465));
 		/* 23 */ result.append(check(6851465));
 		/* 24 */
-		result.append(SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
-			char *s = ft_itoa(42);
+		result.append(SupraTest.test_each_malloc((n)=>{
+			SupraLeak.fail_at(n);
+			char *s = ft_itoa(-42);
+			SupraLeak.fail_at(0);
+			if (SupraLeak.has_failed && s != null)
+				stderr.printf("ft_itoa(-42) must return NULL when its malloc n°%d fails, but returned a result", n);
+			else if (!SupraLeak.has_failed && s == null)
+				stderr.printf("ft_itoa(-42) returned NULL but no malloc failed (expected \"-42\"): your function returns NULL outside of a malloc failure");
 			if (s != null)
 				delete s;
-			return (s == null);
+			return (SupraLeak.has_failed == (s == null));
 		}, "no protect malloc ").msg_err());
 		return (owned)result.str;
 	}

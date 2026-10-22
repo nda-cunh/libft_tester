@@ -9,14 +9,14 @@ string run_strncmp() {
 				var b = ft_strncmp(s1, s2, n);
 				stderr.printf("libc: %d you: %d ", a, b);
 				return (clang_s(strncmp(s1, s2, n)) == clang_s(ft_strncmp(s1, s2, n)));
-			}, @"strncmp('$((string)s1)', '$((string)s2)', $n) ");
+			}, @"strncmp(\"$((string)s1)\",\"$((string)s2)\", $n) ");
 			if (t.status == KO)
-				return t.msg_ko(msg ?? t.message + t.stderr);
+				return t.msg_ko((msg ?? t.message) + t.stderr);
 			return t.msg();
 		}
 		/* 1 */ result.append(check("a", "b", 1));
 		/* 2 */ result.append(check("", "", 4));
-		/* 3 */ result.append(check("bjr\0kitty", "bjr\0hello", 7));
+		/* 3 */ result.append(check("bjr\0kitty", "bjr\0hello", 7, """strncmp("bjr\0kitty", "bjr\0hello", 7) """));
 		/* 4 */ result.append(check("abcd", "abce", 3));
 		/* 5 */ result.append(check("test\0", "", 6));
 		/* 6 */ result.append(check("", "test\0", 6));

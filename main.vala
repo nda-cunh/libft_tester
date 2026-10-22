@@ -126,20 +126,14 @@ class LibftTester {
 	}
 
 
-// 	                          888         888888b.
-//                           888         888  "88b
-//                           888         888  .88P
-// 88888b.   8888b.  888d888 888888      8888888K.   .d88b.  88888b.  888  888 .d8888b
-// 888 "88b     "88b 888P"   888         888  "Y88b d88""88b 888 "88b 888  888 88K
-// 888  888 .d888888 888     888         888    888 888  888 888  888 888  888 "Y8888b.
-// 888 d88P 888  888 888     Y88b.       888   d88P Y88..88P 888  888 Y88b 888      X88
-// 88888P"  "Y888888 888      "Y888      8888888P"   "Y88P"  888  888  "Y88888  88888P'
-// 888
-// 888
-// 888
+	// ,------.                  ,--.    ,----.
+	// |  .--. ' ,--,--.,--.--.,-'  '-. '.-.  |
+	// |  '--' |' ,-.  ||  .--''-.  .-'   .' <
+	// |  | --' \ '-'  ||  |     |  |   /'-'  |
+	// `--'      `--`--'`--'     `--'   `----'
 
-	async void run_part_bonus () {
-		const d_worker []tab_func_p2 = {
+	async void run_part3 () {
+		const d_worker []tab_func_p3 = {
 			run_lstnew,
 			run_lstsize,
 			run_lstadd_front,
@@ -149,10 +143,9 @@ class LibftTester {
 			run_lstclear,
 			run_lstiter,
 			run_lstmap
-
 		};
-		print("\033[33m     <------------- [ Bonus ] ------------->\n\033[0m");
-		yield run_part(tab_func_p2);
+		print("\033[33m     <------- [ PART 3 - Linked list ] ------->\n\033[0m");
+		yield run_part(tab_func_p3);
 	}
 
 
@@ -167,7 +160,7 @@ class LibftTester {
 
 		yield run_part1();
 		yield run_part2();
-		yield run_part_bonus();
+		yield run_part3();
 
 		try {
 			check_forbidden_functions();

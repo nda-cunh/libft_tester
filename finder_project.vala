@@ -133,7 +133,8 @@ public string? generate_libft_so (string dir_makefile) throws Error {
 	int wait_status;
 	SpawnFlags flags = SpawnFlags.SEARCH_PATH + SpawnFlags.STDOUT_TO_DEV_NULL;
 	Process.spawn_sync(null, {"make", "all", "-C", dir_makefile}, null, flags, null, null, out errput, out wait_status); 
-	Process.spawn_sync(null, {"make", "bonus", "-C", dir_makefile}, null, flags, null, null); 
+	// older subjects put the linked list in a bonus rule, newer ones have no bonus rule at all
+	Process.spawn_sync(null, {"make", "bonus", "-C", dir_makefile}, null, flags + SpawnFlags.STDERR_TO_DEV_NULL, null, null);
 
 
 	if (wait_status != 0) {

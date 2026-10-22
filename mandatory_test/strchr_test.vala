@@ -6,7 +6,7 @@ string run_strchr() {
 		string check (char* s, int c, string? msg = null) {
 			string cp;
 			if (c == '\0')
-				cp = "'\\0'";
+				cp = "\\0";
 			else
 				cp = ((char)c).to_string();
 			var p = SupraTest.test(null, () => {

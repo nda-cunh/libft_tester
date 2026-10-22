@@ -247,18 +247,26 @@ void check_forbidden_functions () throws Error {
 }
 
 void check_update () {
-	string errput = "";
+	const string script = """
+		exec </dev/null
+		before=$(git rev-parse HEAD)
+		timeout 30 git pull -q || exit 0
+		[ "$before" = "$(git rev-parse HEAD)" ] || timeout 600 sh install.sh
+	""";
 	try {
 		string path = Path.get_dirname (FileUtils.read_link ("/proc/self/exe"));
+		if (!FileUtils.test (Path.build_filename (path, ".git"), FileTest.EXISTS))
+			return;
 
-		if (FileUtils.test (Path.build_filename (path, ".git"), GLib.FileTest.EXISTS) == true) {
-			Process.spawn_sync (path, {"git", "pull"}, null, SpawnFlags.SEARCH_PATH, null, null, out errput);
-			Process.spawn_sync (path, {"sh", "install.sh"}, null, SpawnFlags.SEARCH_PATH, null, null, out errput);
-		}
+		string[] env = Environ.get ();
+		env = Environ.set_variable (env, "GIT_TERMINAL_PROMPT", "0");
+		env = Environ.set_variable (env, "GIT_SSH_COMMAND", "ssh -o BatchMode=yes");
+
+		string lock = Path.build_filename (path, ".git", "update.lock");
+		Process.spawn_async (path, {"setsid", "flock", "-n", lock, "sh", "-c", script}, env,
+			SpawnFlags.SEARCH_PATH | SpawnFlags.STDOUT_TO_DEV_NULL | SpawnFlags.STDERR_TO_DEV_NULL, null, null);
 	}
-	catch (Error e) {
-		printerr ("\033[31m[Update]\033[0m %s\n%s", e.message, errput);
-	}
+	catch (Error e) {}
 }
 
 async void main() {

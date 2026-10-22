@@ -2,7 +2,9 @@
 private size_t g_alloc_bytes = 0;
 private int g_alloc_count = 0;
 private int g_free_count = 0;
-private bool g_is_null = false;
+private int g_fail_at = 0;
+private int g_fail_saved = 0;
+private bool g_has_failed = false;
 
 public class SupraLeak : Object {
 	public static size_t bytes{
@@ -20,8 +22,28 @@ public class SupraLeak : Object {
 			return g_alloc_count;
 		}
 	}
+
+	public static bool has_failed {
+		get {
+			return g_has_failed;
+		}
+	}
+
+	public static void fail_at(int n) {
+		g_fail_at = n;
+		if (n > 0)
+			g_has_failed = false;
+	}
 	public static void send_null() {
-		g_is_null = true;
+		fail_at(1);
+	}
+
+	public static void pause() {
+		g_fail_saved = g_fail_at;
+		g_fail_at = 0;
+	}
+	public static void resume() {
+		g_fail_at = g_fail_saved;
 	}
 	public static void reset() {
 		g_alloc_count = 0;
@@ -34,8 +56,8 @@ public class SupraLeak : Object {
 // Extern Function
 [CCode (cname = "vala_malloc")]
 public void* vala_malloc(void *ptr, size_t len) {
-	if (g_is_null) {
-		g_is_null = false;
+	if (g_fail_at > 0 && --g_fail_at == 0) {
+		g_has_failed = true;
 		return null;
 	}
 	g_alloc_count++;

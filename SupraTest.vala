@@ -36,6 +36,7 @@ namespace SupraTest{
 		int				alloc;
 		int				free;
 		size_t			bytes;
+		bool			malloc_failed;
 
 		public Test(string message) {
 			this.message = message;
@@ -45,6 +46,7 @@ namespace SupraTest{
 			this.status = KO;
 			this.alloc = 0;
 			this.free = 0;
+			this.malloc_failed = false;
 		}
 
 		public unowned string msg_ok() {
@@ -194,6 +196,8 @@ namespace SupraTest{
 			Posix.dup2(fd_err, 2);
 			Posix.close(fd_err);
 			bool b = func();
+			if (SupraLeak.has_failed)
+				stderr.printf("[SupraFail]\n");
 			stderr.printf("[SupraLeak] %d Free, %d Malloc, %zu Bytes\n", SupraLeak.free, SupraLeak.malloc, SupraLeak.bytes);
 			Posix.exit((b == true) ? 0 : 1);
 		}
@@ -231,6 +235,12 @@ namespace SupraTest{
 			result.stderr = result.stderr.replace(@"[SupraLeak] $(result.free) Free, $(result.alloc) Malloc, $(result.bytes) Bytes\n", "");
 		}
 
+		// the malloc armed with SupraLeak.fail_at() has been reached
+		if (result.stderr.index_of("[SupraFail]\n") != -1) {
+			result.malloc_failed = true;
+			result.stderr = result.stderr.replace("[SupraFail]\n", "");
+		}
+
 		FileUtils.unlink((string)template_stderr);
 		if (result.status == OK || result.status == KO) {
 			if (result.free != result.alloc)
@@ -241,6 +251,26 @@ namespace SupraTest{
 
 
 
+
+
+
+	public delegate bool mallocFunction(int n);
+
+	public Test test_each_malloc(mallocFunction func, string err_message = "", int max = 64) {
+		Test result = Test(err_message);
+		for (int n = 1; n <= max; n++) {
+			result = test(null, () => func(n), @"$(err_message)(malloc n°$(n) fail)");
+			if (result.status == KO && result.stderr.strip() != "") {
+				result.message = "";
+				result.stderr = result.stderr.strip();
+			}
+			else if (result.status == KO && !result.malloc_failed)
+				result.message = @"$(err_message)(returns NULL but no malloc failed)";
+			if (result.status != OK || !result.malloc_failed)
+				break;
+		}
+		return result;
+	}
 
 
 

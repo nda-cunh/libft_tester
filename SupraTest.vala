@@ -266,6 +266,8 @@ namespace SupraTest{
 			}
 			else if (result.status == KO && !result.malloc_failed)
 				result.message = @"$(err_message)(returns NULL but no malloc failed)";
+			else if (!result.malloc_failed)
+				result.message = @"$(err_message)(no malloc failed)";
 			if (result.status != OK || !result.malloc_failed)
 				break;
 		}

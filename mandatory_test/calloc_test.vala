@@ -63,8 +63,10 @@ string run_calloc() {
 				void *a = ft_calloc(nmemb, size);
 				void *b = ft_calloc(nmemb, size);
 				bool ok = (a != null && b != null && a != b);
-				if (!ok)
-					stderr.printf("You: %p and %p Me: 2 different pointers, not NULL", a, b);
+				if (a == null || b == null)
+					stderr.printf("You: NULL Me: a unique pointer that can be passed to free()");
+				else if (a == b)
+					stderr.printf("You: the same pointer twice Me: a unique pointer that can be passed to free()");
 				free(a);
 				free(b);
 				return ok;

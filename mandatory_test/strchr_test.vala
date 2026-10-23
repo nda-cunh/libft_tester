@@ -13,7 +13,7 @@ string run_strchr() {
 				var a = strchr(s, c);
 				var b = ft_strchr(s, c);
 				if (a != b) {
-					stderr.printf("libc: %s you: %s ", ((string)a) ?? "null", ((string)b) ?? "(null)");
+					stderr.printf("You: %s Me: %s ", quote((string)b), quote((string)a));
 					return false;
 				}
 				return true;
@@ -48,10 +48,11 @@ string run_strchr() {
 		}, """strchr("1024", '\0')""").msg();
 		
 		result += SupraTest.test(null, () => {
-				const string s = "1024";
+				// c is converted to char: 't' + 256 must find 't'
+				const string s = "suprapatata";
 				int c = 't' + 256;
 				return (strchr(s, c) == ft_strchr(s, c));
-		}, """strchr("1024", ('t' + 256))""").msg();
+		}, """strchr("suprapatata", 't' + 256)""").msg();
 
 		result += SupraTest.test(null, () => {
 				ft_strchr(null, '\0');

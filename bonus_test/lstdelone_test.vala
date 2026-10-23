@@ -2,6 +2,13 @@ string run_lstdelone() {
 	string result = "LSTDELONE:    ";
 	try {
 		var ft_lstdelone = (d_lstdelone)loader.symbol("ft_lstdelone");
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			ft_lstdelone(null, (content) => {});
+			return true;
+		}, "lstdelone(NULL, del)");
+		result += shield.msg();
+
 		result += SupraTest.test(null, () => {
 			int nb1 = 5;
 			int nb2 = 5;

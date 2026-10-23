@@ -2,6 +2,13 @@ string run_lstclear() {
 	string result = "LSTCLEAR:     ";
 	try {
 		var ft_lstclear = (d_lstclear)loader.symbol("ft_lstclear");
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			ft_lstclear(null, (content) => {});
+			return true;
+		}, "lstclear(NULL, del)");
+		result += shield.msg();
+
 		result += SupraTest.test(null, () => {
 			int nb1 = 5;
 			int nb2 = 3;

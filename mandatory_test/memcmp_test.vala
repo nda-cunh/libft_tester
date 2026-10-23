@@ -18,7 +18,7 @@ string run_memcmp() {
 				string s2;
 				s1 = (string)m1;
 				s2 = (string)m2;
-				msg_dup = @"memcmp('$s1', '$s2', $len)";
+				msg_dup = @"memcmp(\"$s1\", \"$s2\", $len)";
 			}
 			else {
 				msg_dup = msg;
@@ -30,12 +30,12 @@ string run_memcmp() {
 		uint8 []p = {'t', 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		result += check("salut", "salut", 5);
-		result += check(p, "t\0", 2, "memcmp('t\\200', 't\\0', 2)");
+		result += check(p, "t\0", 2, "memcmp(\"t\\200\", \"t\\0\", 2)");
 		result += check("testss", "test", 5);
 		result += check("test", "tEst", 4);
 		result += check("", "test", 4);
 		result += check("test", "", 4);
-		result += check("supra\0vim", "supra\0pack", 8, "memcmp('supra\\0vim', 'supra\\0pack', 8)");
+		result += check("supra\0vim", "supra\0pack", 8, "memcmp(\"supra\\0vim\", \"supra\\0pack\", 8)");
 		result += check("abcdefghij", "abcdefgxyz", 7);
 		result += check("abcdefgh", "abcdwxyz", 6);
 		result += check("zyxbcdefgh", "abcdefgxyz", 0);

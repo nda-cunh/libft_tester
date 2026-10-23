@@ -47,6 +47,14 @@ string run_lstsize() {
 				return false;
 			return true;
 		}).msg_err();
+
+		// NULL is an empty list
+		result += SupraTest.test(null, () => {
+			uint size = ft_lstsize(null);
+			if (size != 0)
+				stderr.printf("You: %u Me: 0", size);
+			return (size == 0);
+		}).msg_err("lstsize(NULL)");
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

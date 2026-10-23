@@ -6,7 +6,7 @@ string run_itoa() {
 		string check(int n, string? msg = null) {
 			return SupraTest.test(null, () => {
 				string s = ft_itoa(n);
-				stderr.printf("You:'%s' Me:'%d'", s, n);
+				stderr.printf("You:\"%s\" Me:\"%d\"", s, n);
 				return (s == @"$n");
 			}).msg_err();
 		}
@@ -33,7 +33,21 @@ string run_itoa() {
 		/* 21 */ result.append(check(684));
 		/* 22 */ result.append(check(-68465));
 		/* 23 */ result.append(check(6851465));
-		/* 24 */
+		/* 24 */ result.append(SupraTest.test_min_alloc(4, ()=>{
+			char *s = ft_itoa(-42);
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}, "itoa(-42)").msg_err());
+		/* 25 */ result.append(SupraTest.test_min_alloc(12, ()=>{
+			char *s = ft_itoa(int.MIN);
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}, "itoa(-2147483648)").msg_err());
+		/* 26 */
 		result.append(SupraTest.test_each_malloc((n)=>{
 			SupraLeak.fail_at(n);
 			char *s = ft_itoa(-42);

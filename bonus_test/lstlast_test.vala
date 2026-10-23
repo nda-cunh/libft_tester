@@ -15,6 +15,14 @@ string run_lstlast() {
 			t_list.free_list(node1);
 			return true;
 		}).msg_err();
+
+		// NULL is an empty list
+		result += SupraTest.test(null, () => {
+			t_list *last = ft_lstlast(null);
+			if (last != null)
+				stderr.printf("You: %p Me: NULL", last);
+			return (last == null);
+		}).msg_err("lstlast(NULL)");
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

@@ -1,17 +1,22 @@
 string run_isdigit() {
 	string result = "ISDIGIT:  ";
 	try {
-		var ft_isdigit= (d_isdigit)loader.symbol("ft_isdigit");
+		var ft_isdigit = (d_isdigit)loader.symbol("ft_isdigit");
+		// the libc answer depends on the locale: use the "C" locale rule
+		bool me(int i) {
+			return (i >= '0' && i <= '9');
+		}
 		var t = SupraTest.test(null, () => {
-				for (int i = 0; i < 255; ++i)
-				{
-					if (clang_s(ft_isdigit(i)) != clang_s(clang_isdigit(i))) {
-						stderr.printf("input: [%d] You: %d, Me: %d ", i, ft_isdigit(i), clang_isdigit(i));
-						return false;
-					}
+			// EOF and every unsigned char
+			for (int i = -1; i <= 255; ++i)
+			{
+				if ((ft_isdigit(i) != 0) != me(i)) {
+					stderr.printf("isdigit(%d) You: %d Me: %s ", i, ft_isdigit(i), me(i) ? "true" : "false");
+					return false;
 				}
-				return true;
-			});
+			}
+			return true;
+		});
 		return result + t.msg_err();
 	}
 	catch (Error e) {

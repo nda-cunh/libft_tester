@@ -4,12 +4,24 @@ string run_striteri() {
 	try {
 		var ft_striteri = (d_striteri)loader.symbol("ft_striteri");
 
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			ft_striteri(null, (n, s) => {});
+			return true;
+		}, "striteri(NULL, f)");
+		shield.check(() => {
+			char s[4] = {'a', 'b', 'c', '\0'};
+			ft_striteri(s, null);
+			return true;
+		}, "striteri(\"abc\", NULL)");
+		result.append(shield.msg());
+
 		string check(string s1, d_param_striteri func, string cmp) {
 			return SupraTest.test(null, () => {
 				ft_striteri(s1, func);
 				if (s1 == cmp)
 					return true;
-				stderr.printf("You:'%s' Me:'%s'", s1, cmp);
+				stderr.printf("You:\"%s\" Me:\"%s\"", s1, cmp);
 				return false;
 			}).msg_err("");
 		}

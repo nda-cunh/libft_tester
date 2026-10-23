@@ -21,7 +21,7 @@ string run_memmove() {
 					return false;
 				}
 				if (Memory.cmp(b1, b2, 64) != 0) {
-					stderr.printf("you: '%s' me: '%s' ", (string)b1, (string)b2);
+					stderr.printf("you: \"%s\" me: \"%s\" ", (string)b1, (string)b2);
 					return false;
 				}
 				return true;

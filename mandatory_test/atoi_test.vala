@@ -7,7 +7,7 @@ string run_atoi() {
 			return SupraTest.test(null, () => {
 				var a = ft_atoi(s_nb);
 				var b = atoi(s_nb);
-				stderr.printf("You:'%d' Me:'%d'", a, b);
+				stderr.printf("You: %d Me: %d", a, b);
 				return (a == b);
 			}).msg_err(msg);
 		}

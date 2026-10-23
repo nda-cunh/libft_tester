@@ -13,11 +13,11 @@ string run_memcpy() {
 				return false;
 			}
 			if (Memory.cmp(dest1.data, dest2.data, 30) != 0) {
-				stderr.printf("Memory is not 'AAAAAAAAAAA' ");
+				stderr.printf("Memory is not \"AAAAAAAAAAA\" ");
 				return false;
 			}
 			return true;
-		}, "memcpy(dest, 'coucou', 0) ").msg_err();
+		}, "memcpy(dest, \"coucou\", 0) ").msg_err();
 
 		result += SupraTest.test(null, () => {
 			const string dest = "AAAAAAAAAA";
@@ -27,12 +27,12 @@ string run_memcpy() {
 				return false;
 			}
 			if (Memory.cmp(dest.data, "AAAAAAAAAA", 10) != 0) {
-				stderr.printf("Memory is not 'AAAAAAAAAAA' ");
+				stderr.printf("Memory is not \"AAAAAAAAAAA\" ");
 				return false;
 			}
 
 			return true;
-		}, "memcpy(dest, NULL, 0) ").msg_err();
+		}, "memcpy(dest, NULL, 0) ").msg_crash_warn();
 
 
 		result += SupraTest.test(null, () => {
@@ -51,7 +51,7 @@ string run_memcpy() {
 				return false;
 			}
 			if (Memory.cmp(dest1, dest2, size) != 0) {
-				stderr.printf("\n>>> you: '%s' me %s ", (string)dest1, (string)dest2);
+				stderr.printf("\n>>> you: \"%s\" me: \"%s\" ", (string)dest1, (string)dest2);
 				return false;
 			}
 			return true;
@@ -74,7 +74,7 @@ string run_memcpy() {
 				return false;
 			}
 			if (Memory.cmp(dest1, dest2, size) != 0) {
-				stderr.printf("\n>>> you: '%s' me %s ", (string)dest1, (string)dest2);
+				stderr.printf("\n>>> you: \"%s\" me: \"%s\" ", (string)dest1, (string)dest2);
 				return false;
 			}
 			return true;
@@ -96,7 +96,7 @@ string run_memcpy() {
 				return false;
 			}
 			if (Memory.cmp(dest1, dest2, size) != 0) {
-				stderr.printf("\n>>> you: '%s' me %s ", (string)dest1, (string)dest2);
+				stderr.printf("\n>>> you: \"%s\" me: \"%s\" ", (string)dest1, (string)dest2);
 				return false;
 			}
 			return true;
@@ -122,7 +122,7 @@ string run_memcpy() {
 					return false;
 				}
 				if (Memory.cmp(dest1, dest2, size) != 0) {
-					stderr.printf("\n(loop: %d)>>> you: '%s' me %s ", i, (string)dest1, (string)dest2);
+					stderr.printf("\n(loop: %d)>>> you: \"%s\" me: \"%s\" ", i, (string)dest1, (string)dest2);
 					return false;
 				}
 				++i;

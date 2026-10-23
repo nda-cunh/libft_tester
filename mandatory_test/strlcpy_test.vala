@@ -25,11 +25,11 @@ string run_strlcpy() {
 					b = false;
 				}
 				if (Memory.cmp(d1, d2, 20) != 0) {
-					stderr.printf("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
+					stderr.printf("dest >  you: \"%s\" Me: \"%s\"", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
 					b = false;
 				}
 				return b;
-			}).msg_err(@"strlcpy('$dest', '$src', $n)");
+			}).msg_err(@"strlcpy(\"$dest\", \"$src\", $n)");
 		}
 		/* 1 */ result.append(check("", "valac", 12));
 		/* 2 */ result.append(check("valac", "", 12));
@@ -52,12 +52,12 @@ string run_strlcpy() {
 		/* 18 */ result.append(SupraTest.test(null, () => {
 			ft_strlcpy(null, "", 0);
 			return true;
-		}, "strlcpy(NULL, '', 0)").msg());
+		}, "strlcpy(NULL, \"\", 0)").msg());
 
 		/* 19 */ result.append(SupraTest.test(null, () => {
 			ft_strlcpy(null, "", 1);
 			return false;
-		}, "strlcpy(NULL, '', 1) No Crash").msg_need_segfault());
+		}, "strlcpy(NULL, \"\", 1) No Crash").msg_need_segfault());
 		
 		/* 20 */ result.append(SupraTest.test(null, () => {
 			ft_strlcpy(null, null, 0);

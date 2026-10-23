@@ -2,6 +2,21 @@ string run_lstadd_back() {
 	string result = "LSTADD_BACK:  ";
 	try {
 		var ft_lstadd_back = (d_lstadd_back)loader.symbol("ft_lstadd_back");
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			t_list *node = t_list.create((void*)"Node");
+			ft_lstadd_back(null, node);
+			t_list.free_list(node);
+			return true;
+		}, "lstadd_back(NULL, node)");
+		shield.check(() => {
+			t_list *lst = t_list.create((void*)"Node");
+			ft_lstadd_back(&lst, null);
+			t_list.free_list(lst);
+			return true;
+		}, "lstadd_back(&lst, NULL)");
+		result += shield.msg();
+
 		result += SupraTest.test(null, () => {
 			t_list *node1 = t_list.create((void*)"Node 1");
 			t_list *node2 = t_list.create((void*)"Node 2");

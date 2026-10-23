@@ -186,6 +186,32 @@ namespace SupraTest{
 			}
 		}
 	}
+	/**
+	 * NULL arguments of the non-libc functions (part 2 and 3) are undefined:
+	 * crashing is fine and shows [  ], surviving every NULL case shows a shield.
+	 * Only a leak or a timeout is an error.
+	 */
+	public class Shield {
+		private bool all_protected = true;
+		private StringBuilder errors = new StringBuilder();
+
+		public void check(testFunction func, string message) {
+			var t = SupraTest.test(null, func, message);
+			if (t.status == SIGSEGV || t.status == SIGBUS)
+				this.all_protected = false;
+			else if (t.status != OK && t.status != KO)
+				this.errors.append(t.msg_err());
+		}
+
+		public string msg() {
+			if (this.errors.len > 0)
+				return this.errors.str;
+			if (this.all_protected)
+				return "\033[36m[🛡️ ]\033[0m";
+			return "\033[36m[  ]\033[0m";
+		}
+	}
+
 	[CCode (cname = "mkstemp", cheader_filename="stdlib.h")]
 	extern int mkstemp(char *template);
 

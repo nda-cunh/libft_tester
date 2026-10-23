@@ -4,6 +4,15 @@ string run_split() {
 	try {
 		var ft_split = (d_split)loader.symbol("ft_split");
 
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			char **sp = ft_split(null, ' ');
+			if (sp != null)
+				strfreev((string[])sp);
+			return true;
+		}, "split(NULL, ' ')");
+		result.append(shield.msg());
+
 		string check(string str, char c, string? []cmp) {
 
 			void free_print(char **sp, string []cmp, bool printing) {
@@ -96,7 +105,14 @@ string run_split() {
 {"lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultricies diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi."}));
 		/* 23 */ result.append(check("", 'z', {null}));
 
-		/* 24 */ result.append(SupraTest.test_each_malloc((n)=>{
+		/* 24 */ result.append(SupraTest.test_min_alloc(3 * sizeof(char*) + 3 + 3, ()=>{
+			char **s = ft_split("ab cd", ' ');
+			if (s == null)
+				return false;
+			strfreev((string[])s);
+			return true;
+		}, "split(\"ab cd\", ' ')").msg_err());
+		/* 25 */ result.append(SupraTest.test_each_malloc((n)=>{
 			SupraLeak.fail_at(n);
 			char **s = ft_split("  bab abab   abhc ", ' ');
 			SupraLeak.fail_at(0);

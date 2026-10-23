@@ -2,6 +2,19 @@ string run_lstiter() {
 	string result = "LSTITER:      ";
 	try {
 		var ft_lstiter = (d_lstiter)loader.symbol("ft_lstiter");
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			ft_lstiter(null, (content) => { return null; });
+			return true;
+		}, "lstiter(NULL, f)");
+		shield.check(() => {
+			t_list *lst = t_list.create((void*)"Node");
+			ft_lstiter(lst, null);
+			t_list.free_list(lst);
+			return true;
+		}, "lstiter(lst, NULL)");
+		result += shield.msg();
+
 		result += SupraTest.test(null, () => {
 			int nb1 = 1;
 			int nb2 = 2;

@@ -15,7 +15,7 @@ string run_memset() {
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[7] != 'E');
-		}, "trop loin... ft_memset(buf, 'E', 6)").msg();
+		}, "too far... ft_memset(buf, 'E', 6)").msg();
 
 		result += SupraTest.test(null, () => {
 			uint8 buf[20];
@@ -23,7 +23,7 @@ string run_memset() {
 			ft_memset(buf, 'E', 6);
 			buf[6] = '\0';
 			return(buf[5] == 'E');
-		}, "pas assez loin... ft_memset(buf, 'E', 6").msg();
+		}, "ft_memset(buf, 'E', 6)").msg();
 
 		result += SupraTest.test(null, () => {
 			uint8 buf[5];
@@ -58,7 +58,7 @@ string run_memset() {
 			Memory.set(buf, '\0', buf.length);
 			ft_memset(buf, 'A' + 256, 4);
 			return ((string)buf == "AAAA");
-		}, "ft_memset(buf, 'A' + 256, 4) != 'AAAA'").msg();
+		}, "ft_memset(buf, 'A' + 256, 4) != \"AAAA\"").msg();
 
 
 		return result;

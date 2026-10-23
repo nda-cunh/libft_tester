@@ -7,7 +7,7 @@ string run_strnstr() {
 				char* a = ft_strnstr(s1, s2, n);
 				char* b = strnstr(s1, s2, n);
 				if (a != b) {
-					stderr.printf("strnstr('%s', '%s', %ld) you: %s, me: %s ", (string)s1, (string)s2, (long)n, (string)a ?? "(null)", (string)b ?? "(null)");
+					stderr.printf("strnstr(\"%s\", \"%s\", %ld) you: %s, me: %s ", (string)s1, (string)s2, (long)n, quote((string)a), quote((string)b));
 					return false;
 				}
 				return true;

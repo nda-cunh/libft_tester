@@ -3,6 +3,25 @@ string run_lstmap() {
 	try {
 		var ft_lstmap = (d_lstmap)loader.symbol("ft_lstmap");
 
+		var shield = new SupraTest.Shield();
+		shield.check(() => {
+			t_list.free_list(ft_lstmap(null, (content) => { return content; }, (content) => {}));
+			return true;
+		}, "lstmap(NULL, f, del)");
+		shield.check(() => {
+			t_list *lst = t_list.create((void*)"Node");
+			t_list.free_list(ft_lstmap(lst, null, (content) => {}));
+			t_list.free_list(lst);
+			return true;
+		}, "lstmap(lst, NULL, del)");
+		shield.check(() => {
+			t_list *lst = t_list.create((void*)"Node");
+			t_list.free_list(ft_lstmap(lst, (content) => { return content; }, null));
+			t_list.free_list(lst);
+			return true;
+		}, "lstmap(lst, f, NULL)");
+		result += shield.msg();
+
 		// Test 1
 		result += SupraTest.test(null, () => {
 			// Create the initial list
@@ -34,6 +53,7 @@ string run_lstmap() {
 			if (node->get_size() != 3) {
 				stderr.printf("The original list size has been modified\n");
 				t_list.free_list(new_list);
+				return false;
 			}
 
 			// test if the content of the original list is unchanged

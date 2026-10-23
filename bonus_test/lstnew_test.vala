@@ -32,6 +32,13 @@ string run_lstnew() {
 			free(node);
 			return true;
 		}).msg_err();
+		result += SupraTest.test_min_alloc(sizeof(t_list), () => {
+			t_list *node = ft_lstnew(null);
+			if (node == null)
+				return false;
+			free(node);
+			return true;
+		}, "lstnew(NULL)").msg_err();
 		result += SupraTest.test(null, () => {
 			const string str = "Etienne";
 			SupraLeak.send_null();

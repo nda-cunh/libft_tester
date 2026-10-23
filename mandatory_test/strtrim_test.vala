@@ -4,20 +4,36 @@ string run_strtrim() {
 	try {
 		var ft_strtrim = (d_strtrim)loader.symbol("ft_strtrim");
 
+		var shield = new SupraTest.Shield();
+		string?[] args = {null, "a", ""};
+		foreach (unowned var s1 in args) {
+			foreach (unowned var s2 in args) {
+				if (s1 != null && s2 != null)
+					continue;
+				shield.check(() => {
+					free(ft_strtrim(s1, s2));
+					return true;
+				}, @"strtrim($(quote(s1)), $(quote(s2)))");
+			}
+		}
+		result.append(shield.msg());
+
 		string check(string? s1, string? s2, string? cmp) {
 			return SupraTest.test(null, () => {
 				char *s = ft_strtrim(s1, s2);
 				if (s == null) {
+					if (cmp != null)
+						stderr.printf("You:NULL Me:\"%s\"", cmp);
 					return (cmp == null);
 				}
 				if ((string)s == cmp) {
 					free(s);
 					return true;
 				}
-				stderr.printf("You:'%s' Me:'%s'", (string)s, cmp);
+				stderr.printf("You:\"%s\" Me:\"%s\"", (string)s, cmp);
 				free(s);
 				return false;
-			}).msg_err("strtrim('%s', %s) ".printf(s1 ?? "(null)", s2 ?? "(null)"));
+			}).msg_err(@"strtrim($(quote(s1)), $(quote(s2))) ");
 		}
 
 		/* 1 */ result.append(check("hello salut", "salut", "hello "));
@@ -39,13 +55,14 @@ string run_strtrim() {
 		/* 16 */ result.append(check("lorem ipsum dolor sit amet", "tel", "orem ipsum dolor sit am"));
 		/* 17 */ result.append(check("          ", " ", ""));
 		/* 18 */ result.append(check("          ", "          ", ""));
-		/* 19 */ result.append(check(null, null, null));
-		/* 20 */ result.append(check("a", null, null));
-		/* 21 */ result.append(check("", null, null));
-		/* 22 */ result.append(check(null, "", null));
-		/* 23 */ result.append(check(null, "abc", null));
-
-		/* 24 */ result.append(SupraTest.test_each_malloc((n)=>{
+		/* 19 */ result.append(SupraTest.test_min_alloc(3, ()=>{
+			char *s = ft_strtrim("  ab  ", " ");
+			if (s == null)
+				return false;
+			delete s;
+			return true;
+		}, "strtrim(\"  ab  \", \" \")").msg_err());
+		/* 20 */ result.append(SupraTest.test_each_malloc((n)=>{
 			SupraLeak.fail_at(n);
 			char *s = ft_strtrim("ab", "ab");
 			SupraLeak.fail_at(0);

@@ -10,8 +10,9 @@ string run_strlcat() {
 				char d2[61];
 				char s1[61];
 				char s2[61];
-				Memory.set(d1, '\0', 61); Memory.copy(d1, dest, dest.length);
-				Memory.set(d2, '\0', 61); Memory.copy(d2, dest, dest.length);
+				// garbage after dest: a missing '\0' or a write past n is visible
+				Memory.set(d1, 'X', 60); d1[60] = '\0'; Memory.copy(d1, dest, dest.length + 1);
+				Memory.set(d2, 'X', 60); d2[60] = '\0'; Memory.copy(d2, dest, dest.length + 1);
 				Memory.set(s1, '\0', 61); Memory.copy(s1, src, src.length);
 				Memory.set(s2, '\0', 61); Memory.copy(s2, src, src.length);
 				size_t len1 = 0;
@@ -24,12 +25,12 @@ string run_strlcat() {
 					stderr.printf("return > you: %zu, me: %zu", len1, len2);
 					b = false;
 				}
-				if (Memory.cmp(d1, d2, 20) != 0) {
-					stderr.printf("dest >  you: '%s' Me: '%s'", (string)d1 ?? "(null)", (string)d2 ?? "(null)");
+				if (Memory.cmp(d1, d2, 61) != 0) {
+					stderr.printf("dest >  you: \"%s\" Me: \"%s\"", (string)d1, (string)d2);
 					b = false;
 				}
 				return b;
-			}).msg_err(@"strlcat('$dest', '$src', $n)");
+			}).msg_err(@"strlcat(\"$dest\", \"$src\", $n)");
 		}
 		/* 1 */ result.append(check("", "valac", 12));
 		/* 2 */ result.append(check("valac", "", 12));
@@ -53,23 +54,23 @@ string run_strlcat() {
 		/* 19 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, "", 0);
 			return true;
-		}, "strlcat(NULL, '', 0)").msg());
+		}, "strlcat(NULL, \"\", 0)").msg_crash_warn());
 
 		/* 20 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 0);
 			return false;
-		}, "strlcat(null, null, 0) No Crash").msg_need_segfault());
+		}, "strlcat(NULL, NULL, 0) No Crash").msg_need_segfault());
 
 		/* 21 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 1);
 			return false;
-		}, "strlcat(null, null, 1) No Crash").msg_need_segfault());
+		}, "strlcat(NULL, NULL, 1) No Crash").msg_need_segfault());
 
 		/* 22 */ result.append(SupraTest.test(null, () => {
 			string str = "hello";
 			ft_strlcat(str, null, 0);
 			return false;
-		}, "strlcat(\"hello\", null, 0) No Crash").msg_need_segfault());
+		}, "strlcat(\"hello\", NULL, 0) No Crash").msg_need_segfault());
 
 
 		/* 23 */ result.append(SupraTest.test(null, () => {
@@ -83,14 +84,20 @@ string run_strlcat() {
 		}, """strlcat(NULL, "source", 1) No Crash""").msg_need_segfault());
 
 		/* 25 */ result.append(SupraTest.test(null, () => {
-			return (ft_strlcat(null, "source", 0) == 6);
-		}).msg("ft_strlcat(NULL, \"source\", 0) != 6"));
+			size_t r = ft_strlcat(null, "source", 0);
+			if (r != 6)
+				stderr.printf("You: %zu Me: 6", r);
+			return (r == 6);
+		}, "strlcat(NULL, \"source\", 0)").msg_crash_warn());
 
 
 		/* 26 */ result.append(SupraTest.test(null, () => {
 			string s = "abcdef";
-			return (ft_strlcat(s, "source", 0) == 6);
-		}).msg("ft_strlcat(\"abcdef\", \"source\", 0) != 6"));
+			size_t r = ft_strlcat(s, "source", 0);
+			if (r != 6)
+				stderr.printf("You: %zu Me: 6", r);
+			return (r == 6);
+		}).msg_err("strlcat(\"abcdef\", \"source\", 0)"));
 
 		return (owned)result.str;
 	}

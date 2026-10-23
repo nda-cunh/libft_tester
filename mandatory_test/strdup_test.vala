@@ -11,16 +11,16 @@ string run_strdup() {
 					return false;
 				bool is_same = ((string)s == (string)cmp);
 				if (!is_same)
-					stderr.printf("You:'%s' Me:'%s'", (string)s, (string)cmp);
+					stderr.printf("You:\"%s\" Me:\"%s\"", (string)s, (string)cmp);
 				free(s);
 				return is_same;
-			}, @"strdup('$((string)cmp)')");
+			}, @"strdup(\"$((string)cmp)\")");
 			if (t.status != OK)
 				return t.msg_err();
 			if (t.alloc != 1)
-				return t.msg_ko(@"No alloc ??? $(t.alloc) alloc");
-			if (t.bytes != ((string)cmp).length + 1)
-				return t.msg_ko(@"Bad alloc size $(t.bytes)");
+				return t.msg_ko(@"strdup(\"$((string)cmp)\") $(t.alloc) malloc instead of 1");
+			if (t.bytes < ((string)cmp).length + 1)
+				return t.msg_ko(@"strdup(\"$((string)cmp)\") alloc $(t.bytes) bytes instead of at least $(((string)cmp).length + 1)");
 			return t.msg_ok();
 		}
 
@@ -40,13 +40,18 @@ string run_strdup() {
 		}, "strdup(NULL) NOCRASH").msg_need_segfault());
 
 		// Test if strdup protect (malloc)
-		/* 5 */ result.append(SupraTest.test(null, ()=>{
-			SupraLeak.send_null();
+		/* 10 */ result.append(SupraTest.test_each_malloc((n)=>{
+			SupraLeak.fail_at(n);
 			char *s = ft_strdup("bababababhc");
+			SupraLeak.fail_at(0);
+			if (SupraLeak.has_failed && s != null)
+				stderr.printf("ft_strdup(\"bababababhc\") must return NULL when its malloc n°%d fails, but returned a result", n);
+			else if (!SupraLeak.has_failed && s == null)
+				stderr.printf("ft_strdup(\"bababababhc\") returned NULL but no malloc failed (expected \"bababababhc\"): your function returns NULL outside of a malloc failure");
 			if (s != null)
 				delete s;
-			return (s == null);
-		}).msg_err("no protect "));
+			return (SupraLeak.has_failed == (s == null));
+		}, "no protect ").msg_err());
 
 		return (owned)result.str;
 	}

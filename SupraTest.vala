@@ -1,14 +1,21 @@
 
 public string read_all(string file) {
-	var stream = FileStream.open(file, "r");
-	if (stream == null)
+	try {
+		string contents;
+		FileUtils.get_contents(file, out contents);
+		return contents;
+	}
+	catch (Error e) {
+		warning ("Error reading file %s: %s", file, e.message);
 		return "";
-	var str = new StringBuilder();
-	uint8 buff[8192];
-	size_t len = 0;
-	while((len = stream.read (buff)) >= 1)
-		str.append ((string)buff[0:len]);
-	return str.str;
+	}
+}
+
+/* C-like display of a string argument: "abc", or NULL */
+public string quote(string? s) {
+	if (s == null)
+		return "NULL";
+	return "\"%s\"".printf(s);
 }
 
 //   SUPRATEST
@@ -63,6 +70,26 @@ namespace SupraTest{
 			if (this.status == OK || this.status == KO || this.status == LEAK)
 				return (this.msg_warn());
 			return (this.msg_err());
+		}
+
+		/**
+		 * For undefined behaviour that the libc handles without crashing
+		 * (NULL with a size of 0): a crash is only a warning
+		 */
+		public string msg_crash_warn (string? format = null) {
+			if (this.status == SIGSEGV || this.status == SIGBUS)
+				return this.msg_warn(format);
+			return this.msg_err(format);
+		}
+
+		/**
+		 * For undefined behaviour with no libc to copy (NULL in part 2):
+		 * crashing and protecting are both fine, only a leak or a timeout is an error
+		 */
+		public string msg_crash_ok (string? format = null) {
+			if (this.status == SIGSEGV || this.status == SIGBUS)
+				return this.msg_ok();
+			return this.msg_err(format);
 		}
 
 		public string msg_warn (string? format = null) {
@@ -250,9 +277,14 @@ namespace SupraTest{
 	}
 
 
-
-
-
+	public Test test_min_alloc(size_t min_bytes, testFunction func, string err_message = "") {
+		Test result = test(null, func, err_message);
+		if (result.status == OK && result.bytes < min_bytes) {
+			result.status = KO;
+			result.message = @"$(err_message) alloc $(result.bytes) bytes instead of at least $(min_bytes)";
+		}
+		return result;
+	}
 
 	public delegate bool mallocFunction(int n);
 

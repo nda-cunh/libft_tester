@@ -1,26 +1,29 @@
-le SupraTester pour la libft de l'école 42 (Linux ~~Mac Os~~)
+The SupraTester for the 42 school libft (Linux ~~Mac Os~~)
 
 # INSTALLATION
 
-    cloner le repo dans votre libft ou à sa racine.
-	executer './install.sh' pour compiler et install le libft_tester
-	le fichier `libft_tester` a été créé
-	lancer le avec `./libft_tester`
+	clone the repo inside your libft or at its root.
+	run './install.sh' to compile and install the libft_tester
+	the `libft_tester` file has been created
+	run it with `./libft_tester`
 
-# REQUIS
-    ``vala et un compileur C (clang ou gcc)``
-    ``compileur C (clang ou gcc)``
-    ``meson.build et ninja``
+# REQUIREMENTS
+	``vala``
+	``a C compiler (clang or gcc)``
+	``meson and ninja``
 
 # NOTES
-	
-si vous voyez des 'EEEEEEE' c'est parceque le libft_tester rempli la stack et la heap par des 'E' avant de lancer vos testes
+
+If you see some 'EEEEEEE', it's because the libft_tester fills the stack and the heap with 'E' before running your tests.
+
+`[🛡️ ]` means your function survives NULL arguments, `[  ]` means it crashes on them.
+NULL is undefined for the non-libc functions (part 2 and 3), so both are fine.
 
 # SupraTester
 
-Il permet de charger vos fonctions et de les tester
-de manière asynchrone et rapide sur plusieurs processeurs.
+It loads your functions and tests them
+asynchronously and fast on several processors.
 
-Il teste la mémoire avec SupraLeak pour un gain de vitesse :)
+It checks the memory with SupraLeak to stay fast :)
 
-Une idée ? Autre chose ? Faites une issue !
+An idea? Something else? Open an issue!

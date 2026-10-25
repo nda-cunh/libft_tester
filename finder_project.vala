@@ -143,7 +143,7 @@ public string? generate_libft_so (string dir_makefile) throws Error {
 		if (!FileUtils.test(@"$dir_makefile/libft.a", FileTest.EXISTS))
 			throw new FileError.ACCES ("Error while running make (no libft.a)");
 
-		stderr.printf(p_supra + "Do you want running your last libft.a ? [y/N]");
+		stderr.printf(p_supra + "Do you want to run your latest libft.a ? [y/N]");
 		string? answer = stdin.read_line();
 		if (answer == null || answer.strip().ascii_down() != "y")
 			throw new FileError.ACCES ("Error while running make");

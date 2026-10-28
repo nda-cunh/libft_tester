@@ -13,18 +13,18 @@ string run_strnstr() {
 				return true;
 			}).msg_err();
 		}
-		/* 1 */  result += check("a", "super magique", 3);
-		/* 2 */  result += check("a", "super magique", 42);
+		/* 1 */  result += check("a", "c'est supra magique", 3);
+		/* 2 */  result += check("a", "c'est supra magique", 42);
 		/* 3 */  result += check("abc", "zzzzzzzzzzzabczzzzzzzzz", 3);
 		/* 4 */  result += check("abc", "zzzzzzzzzzzabczzzzzzzzz", 42);
 		/* 5 */  result += check("", "zzzzzzzzzzzabczzzzzzzzz", 42);
 		/* 6 */  result += check("", "", 42);
 		/* 7 */  result += check("", "", 0);
 		/* 8 */  result += check("zzzzzzzzzzzabczzzzzzzzz", "", 42);
-		/* 9 */  result += check("supravim n'est point un IDE", "vim", 42);
-		/* 10 */  result += check("supravim n'est point un IDE", "vim", 8);
-		/* 11 */  result += check("supravim n'est point un IDE", "vim", 7);
-		/* 12 */  result += check("supravim n'est point un IDE", "vim", 6);
+		/* 9 */  result += check("supravim est supra bien", "vim", 42);
+		/* 10 */  result += check("supravim est supra bien", "vim", 8);
+		/* 11 */  result += check("supravim est supra bien", "vim", 7);
+		/* 12 */  result += check("supravim est supra bien", "vim", 6);
 		/* 13 */  result += check("hello\0world", "world", 42);
 		/* 14 */  result += check("lorem ipsum dolor sit amet", "dol", 30);
 		/* 15 */  result += check("lorem ipsum dolor sit amet", "consectetur", 30);

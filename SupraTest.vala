@@ -19,7 +19,7 @@ public string quote(string? s) {
 }
 
 //   SUPRATEST
-public enum Status{
+public enum Status {
 	OK = 0,
 	KO = 1,
 	SIGINT = 2,
@@ -44,6 +44,7 @@ namespace SupraTest{
 		int				free;
 		size_t			bytes;
 		bool			malloc_failed;
+		public int32	elapsed_time;
 
 		public Test(string message) {
 			this.message = message;
@@ -220,6 +221,44 @@ namespace SupraTest{
 	[CCode (cname = "WEXITSTATUS", cheader_filename="sys/wait.h")]
 	extern int exit_status(int status);
 
+	[CCode (cname = "poison_stack")]
+	extern void poison_stack();
+
+	[CCode (cname = "g_source_set_callback", cheader_filename = "glib.h")]
+	extern void child_watch_set_callback(ChildWatchSource source, [CCode (type = "GSourceFunc")] owned ChildWatchFunc func);
+
+	Status wait_child(Posix.pid_t child_pid, uint time) {
+		var ctx = new MainContext();
+		var loop = new MainLoop(ctx);
+		Status status = KO;
+		bool timed_out = false;
+
+		var child_watch = new ChildWatchSource(child_pid);
+		child_watch_set_callback(child_watch, (pid, wait_status) => {
+			if (Process.if_exited(wait_status))
+				status = (Status)exit_status(wait_status);
+			else if (Process.if_signaled(wait_status))
+				status = (Status)Process.term_sig(wait_status);
+			loop.quit();
+		});
+		child_watch.attach(ctx);
+
+		var timeout = new TimeoutSource.seconds(time);
+		timeout.set_callback(() => {
+			// the child watch still reaps it, no zombie
+			Posix.kill(child_pid, Posix.Signal.KILL);
+			timed_out = true;
+			return Source.REMOVE;
+		});
+		timeout.attach(ctx);
+
+		loop.run();
+		timeout.destroy();
+		if (timed_out)
+			return TIMEOUT;
+		return status;
+	}
+
 	public Test test(uint? timeout, testFunction func, string err_message = "") {
 		uint time;
 		if (timeout == null)
@@ -237,12 +276,7 @@ namespace SupraTest{
 		var child_pid = Posix.fork();
 		if (child_pid == 0) {
 
-			// Write in STACK memory EEEEE
-			{
-				uint8 memory[8192];
-				Memory.set(memory, 'E', 4046);
-				Memory.set(&memory[4046], '\0', 4046);
-			}
+			poison_stack();
 
 			result.init_sig();
 			SupraLeak.reset();
@@ -255,26 +289,9 @@ namespace SupraTest{
 			Posix.exit((b == true) ? 0 : 1);
 		}
 
-
-		// Async waitpid
-		var timer = new Timer();
-		while (true) {
-			int status;
-			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
-				if (Process.if_exited(status))
-					result.status = (Status)exit_status(status);
-				else if (Process.if_signaled(status))
-					result.status = (Status)Process.term_sig(status);
-				break;
-			}
-			if ((uint)timer.elapsed() >= time){
-				Posix.kill(child_pid, Posix.Signal.KILL);
-				Posix.waitpid(child_pid, out status, 0);
-				result.status = TIMEOUT;
-				break;
-			}
-			Thread.usleep(500);
-		}
+		Timer timer = new Timer();
+		result.status = wait_child(child_pid, time);
+		result.elapsed_time = (int32)(timer.elapsed() * 1000000);
 
 		Posix.close(fd_err);
 		result.stderr = read_all((string)template_stderr);
@@ -349,12 +366,7 @@ namespace SupraTest{
 		var child_pid = Posix.fork();
 		if (child_pid == 0) {
 
-			// Write in STACK memory EEEEE
-			{
-				uint8 memory[8192];
-				Memory.set(memory, 'E', 4046);
-				Memory.set(&memory[4046], '\0', 4046);
-			}
+			poison_stack();
 			result.init_sig();
 			SupraLeak.reset();
 			Posix.dup2(fd_out, 1);
@@ -368,26 +380,9 @@ namespace SupraTest{
 			Posix.exit(1);
 		}
 
-
-		// Async waitpid
-		var timer = new Timer();
-		while (true) {
-			int status;
-			if (0 != Posix.waitpid(child_pid, out status, Posix.WNOHANG)) {
-				if (Process.if_exited(status))
-					result.status = (Status)exit_status(status);
-				else if (Process.if_signaled(status))
-					result.status = (Status)Process.term_sig(status);
-				break;
-			}
-			if ((uint)timer.elapsed() >= timeout){
-				Posix.kill(child_pid, Posix.Signal.KILL);
-				Posix.waitpid(child_pid, out status, 0);
-				result.status = TIMEOUT;
-				break;
-			}
-			Thread.usleep(500);
-		}
+		Timer timer = new Timer();
+		result.status = wait_child(child_pid, timeout);
+		result.elapsed_time = (int32)(timer.elapsed() * 1000000);
 
 		Posix.close(fd_out);
 		Posix.close(fd_err);

@@ -50,40 +50,42 @@ string run_strlcat() {
 		/* 16 */ result.append(check("1", "2", 2));
 		/* 17 */ result.append(check("", "", 12));
 		/* 18 */ result.append(check("rrrrrrrrrrrrrrr", "lorem ipsum dolor sit amet", 5));
+		/* 19 */ result.append(check("BBBB", "AAAAAAAAA", 3));
+		/* 20 */ result.append(check("1111111111", "lorem ipsum dolor sit amet", 5));
 
-		/* 19 */ result.append(SupraTest.test(null, () => {
+		/* 21 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, "", 0);
 			return true;
 		}, "strlcat(NULL, \"\", 0)").msg_crash_warn());
 
-		/* 20 */ result.append(SupraTest.test(null, () => {
+		/* 22 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 0);
 			return false;
 		}, "strlcat(NULL, NULL, 0) No Crash").msg_need_segfault());
 
-		/* 21 */ result.append(SupraTest.test(null, () => {
+		/* 23 */ result.append(SupraTest.test(null, () => {
 			ft_strlcat(null, null, 1);
 			return false;
 		}, "strlcat(NULL, NULL, 1) No Crash").msg_need_segfault());
 
-		/* 22 */ result.append(SupraTest.test(null, () => {
+		/* 24 */ result.append(SupraTest.test(null, () => {
 			string str = "hello";
 			ft_strlcat(str, null, 0);
 			return false;
 		}, "strlcat(\"hello\", NULL, 0) No Crash").msg_need_segfault());
 
 
-		/* 23 */ result.append(SupraTest.test(null, () => {
+		/* 25 */ result.append(SupraTest.test(null, () => {
 			string str = "hello";
 			ft_strlcat(str, null, 1);
 			return false;
 		}, "strlcat(\"hello\", NULL, 1) No Crash").msg_need_segfault());
 
-		/* 24 */ result.append(SupraTest.test(null, () => {
+		/* 26 */ result.append(SupraTest.test(null, () => {
 			return (ft_strlcat(null, "source", 1) == 6);
 		}, """strlcat(NULL, "source", 1) No Crash""").msg_need_segfault());
 
-		/* 25 */ result.append(SupraTest.test(null, () => {
+		/* 27 */ result.append(SupraTest.test(null, () => {
 			size_t r = ft_strlcat(null, "source", 0);
 			if (r != 6)
 				stderr.printf("You: %zu Me: 6", r);
@@ -91,7 +93,7 @@ string run_strlcat() {
 		}, "strlcat(NULL, \"source\", 0)").msg_crash_warn());
 
 
-		/* 26 */ result.append(SupraTest.test(null, () => {
+		/* 28 */ result.append(SupraTest.test(null, () => {
 			string s = "abcdef";
 			size_t r = ft_strlcat(s, "source", 0);
 			if (r != 6)

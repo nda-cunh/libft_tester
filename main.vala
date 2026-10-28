@@ -262,13 +262,35 @@ void check_update () {
 	catch (Error e) {}
 }
 
-async void main() {
+public string? versus = null;
+
+private const GLib.OptionEntry[] options = {
+	{ "versus", '\0', OptionFlags.NONE, OptionArg.STRING, ref versus, "Benchmark your libft against libc or another libft (.so, .a or folder with a Makefile)", "libc|LIBFT" },
+	{ null }
+};
+
+async void main (string[] args) {
+	Log.set_default_handler(()=> {});
+	Intl.setlocale();
+	try {
+		var context = new OptionContext("libft_tester");
+		context.add_main_entries (options, null);
+		context.parse (ref args);
+	}
+	catch (Error e) {
+		stderr.printf ("\033[31m[SupraTest]\033[0m %s", e.message);
+		return;
+	}
+
+	if (versus != null) {
+		versus_mode(versus);
+		return;
+	}
+
 	check_update();
 	print("\n--------------- [ LIBFT TESTER ] ---------------\n");
 	print("CPU: [%u] ", get_num_processors());
 	print("%s\n\n", get_num_processors() > 2 ? "\033[92mFast Mode enabled\033[0m" : "\033[91mFast Mode disabled\033[0m");
-	Log.set_default_handler(()=> {});
-	Intl.setlocale();
 
 	try {
 		var tester = new LibftTester();

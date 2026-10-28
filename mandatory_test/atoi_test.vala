@@ -36,8 +36,11 @@ string run_atoi() {
 		/* 23 */ result.append(check("+999"));
 		/* 24 */ result.append(check(" 000002147483647"));
 		/* 25 */ result.append(check(" 000-2147483648"));
+		/* 26 */ result.append(check("+-42"));
+		/* 27 */ result.append(check("-+42"));
+		/* 28 */ result.append(check("++42"));
 
-		/* 26 */
+		/* 29 */
 		for (int N = 0; N < 5; ++N)
 		{
 			var i = Random.int_range(int.MIN, int.MAX);

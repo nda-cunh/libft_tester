@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/nda-cunh/libsupratest.git
+revision = head
+depth = 1
+
+[provide]
+supratest = supratest_dep

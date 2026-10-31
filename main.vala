@@ -5,7 +5,7 @@ Loader loader;
 class LibftTester {
 
 	public LibftTester () throws Error {
-		var libft = find_libft();
+		var libft = SupraFinder.find_and_build ("libft", {"libft"}, true);
 		loader = new Loader(libft);
 	}
 
@@ -168,7 +168,7 @@ class LibftTester {
 		catch (Error e) {
 			stderr.printf ("\033[31m[SupraTest]\033[0m %s", e.message);
 		}
-		remove_tmp_dir (Path.get_dirname (loader.library_path));
+		SupraFinder.remove_tmp_dir (Path.get_dirname (loader.library_path));
 	}
 
 

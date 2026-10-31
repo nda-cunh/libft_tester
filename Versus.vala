@@ -40,7 +40,7 @@ class Bench {
 		this.iterations = iterations;
 	}
 
-	public ulong run_once () {
+	public int64 run_once () {
 		return SupraTest.test(3, ()=> {
 			for (int j = 0; j < iterations; j++)
 				call ();
@@ -53,23 +53,23 @@ const int RUNS = 5;
 
 double fork_us = -1.0;
 
-double per_call_ns (ulong best, int iterations) {
+double per_call_ns (int64 best, int iterations) {
 	double us = double.max ((double)best - fork_us, 0.001);
 	return us * 1000.0 / iterations;
 }
 
 void duel (Bench a, Bench b, out double a_ns, out double b_ns) {
 	if (fork_us < 0.0) {
-		ulong empty = ulong.MAX;
+		int64 empty = int64.MAX;
 		for (int i = 0; i < RUNS; i++)
-			empty = ulong.min (empty, SupraTest.test(3, ()=> true).elapsed_time);
+			empty = int64.min (empty, SupraTest.test(3, ()=> true).elapsed_time);
 		fork_us = (double)empty;
 	}
-	ulong best_a = ulong.MAX;
-	ulong best_b = ulong.MAX;
+	int64 best_a = int64.MAX;
+	int64 best_b = int64.MAX;
 	for (int i = 0; i < RUNS; i++) {
-		best_a = ulong.min (best_a, a.run_once ());
-		best_b = ulong.min (best_b, b.run_once ());
+		best_a = int64.min (best_a, a.run_once ());
+		best_b = int64.min (best_b, b.run_once ());
 	}
 	a_ns = per_call_ns (best_a, a.iterations);
 	b_ns = per_call_ns (best_b, b.iterations);
@@ -667,11 +667,11 @@ LibValue load_opponent (string versus) throws Error {
 	string path = File.new_for_path (versus).get_path ();
 	opp = opponent_name (path);
 	if (FileUtils.test (path, FileTest.IS_DIR))
-		return new LibValue (generate_libft_so (path));
+		return new LibValue (SupraFinder.build_so (path, "libft", true));
 	if (!FileUtils.test (path, FileTest.EXISTS))
 		throw new FileError.NOENT ("%s: no such file", versus);
 	if (path.has_suffix (".a"))
-		return new LibValue (extract_libft_dll (path));
+		return new LibValue (SupraFinder.archive_to_so (path, "libft"));
 	return new LibValue (path);
 }
 
@@ -679,7 +679,7 @@ public void versus_mode (string versus) {
 	LibValue val_me;
 	LibValue val_opp;
 	try {
-		var libft = find_libft ();
+		var libft = SupraFinder.find_and_build ("libft", {"libft"}, true);
 		Versus.init_strings ();
 		stdout.flush ();
 		val_me = new LibValue (libft);

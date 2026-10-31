@@ -1,22 +1,16 @@
 project('libft_tester', ['c', 'vala'], default_options : ['optimization=2'])
 
 files_vala = files(
-  'Loader.vala',
-  'Module.vapi',
-  'SupraLeak.vala',
-  'SupraTest.vala',
   'Versus.vala',
   'delegate.vala',
-  'finder_project.vala',
-  'leak.c',
   'main.vala',
-  'poison.c',
 )
 
 subdir('mandatory_test')
 subdir('bonus_test')
 
 vala_lib = [
+  dependency('supratest'),
   dependency('glib-2.0'),
   dependency('gio-2.0'),
   meson.get_compiler('vala').find_library('posix'),

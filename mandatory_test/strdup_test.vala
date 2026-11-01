@@ -53,6 +53,24 @@ string run_strdup() {
 			return (SupraLeak.has_failed == (s == null));
 		}, "no protect ").msg_err());
 
+		result.append(SupraTest.test_x_alloc (6, () => {
+			void* mem = ft_strdup("salut");
+			free(mem);
+			return true;
+		}, "ft_strdup(\"salut\")").msg_ok());
+
+		result.append(SupraTest.test_x_alloc (1, () => {
+			void* mem = ft_strdup("");
+			free(mem);
+			return true;
+		}, "ft_strdup(\"\")").msg_ok());
+
+		result.append(SupraTest.test_x_alloc (5, () => {
+			void* mem = ft_strdup("andy");
+			free(mem);
+			return true;
+		}, "ft_strdup(\"andy\")").msg_ok());
+
 		return (owned)result.str;
 	}
 	catch (Error e) {

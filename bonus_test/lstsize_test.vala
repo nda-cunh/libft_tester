@@ -55,6 +55,20 @@ string run_lstsize() {
 				stderr.printf("You: %u Me: 0", size);
 			return (size == 0);
 		}).msg_err("lstsize(NULL)");
+
+		result += SupraTest.test(null, () => {
+		    t_list *node1 = t_list.create((void *)null);
+			node1->append((void *)null);
+			node1->append((void *)null);
+			node1->append((void *)null);
+			node1->append((void *)null);
+			uint size = ft_lstsize(node1);
+			stderr.printf("size: %u != 5\n", size);
+			t_list.free_list(node1);
+			if (size != 5)
+			    return false;
+			return true;
+		}).msg_err();
 	}
 	catch (Error e) {
 		return @"$result \033[31m$(e.message)\033[0m";

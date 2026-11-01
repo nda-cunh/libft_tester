@@ -40,7 +40,7 @@ string run_calloc() {
 			return true;
 		}, "calloc(13, 4)").msg_err();
 
-		/* 3 */ result += SupraTest.test_min_alloc(52, ()=>{
+		/* 3 */ result += SupraTest.test_x_alloc(52, ()=>{
 			void *mem = ft_calloc(13, 4);
 			if (mem == null)
 				return false;
@@ -48,7 +48,23 @@ string run_calloc() {
 			return true;
 		}, "calloc(13, 4)").msg_err();
 
-		/* 4 */ result += SupraTest.test(null, ()=>{
+		/* 4 */ result += SupraTest.test_x_alloc(12, ()=>{
+			void *mem = ft_calloc(1, 12);
+			if (mem == null)
+				return false;
+			free(mem);
+			return true;
+		}, "calloc(1, 12)").msg_err();
+
+		/* 5 */ result += SupraTest.test_x_alloc(12, ()=>{
+			void *mem = ft_calloc(12, 1);
+			if (mem == null)
+				return false;
+			free(mem);
+			return true;
+		}, "calloc(12, 1)").msg_err();
+
+		/* 6 */ result += SupraTest.test(null, ()=>{
 			SupraLeak.send_null();
 			char *s = ft_calloc(42, 1);
 			if (s != null)
@@ -72,9 +88,9 @@ string run_calloc() {
 				return ok;
 			}, @"calloc($nmemb, $size)").msg_err();
 		}
-		/* 5 */ result += check_zero(0, 1);
-		/* 6 */ result += check_zero(1, 0);
-		/* 7 */ result += check_zero(0, 0);
+		/* 7 */ result += check_zero(0, 1);
+		/* 8 */ result += check_zero(1, 0);
+		/* 9 */ result += check_zero(0, 0);
 
 		// nmemb * size overflows: must return NULL, not a tiny block
 		string check_overflow(size_t nmemb, size_t size, string msg) {

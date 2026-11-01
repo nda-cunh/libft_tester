@@ -319,6 +319,14 @@ namespace SupraTest{
 		return result;
 	}
 
+	public Test test_x_alloc(size_t bytes, testFunction func, string err_message = "") {
+		Test result = test(null, func, err_message);
+		if (result.status == OK && result.bytes != bytes) {
+			result.status = KO;
+			result.message = @"$(err_message) alloc $(result.bytes) bytes instead of $(bytes)";
+		}
+		return result;
+	}
 
 	public Test test_min_alloc(size_t min_bytes, testFunction func, string err_message = "") {
 		Test result = test(null, func, err_message);
